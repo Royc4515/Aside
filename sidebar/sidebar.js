@@ -546,8 +546,10 @@ function renderTables(text) {
 
 // ── Direction ─────────────────────────────────────────────────────────
 (function setDir() {
-  const docDir = (window.parent?.document?.dir) || '';
-  if (docDir) document.documentElement.dir = docDir;
+  try {
+    const docDir = window.parent?.document?.dir || '';
+    if (docDir) document.documentElement.dir = docDir;
+  } catch {}
 })();
 
 init();
