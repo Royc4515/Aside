@@ -303,25 +303,23 @@ async function handleAction(action) {
 
   switch (action) {
     case 'summarize':
-      if (!pageContent) return showError('Could not read this page.');
-      content = 'Summarize this page in concise bullet points.';
-      label = 'summarize'; break;
     case 'extract':
-      if (!pageContent) return showError('Could not read this page.');
-      content = 'Extract all structured data from this page as a markdown table with clear headers.';
-      label = 'extract'; break;
     case 'translate-page':
+    case 'rewrite-page': {
       if (!pageContent) return showError('Could not read this page.');
-      content = 'Translate the content of this page to English. Preserve structure.';
-      label = 'translate'; break;
-    case 'rewrite-page':
-      if (!pageContent) return showError('Could not read this page.');
-      content = 'Rewrite the page content to be clearer and more concise.';
-      label = 'rewrite'; break;
-    case 'find-prompt':
-      document.getElementById('ask-input').focus();
-      document.getElementById('ask-input').placeholder = 'What should I find on this page?';
+      const cfg = PAGE_ACTIONS[action];
+      content = cfg.content;
+      display = cfg.display;
+      label   = cfg.label;
+      break;
+    }
+    case 'find':
+    case 'find-prompt': {
+      const inp = document.getElementById('ask-input');
+      inp.placeholder = 'What should I find on this page?';
+      inp.focus();
       return;
+    }
     case 'explain':
       if (!selectedText) return showError('Select some text first.');
       content = `Explain this clearly and concisely:\n\n"${selectedText}"`;
