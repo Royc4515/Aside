@@ -6,6 +6,8 @@ let pageContent  = '';
 let turns        = [];      // { role, content, display?, action?, model?, html?, loading?, streaming? }
 let activeTab    = 'chat';
 let pickerOpen   = false;
+let langPickerOpen = false;
+let detectedLang = '';
 let busy         = false;
 let _renderPending = false;
 
@@ -52,6 +54,7 @@ async function init() {
   await loadSettings();
   bindUI();
   renderHeader();
+  renderLangBtn();
   renderHero();
   renderTools();
   renderCmdbar();
@@ -76,6 +79,7 @@ function bindUI() {
   document.getElementById('settings-btn').onclick = () => chrome.runtime.openOptionsPage();
   document.getElementById('onboarding-settings-btn').onclick = () => chrome.runtime.openOptionsPage();
   document.getElementById('new-chat-btn').onclick = newChat;
+  document.getElementById('lang-btn').onclick = () => toggleLangPicker();
   document.getElementById('model-btn').onclick = () => togglePicker();
 
   document.getElementById('ask-btn').onclick = handleAsk;
@@ -189,6 +193,68 @@ function togglePicker() {
   });
 }
 
+// ── Language picker ────────────────────────────────────────────────────
+function renderLangBtn() {
+  const btn  = document.getElementById('lang-btn');
+  if (!btn) return;
+  const code = getEffectiveLang(settings.language, detectedLang);
+  const stored = settings.language || 'auto';
+  // Show 2-letter code when a language is active, globe otherwise
+  if (code) {
+    btn.textContent = '';
+    btn.setAttribute('data-lang', code);
+    // show flag-like 2-letter code
+    const span = document.createElement('span');
+    span.className = 'sb-lang-code';
+    span.textContent = code.toUpperCase();
+    btn.appendChild(span);
+  } else {
+    btn.textContent = '';
+    btn.setAttribute('data-lang', '');
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+  }
+  const isAuto = stored === 'auto';
+  btn.title = isAuto
+    ? (code ? `Language: Auto (${LANG_NAMES[code] || code})` : 'Language: Auto')
+    : `Language: ${LANG_NAMES[stored] || stored}`;
+}
+
+function toggleLangPicker() {
+  langPickerOpen = !langPickerOpen;
+  const host = document.getElementById('lang-picker-host');
+  document.getElementById('lang-btn').setAttribute('aria-expanded', String(langPickerOpen));
+  if (!langPickerOpen) { host.innerHTML = ''; return; }
+
+  const stored   = settings.language || 'auto';
+  const autoHint = detectedLang ? ` (${LANG_NAMES[detectedLang] || detectedLang})` : '';
+
+  host.innerHTML = `
+    <div class="sb-picker-veil" id="lang-picker-veil"></div>
+    <div class="sb-picker" role="listbox">
+      <div class="sb-picker-label">Response language</div>
+      ${LANGUAGES.map(l => {
+        const isActive  = l.code === stored;
+        const sublabel  = l.code === 'auto' ? `<span class="sb-picker-model">${autoHint || 'detect from page'}</span>` : '';
+        const check     = isActive ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>` : '';
+        return `<button class="sb-picker-row${isActive ? ' is-active' : ''}" data-lang="${l.code}">
+          <span class="sb-picker-name">${l.label}</span>
+          ${sublabel}${check}
+        </button>`;
+      }).join('')}
+    </div>`;
+
+  document.getElementById('lang-picker-veil').onclick = () => toggleLangPicker();
+  host.querySelectorAll('.sb-picker-row').forEach(b => {
+    b.onclick = async () => {
+      const code = b.dataset.lang;
+      settings.language = code;
+      await chrome.storage.sync.set({ language: code });
+      renderLangBtn();
+      toggleLangPicker();
+    };
+  });
+}
+
 // ── Hero suggestions ───────────────────────────────────────────────────
 function renderHero() {
   const wrap = document.getElementById('hero-suggest');
@@ -249,6 +315,7 @@ window.addEventListener('message', (e) => {
   const msg = e.data;
   if (!msg || typeof msg !== 'object') return;
   if (msg.type === 'PAGE_CONTENT')  pageContent = msg.content || '';
+  if (msg.type === 'PAGE_LANG')     { detectedLang = msg.lang || ''; renderLangBtn(); }
   if (msg.type === 'SELECTED_TEXT') { selectedText = msg.text || ''; updateSelectionUI(); }
   if (msg.type === 'SIDEBAR_OPENED') {
     if (msg.dir === 'rtl' || msg.dir === 'ltr') document.documentElement.dir = msg.dir;
@@ -480,10 +547,7 @@ function showError(msg) {
 
 // ── Helpers ────────────────────────────────────────────────────────────
 function getLanguageName() {
-  const lang = settings.language;
-  if (!lang || lang === 'auto') return '';
-  const names = { en:'English', he:'Hebrew', es:'Spanish', fr:'French', de:'German', zh:'Chinese', ar:'Arabic', ja:'Japanese' };
-  return names[lang] || '';
+  return getEffectiveLangName(settings.language, detectedLang);
 }
 function truncate(t) {
   if (!t) return '';

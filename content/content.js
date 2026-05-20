@@ -46,6 +46,7 @@
       if (!iframe) return;
       iframe.contentWindow?.postMessage({ type: 'SIDEBAR_OPENED', dir: document.documentElement.dir || 'ltr' }, '*');
       sendPageContent();
+      sendPageLang();
       sendSelectedText();
     }, 200);
   }
@@ -154,6 +155,18 @@
     const iframe = document.getElementById(IFRAME_ID);
     if (!iframe) return;
     iframe.contentWindow?.postMessage({ type: 'SELECTED_TEXT', text: getSelectedText() }, '*');
+  }
+
+  function sendPageLang() {
+    const iframe = document.getElementById(IFRAME_ID);
+    if (!iframe) return;
+    const raw  = document.documentElement.lang || '';
+    const code = raw.toLowerCase().split(/[-_]/)[0];
+    const supported = ['en','he','es','fr','de','zh','ar','ja'];
+    iframe.contentWindow?.postMessage({
+      type: 'PAGE_LANG',
+      lang: supported.includes(code) ? code : ''
+    }, '*');
   }
 
   // Listeners

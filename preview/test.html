@@ -54,7 +54,7 @@
 </head>
 <body>
   <h1>Aside — Unit Tests</h1>
-  <div class="meta">TDD · Suites A–B and F should be green. Suites C–E are expected RED until providers are refactored.</div>
+  <div class="meta">TDD · Suites A–B, F–G should be green. Suites C–E are expected RED until providers are refactored.</div>
   <div id="output"><em style="color:#8b949e">Running…</em></div>
 
   <!-- Load real BaseProvider (the one in the repo) -->
@@ -426,6 +426,65 @@
       s.it('F3b — FIND_ACTIONS includes "find-prompt" (cmd bar id)', async () => {
         assert(FIND_ACTIONS.includes('find-prompt'),
           '"find-prompt" must be in FIND_ACTIONS — cmd bar chip must still work');
+      });
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // SUITE G — Language helpers: normalizePageLang + getEffectiveLangName
+    // ═════════════════════════════════════════════════════════════════════════
+    {
+      const s = describe('G — Language helpers (normalizePageLang + getEffectiveLangName)');
+
+      // normalizePageLang
+      s.it('G1 — "he-IL" → "he"', async () => {
+        expect(normalizePageLang('he-IL')).toBe('he');
+      });
+      s.it('G2 — "en-US" → "en"', async () => {
+        expect(normalizePageLang('en-US')).toBe('en');
+      });
+      s.it('G3 — "ZH" (uppercase) → "zh"', async () => {
+        expect(normalizePageLang('ZH')).toBe('zh');
+      });
+      s.it('G4 — "fr" → "fr"', async () => {
+        expect(normalizePageLang('fr')).toBe('fr');
+      });
+      s.it('G5 — unsupported "pt-BR" → ""', async () => {
+        expect(normalizePageLang('pt-BR')).toBe('');
+      });
+      s.it('G6 — empty string → ""', async () => {
+        expect(normalizePageLang('')).toBe('');
+      });
+      s.it('G7 — null/undefined → ""', async () => {
+        expect(normalizePageLang(null)).toBe('');
+        expect(normalizePageLang(undefined)).toBe('');
+      });
+
+      // getEffectiveLangName
+      s.it('G8 — stored "en", no detect → "English"', async () => {
+        expect(getEffectiveLangName('en', '')).toBe('English');
+      });
+      s.it('G9 — stored "auto", detected "he" → "Hebrew"', async () => {
+        expect(getEffectiveLangName('auto', 'he')).toBe('Hebrew');
+      });
+      s.it('G10 — stored "auto", no detect → "" (no constraint)', async () => {
+        expect(getEffectiveLangName('auto', '')).toBe('');
+      });
+      s.it('G11 — stored "fr", detected "he" → "French" (manual wins)', async () => {
+        expect(getEffectiveLangName('fr', 'he')).toBe('French');
+      });
+      s.it('G12 — stored "" (unset) → "" (no constraint)', async () => {
+        expect(getEffectiveLangName('', '')).toBe('');
+      });
+
+      // LANGUAGES list integrity
+      s.it('G13 — LANGUAGES includes "auto" as first entry', async () => {
+        assert(Array.isArray(LANGUAGES), 'LANGUAGES must be an array');
+        assert(LANGUAGES[0]?.code === 'auto', 'First entry must be auto');
+      });
+      s.it('G14 — all LANGUAGES entries have code + label', async () => {
+        for (const l of LANGUAGES) {
+          assert(l.code && l.label, `Entry ${JSON.stringify(l)} missing code or label`);
+        }
       });
     }
 
