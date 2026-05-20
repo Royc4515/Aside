@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aside — Unit Tests</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+      font-size: 13px; background: #0d1117; color: #e6edf3;
+      padding: 24px; min-height: 100vh;
+    }
+    h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #f0f6fc; }
+    .meta { color: #8b949e; margin-bottom: 24px; font-size: 12px; }
+    .suite { margin-bottom: 24px; }
+    .suite-title {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+      color: #8b949e; margin-bottom: 8px; padding-bottom: 6px;
+      border-bottom: 1px solid #21262d;
+    }
+    .test {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 7px 10px; border-radius: 6px; margin-bottom: 3px;
+    }
+    .test.pass  { background: rgba(35,134,54,0.15); }
+    .test.fail  { background: rgba(218,54,51,0.15); }
+    .test.error { background: rgba(210,153,34,0.12); }
+    .badge {
+      min-width: 42px; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.05em; padding: 2px 6px; border-radius: 4px;
+      text-align: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .pass  .badge { background: #238636; color: #fff; }
+    .fail  .badge { background: #da3633; color: #fff; }
+    .error .badge { background: #9e6a03; color: #fff; }
+    .test-name { flex: 1; line-height: 1.5; }
+    .detail { color: #8b949e; font-size: 11.5px; margin-top: 2px; }
+    .detail.err { color: #f85149; }
+    .summary {
+      margin-top: 24px; padding: 14px 16px;
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 8px; display: flex; gap: 24px;
+    }
+    .s-pass  { color: #3fb950; font-weight: 700; }
+    .s-fail  { color: #f85149; font-weight: 700; }
+    .s-total { color: #e6edf3; font-weight: 700; }
+    .note {
+      margin-top: 14px; padding: 12px 14px;
+      background: rgba(56,139,253,0.08); border: 1px solid rgba(56,139,253,0.25);
+      border-radius: 6px; font-size: 12px; color: #79c0ff; line-height: 1.6;
+    }
+    code { background: #161b22; padding: 1px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Aside — Unit Tests</h1>
+  <div class="meta">TDD · Suites A–B and F should be green. Suites C–E are expected RED until providers are refactored.</div>
+  <div id="output"><em style="color:#8b949e">Running…</em></div>
+
+  <!-- Load real BaseProvider (the one in the repo) -->
+  <script src="../providers/base-provider.js"></script>
+  <!-- Load action config for F2/F3 tests -->
+  <script src="../sidebar/action-config.js"></script>
+
+  <script>
+    // ── Micro test harness ────────────────────────────────────────────────────
+    const suites = [];
+
+    function describe(name) {
+      const suite = { name, tests: [] };
+      suites.push(suite);
+      return {
+        it(label, fn) {
+          suite.tests.push({ label, fn, status: 'pending', detail: '' });
+        }
+      };
+    }
+
+    class AssertionError extends Error {}
+
+    function assert(cond, msg) {
+      if (!cond) throw new AssertionError(msg || 'Assertion failed');
+    }
+
+    function expect(actual) {
+      return {
+        toBe(expected) {
+          if (actual !== expected)
+            throw new AssertionError(
+              `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+        },
+        toEqual(expected) {
+          const a = JSON.stringify(actual), b = JSON.stringify(expected);
+          if (a !== b) throw new AssertionError(`Expected\n  ${b}\ngot\n  ${a}`);
+        },
+        toBeTruthy() { if (!actual) throw new AssertionError(`Expected truthy, got ${JSON.stringify(actual)}`); },
+        toBeFalsy()  { if (actual)  throw new AssertionError(`Expected falsy, got ${JSON.stringify(actual)}`); },
+      };
+    }
+
+    async function runAll() {
+      for (const suite of suites) {
+        for (const t of suite.tests) {
+          try {
+            await t.fn();
+            t.status = 'pass';
+          } catch(e) {
+            t.status = e instanceof AssertionError ? 'fail' : 'error';
+            t.detail = e?.message || String(e);
+          }
+        }
+      }
+      render();
+    }
+
+    function render() {
+      let pass = 0, fail = 0, err = 0;
+      let html = '';
+      for (const s of suites) {
+        html += `<div class="suite"><div class="suite-title">${s.name}</div>`;
+        for (const t of s.tests) {
+          if (t.status === 'pass')  pass++;
+          else if (t.status === 'fail') fail++;
+          else err++;
+          const badge = t.status === 'pass' ? 'PASS' : t.status === 'fail' ? 'FAIL' : 'ERR';
+          const detail = t.detail
+            ? `<div class="detail ${t.status === 'error' ? 'err' : ''}">${t.detail}</div>`
+            : '';
+          html += `<div class="test ${t.status}">
+            <span class="badge">${badge}</span>
+            <div class="test-name">${t.label}${detail}</div>
+          </div>`;
+        }
+        html += '</div>';
+      }
+      html += `<div class="summary">
+        <span class="s-pass">PASS ${pass}</span>
+        <span class="s-fail">FAIL ${fail + err}</span>
+        <span class="s-total">TOTAL ${pass + fail + err}</span>
+      </div>`;
+      html += `<div class="note">
+        Suites C–E are <strong>expected to be red</strong> in this phase —
+        <code>buildSystemPrompt</code>, <code>completeStream</code>, and <code>_streamSSE</code>
+        don't exist yet on BaseProvider. After the provider refactor all suites must be green before merge.
+      </div>`;
+      document.getElementById('output').innerHTML = html;
+    }
+
+    // ── Helpers for stream mocking ────────────────────────────────────────────
+    function fakeStreamResponse(textChunks) {
+      const enc = new TextEncoder();
+      let i = 0;
+      return {
+        ok: true, status: 200,
+        body: {
+          getReader() {
+            return {
+              async read() {
+                if (i < textChunks.length) return { done: false, value: enc.encode(textChunks[i++]) };
+                return { done: true };
+              }
+            };
+          }
+        },
+        json: () => Promise.reject(new Error('not json'))
+      };
+    }
+
+    function fakeErrorResponse(status, body) {
+      return {
+        ok: false, status,
+        statusText: 'Error',
+        json: () => Promise.resolve(body),
+        body: null
+      };
+    }
+
+    // ── Reference impl of buildConversationMessages (spec-as-code) ───────────
+    // This IS the spec. sidebar.js must implement the same contract.
+    function buildConversationMessages(turns) {
+      return turns
+        .filter(t => !t.loading && t.role &&
+          (t.role === 'user' || (t.role === 'assistant' && t.content)))
+        .map(t => ({ role: t.role, content: t.content }));
+    }
+
+    // ── Reference impl of getLanguageName ────────────────────────────────────
+    function getLanguageName(language) {
+      if (!language || language === 'auto') return '';
+      const names = { en:'English', he:'Hebrew', es:'Spanish', fr:'French',
+                      de:'German', zh:'Chinese', ar:'Arabic', ja:'Japanese' };
+      return names[language] || '';
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // SUITE A — buildConversationMessages (pure logic, always green)
+    // ═════════════════════════════════════════════════════════════════════════
+    {
+      const s = describe('A — buildConversationMessages (spec, always green)');
+
+      s.it('A1 — empty turns → []', async () => {
+        expect(buildConversationMessages([])).toEqual([]);
+      });
+
+      s.it('A2 — user→assistant→user preserved in order', async () => {
+        const turns = [
+          { role: 'user',      content: 'hi'    },
+          { role: 'assistant', content: 'hello' },
+          { role: 'user',      content: 'more'  },
+        ];
+        expect(buildConversationMessages(turns)).toEqual([
+          { role: 'user',      content: 'hi'    },
+          { role: 'assistant', content: 'hello' },
+          { role: 'user',      content: 'more'  },
+        ]);
+      });
+
+      s.it('A3 — loading:true skeleton is excluded', async () => {
+        const turns = [
+          { role: 'user',      content: 'hi' },
+          { role: 'assistant', loading: true  },
+        ];
+        expect(buildConversationMessages(turns)).toEqual([
+          { role: 'user', content: 'hi' }
+        ]);
+      });
+
+      s.it('A4 — empty assistant content is excluded', async () => {
+        const turns = [
+          { role: 'user',      content: 'hi' },
+          { role: 'assistant', content: ''   },
+        ];
+        expect(buildConversationMessages(turns)).toEqual([
+          { role: 'user', content: 'hi' }
+        ]);
+      });
+
+      s.it('A4b — display field not leaked into API payload', async () => {
+        const turns = [
+          { role: 'user', content: 'Explain:\n\n"long text"', display: 'Explain: "long tex…"' },
+          { role: 'assistant', content: 'Here is the explanation.' },
+        ];
+        const msgs = buildConversationMessages(turns);
+        assert(msgs[0].content === 'Explain:\n\n"long text"', 'content must be full text');
+        assert(!('display' in msgs[0]), 'display must not be in API payload');
+      });
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // SUITE B — getLanguageName (pure logic, always green)
+    // ═════════════════════════════════════════════════════════════════════════
+    {
+      const s = describe('B — getLanguageName (spec, always green)');
+
+      s.it('A10a — "auto" → ""', async () => {
+        expect(getLanguageName('auto')).toBe('');
+      });
+
+      s.it('A10b — undefined → ""', async () => {
+        expect(getLanguageName(undefined)).toBe('');
+      });
+
+      s.it('A10c — "he" → "Hebrew"', async () => {
+        expect(getLanguageName('he')).toBe('Hebrew');
+      });
+
+      s.it('A10d — unknown code "xx" → ""', async () => {
+        expect(getLanguageName('xx')).toBe('');
+      });
+
+      s.it('A10e — "en" → "English"', async () => {
+        expect(getLanguageName('en')).toBe('English');
+      });
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // SUITE C — BaseProvider.buildSystemPrompt (RED until refactor)
+    // ═════════════════════════════════════════════════════════════════════════
+    {
+      const s = describe('C — BaseProvider.buildSystemPrompt (RED — method not yet added)');
+
+      s.it('C1 — method exists on BaseProvider', async () => {
+        const p = new BaseProvider('k');
+        assert(typeof p.buildSystemPrompt === 'function',
+          'buildSystemPrompt is not defined on BaseProvider — add it in the refactor');
+      });
+
+      s.it('C2 — no context → no mention of page content', async () => {
+        const p = new BaseProvider('k');
+        const sys = p.buildSystemPrompt('', '');
+        assert(!sys.toLowerCase().includes('page content'),
+          'Without context, system prompt should not mention page content');
+      });
+
+      s.it('C3 — with context → embeds page text', async () => {
+        const p = new BaseProvider('k');
+        const sys = p.buildSystemPrompt('My page text here', '');
+        assert(sys.includes('My page text here'), 'Must embed page text in system prompt');
+      });
+
+      s.it('C4 — with language → includes language name', async () => {
+        const p = new BaseProvider('k');
+        const sys = p.buildSystemPrompt('', 'Hebrew');
+        assert(sys.toLowerCase().includes('hebrew'),
+          'System prompt must include the language name when specified');
+      });
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // SUITE D — BaseProvider.completeStream fallback (RED until refactor)
+    // ═════════════════════════════════════════════════════════════════════════
+    {
+      const s = describe('D — BaseProvider.completeStream fallback (RED — method not yet added)');
+
+      s.it('A9 — method exists', async () => {
+        const p = new BaseProvider('k');
+        assert(typeof p.completeStream === 'function',
+          'completeStream is not defined on BaseProvider — add it in the refactor');
+      });
+
+      s.it('A9b — calls onChunk once with full text, returns full text', async () => {
+        class FakeProvider extends BaseProvider {
+          async complete() { return 'full response'; }
+        }
+        const p = new FakeProvider('k');
+        const chunks = [];
+        const result = await p.completeStream([], 'sys', c => chunks.push(c));
+        expect(result).toBe('full response');
+        expect(chunks).toEqual(['full response']);
+      });
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // SUITE E — BaseProvider._streamSSE parser (RED until refactor)
+    // ═════════════════════════════════════════════════════════════════════════
+    {
+      const s = describe('E — BaseProvider._streamSSE parser (RED — method not yet added)');
+
+      s.it('E-exists — _streamSSE method exists', async () => {
+        const p = new BaseProvider('k');
+        assert(typeof p._streamSSE === 'function',
+          '_streamSSE is not defined on BaseProvider — add it in the refactor');
+      });
+
+      s.it('A5 — basic chunks emitted in order, [DONE] ignored', async () => {
+        const p = new BaseProvider('k');
+        const lines = ['data: {"d":"hello"}\n', 'data: {"d":" world"}\n', 'data: [DONE]\n'];
+        const origFetch = globalThis.fetch;
+        globalThis.fetch = async () => fakeStreamResponse(lines);
+        const chunks = [];
+        const result = await p._streamSSE('http://fake', {}, c => chunks.push(c), ev => ev.d || '');
+        globalThis.fetch = origFetch;
+        expect(result).toBe('hello world');
+        expect(chunks).toEqual(['hello', ' world']);
+      });
+
+      s.it('A6 — split read across buffer boundary handled correctly', async () => {
+        const p = new BaseProvider('k');
+        const reads = ['data: {"d":"par', 'tial"}\n'];
+        const origFetch = globalThis.fetch;
+        globalThis.fetch = async () => fakeStreamResponse(reads);
+        const chunks = [];
+        const result = await p._streamSSE('http://fake', {}, c => chunks.push(c), ev => ev.d || '');
+        globalThis.fetch = origFetch;
+        expect(result).toBe('partial');
+        expect(chunks).toEqual(['partial']);
+      });
+
+      s.it('A7 — malformed JSON lines silently skipped', async () => {
+        const p = new BaseProvider('k');
+        const lines = ['data: {bad json}\n', 'data: {"d":"ok"}\n'];
+        const origFetch = globalThis.fetch;
+        globalThis.fetch = async () => fakeStreamResponse(lines);
+        const chunks = [];
+        const result = await p._streamSSE('http://fake', {}, c => chunks.push(c), ev => ev.d || '');
+        globalThis.fetch = origFetch;
+        expect(result).toBe('ok');
+        expect(chunks).toEqual(['ok']);
+      });
+
+      s.it('A8 — non-2xx response rejects with API error message', async () => {
+        const p = new BaseProvider('k');
+        const origFetch = globalThis.fetch;
+        globalThis.fetch = async () => fakeErrorResponse(401, { error: { message: 'bad key' } });
+        let threw = null;
+        try {
+          await p._streamSSE('http://fake', {}, () => {}, ev => ev.d || '');
+        } catch(e) { threw = e; }
+        globalThis.fetch = origFetch;
+        assert(threw !== null, 'Must reject on non-2xx response');
+        assert(threw.message.includes('bad key'),
+          `Error must include API message, got: "${threw?.message}"`);
+      });
+    }
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // SUITE F — PAGE_ACTIONS display labels (F2) + find routing (F3)
+    // ═════════════════════════════════════════════════════════════════════════
+    {
+      const s = describe('F — Page action display labels (F2) + find routing (F3)');
+
+      s.it('F0 — PAGE_ACTIONS constant is defined', async () => {
+        assert(typeof PAGE_ACTIONS !== 'undefined',
+          'PAGE_ACTIONS must be exported from sidebar/action-config.js');
+      });
+
+      for (const id of ['summarize', 'extract', 'translate-page', 'rewrite-page']) {
+        const capturedId = id;
+        s.it(`F2 — ${capturedId}: display is set and differs from content`, async () => {
+          const a = PAGE_ACTIONS[capturedId];
+          assert(a, `PAGE_ACTIONS.${capturedId} must exist`);
+          assert(a.display, `display must be a non-empty string for ${capturedId}`);
+          assert(a.content, `content must be a non-empty string for ${capturedId}`);
+          assert(a.display !== a.content,
+            `display must not be the raw API prompt for ${capturedId}`);
+          assert(a.label,   `label must be set for ${capturedId}`);
+        });
+      }
+
+      s.it('F3a — FIND_ACTIONS includes "find" (card id)', async () => {
+        assert(typeof FIND_ACTIONS !== 'undefined', 'FIND_ACTIONS must be exported');
+        assert(FIND_ACTIONS.includes('find'),
+          '"find" must be in FIND_ACTIONS — clicking the Find card must not silently no-op');
+      });
+
+      s.it('F3b — FIND_ACTIONS includes "find-prompt" (cmd bar id)', async () => {
+        assert(FIND_ACTIONS.includes('find-prompt'),
+          '"find-prompt" must be in FIND_ACTIONS — cmd bar chip must still work');
+      });
+    }
+
+    // ── Run ───────────────────────────────────────────────────────────────────
+    runAll();
+  </script>
+</body>
+</html>
