@@ -20,33 +20,34 @@ const PROVIDERS = [
   { id: 'ollama', name: 'Ollama', model: 'Local',         hue: 'var(--p-ollama)' },
 ];
 
-const ACTION_LABELS = {
-  explain: 'Explanation', summarize: 'Summary', ask: 'Answer',
-  reply: 'Reply suggestions', extract: 'Extracted data',
-  translate: 'Translation', rewrite: 'Rewrite', find: 'Found on page'
+const ACTION_LABEL_KEYS = {
+  explain: 'action_explain', summarize: 'action_summarize', ask: 'action_ask',
+  reply: 'action_reply', extract: 'action_extract',
+  translate: 'action_translate', rewrite: 'action_rewrite', find: 'action_find',
 };
+function actionLabel(key) { return t(ACTION_LABEL_KEYS[key]) || key; }
 
 const TOOL_DEFS = {
   page: [
-    { id: 'summarize',      label: 'Summarize',    sub: 'Smart digest of the page',  iconPath: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>' },
-    { id: 'extract',        label: 'Extract data', sub: 'Tables, lists, facts',      iconPath: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>' },
-    { id: 'find',           label: 'Find on page', sub: 'Search & quote sections',   iconPath: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>' },
-    { id: 'translate-page', label: 'Translate',    sub: 'Match your language',       iconPath: '<path d="M4 5h7M7.5 4v2M5 9c.7 2.5 2 4.5 4 6M11 9c-1.5 4-4 6.5-7 8M14 21l4-9 4 9M15.5 18h5"/>' },
+    { id: 'summarize',      lk: 'tool_summarize',          sk: 'tool_summarize_sub',          iconPath: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>' },
+    { id: 'extract',        lk: 'tool_extract',            sk: 'tool_extract_sub',            iconPath: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>' },
+    { id: 'find',           lk: 'tool_find',               sk: 'tool_find_sub',               iconPath: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>' },
+    { id: 'translate-page', lk: 'tool_translate_page',     sk: 'tool_translate_page_sub',     iconPath: '<path d="M4 5h7M7.5 4v2M5 9c.7 2.5 2 4.5 4 6M11 9c-1.5 4-4 6.5-7 8M14 21l4-9 4 9M15.5 18h5"/>' },
   ],
   sel: [
-    { id: 'explain',   label: 'Explain',   sub: 'Clear explanation',    iconPath: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1.5 1.5 1.5 2.5h5c0-1 .7-1.8 1.5-2.5A6 6 0 0 0 12 3z"/>' },
-    { id: 'reply',     label: 'Reply',     sub: '3 reply suggestions',  iconPath: '<path d="M9 14l-4-4 4-4"/><path d="M5 10h7a6 6 0 0 1 6 6v2"/>' },
-    { id: 'translate', label: 'Translate', sub: 'Translate selection',  iconPath: '<path d="M4 5h7M7.5 4v2M5 9c.7 2.5 2 4.5 4 6M11 9c-1.5 4-4 6.5-7 8M14 21l4-9 4 9M15.5 18h5"/>' },
-    { id: 'rewrite',   label: 'Rewrite',   sub: 'Improve clarity',      iconPath: '<path d="M14 4l6 6L9 21H3v-6z"/>' },
+    { id: 'explain',   lk: 'tool_explain',   sk: 'tool_explain_sub',   iconPath: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1.5 1.5 1.5 2.5h5c0-1 .7-1.8 1.5-2.5A6 6 0 0 0 12 3z"/>' },
+    { id: 'reply',     lk: 'tool_reply',     sk: 'tool_reply_sub',     iconPath: '<path d="M9 14l-4-4 4-4"/><path d="M5 10h7a6 6 0 0 1 6 6v2"/>' },
+    { id: 'translate', lk: 'tool_translate', sk: 'tool_translate_sub', iconPath: '<path d="M4 5h7M7.5 4v2M5 9c.7 2.5 2 4.5 4 6M11 9c-1.5 4-4 6.5-7 8M14 21l4-9 4 9M15.5 18h5"/>' },
+    { id: 'rewrite',   lk: 'tool_rewrite',   sk: 'tool_rewrite_sub',   iconPath: '<path d="M14 4l6 6L9 21H3v-6z"/>' },
   ]
 };
 
 const CMD_BAR = [
-  { id: 'summarize',      label: 'Summarize', accent: true },
-  { id: 'extract',        label: 'Extract' },
-  { id: 'translate-page', label: 'Translate' },
-  { id: 'rewrite-page',   label: 'Rewrite' },
-  { id: 'find-prompt',    label: 'Find' },
+  { id: 'summarize',      lk: 'cmd_summarize',      accent: true },
+  { id: 'extract',        lk: 'cmd_extract' },
+  { id: 'translate-page', lk: 'cmd_translate_page' },
+  { id: 'rewrite-page',   lk: 'cmd_rewrite_page' },
+  { id: 'find-prompt',    lk: 'cmd_find' },
 ];
 
 // ── Init ───────────────────────────────────────────────────────────────────
@@ -55,10 +56,18 @@ async function init() {
   bindUI();
   renderHeader();
   renderLangBtn();
+  applyUILanguage();
+  requestPageContent();
+}
+
+function applyUILanguage() {
+  const lang = getEffectiveLang(settings.language, detectedLang) || 'en';
+  setUILanguage(lang);
+  document.documentElement.dir = (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr';
+  applyI18n();
   renderHero();
   renderTools();
   renderCmdbar();
-  requestPageContent();
 }
 
 async function loadSettings() {
@@ -165,7 +174,7 @@ function togglePicker() {
   host.innerHTML = `
     <div class="sb-picker-veil" id="picker-veil"></div>
     <div class="sb-picker" role="listbox">
-      <div class="sb-picker-label">Switch model</div>
+      <div class="sb-picker-label">${t('picker_switch_model')}</div>
       ${PROVIDERS.map(p => `
         <button class="sb-picker-row${p.id===settings.activeProvider?' is-active':''}" data-id="${p.id}">
           <span class="dot" style="background:${p.hue}"></span>
@@ -231,10 +240,10 @@ function toggleLangPicker() {
   host.innerHTML = `
     <div class="sb-picker-veil" id="lang-picker-veil"></div>
     <div class="sb-picker" role="listbox">
-      <div class="sb-picker-label">Response language</div>
+      <div class="sb-picker-label">${t('picker_response_lang')}</div>
       ${LANGUAGES.map(l => {
         const isActive  = l.code === stored;
-        const sublabel  = l.code === 'auto' ? `<span class="sb-picker-model">${autoHint || 'detect from page'}</span>` : '';
+        const sublabel  = l.code === 'auto' ? `<span class="sb-picker-model">${autoHint || t('picker_lang_auto')}</span>` : '';
         const check     = isActive ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>` : '';
         return `<button class="sb-picker-row${isActive ? ' is-active' : ''}" data-lang="${l.code}">
           <span class="sb-picker-name">${l.label}</span>
@@ -250,6 +259,7 @@ function toggleLangPicker() {
       settings.language = code;
       await chrome.storage.sync.set({ language: code });
       renderLangBtn();
+      applyUILanguage();
       toggleLangPicker();
     };
   });
@@ -259,15 +269,15 @@ function toggleLangPicker() {
 function renderHero() {
   const wrap = document.getElementById('hero-suggest');
   const items = [
-    { id: 'summarize',      t: 'Summarize this page',       icon: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>' },
-    { id: 'extract',        t: 'Extract key points & data', icon: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>' },
-    { id: 'translate-page', t: 'Translate this page',       icon: '<path d="M4 5h7M7.5 4v2M5 9c.7 2.5 2 4.5 4 6M11 9c-1.5 4-4 6.5-7 8M14 21l4-9 4 9M15.5 18h5"/>' },
+    { id: 'summarize',      tk: 'hero_summarize', icon: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>' },
+    { id: 'extract',        tk: 'hero_extract',   icon: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>' },
+    { id: 'translate-page', tk: 'hero_translate', icon: '<path d="M4 5h7M7.5 4v2M5 9c.7 2.5 2 4.5 4 6M11 9c-1.5 4-4 6.5-7 8M14 21l4-9 4 9M15.5 18h5"/>' },
   ];
   wrap.innerHTML = items.map(i => `
     <button class="sb-suggest-btn" data-action="${i.id}">
       <span style="display:inline-flex;align-items:center;gap:8px">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${i.icon}</svg>
-        <span>${i.t}</span>
+        <span>${t(i.tk)}</span>
       </span>
       <svg class="sb-suggest-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
     </button>
@@ -285,8 +295,8 @@ function renderTools() {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${a.iconPath}</svg>
       </span>
       <span class="sb-action-card-body">
-        <span class="sb-action-card-title">${a.label}</span>
-        <span class="sb-action-card-sub">${a.sub}</span>
+        <span class="sb-action-card-title">${t(a.lk)}</span>
+        <span class="sb-action-card-sub">${t(a.sk)}</span>
       </span>
     </button>`;
   document.getElementById('page-actions').innerHTML = TOOL_DEFS.page.map(cardHtml).join('');
@@ -300,7 +310,7 @@ function renderTools() {
 function renderCmdbar() {
   const bar = document.getElementById('cmdbar');
   bar.innerHTML = CMD_BAR.map(c => `
-    <button class="sb-chip${c.accent?' sb-chip--accent':''}" data-action="${c.id}">${c.label}</button>
+    <button class="sb-chip${c.accent?' sb-chip--accent':''}" data-action="${c.id}">${t(c.lk)}</button>
   `).join('');
   bar.querySelectorAll('.sb-chip').forEach(b =>
     b.onclick = () => handleAction(b.dataset.action));
@@ -315,7 +325,7 @@ window.addEventListener('message', (e) => {
   const msg = e.data;
   if (!msg || typeof msg !== 'object') return;
   if (msg.type === 'PAGE_CONTENT')  pageContent = msg.content || '';
-  if (msg.type === 'PAGE_LANG')     { detectedLang = msg.lang || ''; renderLangBtn(); }
+  if (msg.type === 'PAGE_LANG')     { detectedLang = msg.lang || ''; renderLangBtn(); applyUILanguage(); }
   if (msg.type === 'SELECTED_TEXT') { selectedText = msg.text || ''; updateSelectionUI(); }
   if (msg.type === 'SIDEBAR_OPENED') {
     if (msg.dir === 'rtl' || msg.dir === 'ltr') document.documentElement.dir = msg.dir;
@@ -374,7 +384,7 @@ async function handleAction(action) {
     case 'extract':
     case 'translate-page':
     case 'rewrite-page': {
-      if (!pageContent) return showError('Could not read this page.');
+      if (!pageContent) return showError(t('error_no_page'));
       const cfg = PAGE_ACTIONS[action];
       content = cfg.content;
       display = cfg.display;
@@ -384,27 +394,27 @@ async function handleAction(action) {
     case 'find':
     case 'find-prompt': {
       const inp = document.getElementById('ask-input');
-      inp.placeholder = 'What should I find on this page?';
+      inp.placeholder = t('find_placeholder');
       inp.focus();
       return;
     }
     case 'explain':
-      if (!selectedText) return showError('Select some text first.');
+      if (!selectedText) return showError(t('error_select_text'));
       content = `Explain this clearly and concisely:\n\n"${selectedText}"`;
       display = `Explain: "${ellipsis(selectedText, 80)}"`;
       label = 'explain'; break;
     case 'reply':
-      if (!selectedText) return showError('Select a message first.');
+      if (!selectedText) return showError(t('error_select_msg'));
       content = `Suggest 3 short, distinct reply options to this message. Number them 1, 2, 3:\n\n"${selectedText}"`;
       display = `Reply to: "${ellipsis(selectedText, 80)}"`;
       label = 'reply'; break;
     case 'translate':
-      if (!selectedText) return showError('Select some text first.');
+      if (!selectedText) return showError(t('error_select_text'));
       content = `Translate this text to English. Preserve formatting:\n\n"${selectedText}"`;
       display = `Translate: "${ellipsis(selectedText, 80)}"`;
       label = 'translate'; break;
     case 'rewrite':
-      if (!selectedText) return showError('Select some text first.');
+      if (!selectedText) return showError(t('error_select_text'));
       content = `Rewrite this to be clearer and more concise:\n\n"${selectedText}"`;
       display = `Rewrite: "${ellipsis(selectedText, 80)}"`;
       label = 'rewrite'; break;
@@ -430,7 +440,7 @@ async function handleAsk() {
 // ── Core prompt runner (streaming) ────────────────────────────────────
 async function runPrompt(label) {
   busy = true;
-  const skel = pushTurn({ role: 'assistant', loading: true, action: ACTION_LABELS[label] || label });
+  const skel = pushTurn({ role: 'assistant', loading: true, action: actionLabel(label) });
   document.getElementById('ask-btn').disabled = true;
 
   const messages = buildConversationMessages();
