@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Aside — Live preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-page: #efece2;
+    --panel: #ffffff;
+    --ink: #1f1d18; --ink-2: #3a3833; --ink-3: #6b675f;
+    --line: rgba(20,18,14,0.10);
+    --accent: #c8643c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg-page: #161513; --panel: #1f1e1b; --ink: #f5f2e9; --ink-2: #d8d4c7; --ink-3: #a09c8e; --line: rgba(255,250,240,0.08); --accent: #d97757; }
+  }
+  body {
+    background: var(--bg-page);
+    color: var(--ink);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh; padding: 24px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .lead { display: flex; align-items: center; gap: 12px; }
+  .lead h1 { font-family: "Source Serif 4", Georgia, serif; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .lead p { color: var(--ink-3); font-size: 13px; margin-top: 2px; }
+  .controls { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg {
+    display: inline-flex; gap: 2px; padding: 3px;
+    background: rgba(255,255,255,0.5); border: 1px solid var(--line); border-radius: 999px;
+  }
+  @media (prefers-color-scheme: dark) { .seg { background: rgba(255,255,255,0.04); } }
+  .seg button {
+    border: none; background: transparent; cursor: pointer;
+    padding: 5px 12px; border-radius: 100px;
+    font-family: inherit; font-size: 12px; color: var(--ink-3);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .seg button.is-active { background: var(--bg-page); color: var(--ink); box-shadow: 0 1px 2px rgba(20,18,14,0.05); }
+  @media (prefers-color-scheme: dark) { .seg button.is-active { background: #2a2925; } }
+
+  .stage { display: grid; gap: 22px; place-items: center; }
+  .device {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 24px 48px rgba(20,18,14,0.10), 0 4px 12px rgba(20,18,14,0.06);
+  }
+  @media (prefers-color-scheme: dark) { .device { box-shadow: 0 24px 48px rgba(0,0,0,0.5); } }
+  .device--sidebar  { width: 420px; height: 760px; }
+  .device--popup    { width: 320px; height: 360px; }
+  .device--settings { width: min(1080px, 100%); height: 760px; }
+  iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+  .note {
+    font-size: 12px; color: var(--ink-3); max-width: 720px; line-height: 1.6;
+  }
+  .note code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11.5px; padding: 1px 5px; background: rgba(20,18,14,0.05); border-radius: 4px; }
+  @media (prefers-color-scheme: dark) { .note code { background: rgba(255,255,255,0.06); } }
+</style>
+</head>
+<body>
+  <header>
+    <div class="lead">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="var(--accent)"/>
+        <circle cx="16" cy="27" r="1.7" fill="var(--accent)"/>
+      </svg>
+      <div>
+        <h1>Aside — extension preview</h1>
+        <p>Current state of <code style="font-family:JetBrains Mono,monospace">main</code> branch · live UI from <code>sidebar/</code>, <code>popup/</code>, <code>options/</code></p>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="seg" id="view-seg">
+        <button data-view="sidebar"  class="is-active">Sidebar</button>
+        <button data-view="popup">Popup</button>
+        <button data-view="settings">Settings</button>
+      </div>
+      <div class="seg" id="dir-seg">
+        <button data-dir="ltr" class="is-active">LTR</button>
+        <button data-dir="rtl">עברית · RTL</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="device device--sidebar" id="device">
+      <iframe id="frame" src="sidebar/sidebar.html"></iframe>
+    </div>
+  </div>
+
+  <p class="note">
+    <strong>Note:</strong> the iframe runs the real extension code with <code>chrome-shim.js</code> mocking <code>chrome.*</code> APIs. Provider responses are canned demo text. To run the real extension: <code>chrome://extensions</code> → <em>Load unpacked</em> → pick the project root.
+  </p>
+
+<script>
+const VIEWS = {
+  sidebar:  { src: 'sidebar/sidebar.html', cls: 'device--sidebar'  },
+  popup:    { src: 'popup/popup.html',     cls: 'device--popup'    },
+  settings: { src: 'options/options.html', cls: 'device--settings' },
+};
+const stage  = document.getElementById('stage');
+const device = document.getElementById('device');
+const frame  = document.getElementById('frame');
+let activeView = 'sidebar';
+let activeDir  = 'ltr';
+
+function load() {
+  const v = VIEWS[activeView];
+  device.className = 'device ' + v.cls;
+  frame.src = v.src + '#dir=' + activeDir + '&t=' + Date.now();
+}
+function bindSeg(sel, key, cb) {
+  document.querySelectorAll(sel + ' button').forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll(sel + ' button').forEach(x => x.classList.remove('is-active'));
+      b.classList.add('is-active');
+      cb(b.dataset[key]);
+    };
+  });
+}
+bindSeg('#view-seg', 'view', v => { activeView = v; load(); });
+bindSeg('#dir-seg',  'dir',  d => { activeDir = d; load(); });
+
+frame.addEventListener('load', () => {
+  try {
+    const dir = (frame.src.match(/[#?&]dir=(\w+)/) || [])[1] || 'ltr';
+    frame.contentDocument.documentElement.dir = dir;
+    if (dir === 'rtl') frame.contentDocument.documentElement.lang = 'he';
+  } catch {}
+});
+
+load();
+</script>
+</body>
+</html>
