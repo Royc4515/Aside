@@ -2,98 +2,40 @@
 
 # AI Sidebar
 
-**Chrome extension that injects a context-aware AI assistant sidebar into any webpage,  
-routing prompts to one of six AI providers with streaming responses.**
+### Aside — your AI co-reader for any webpage
+
+**A Chrome extension that adds an AI assistant to every page you visit.  
+Summarize, translate, extract data, or just ask anything — the page context is included automatically.**
 
 <br>
 
 <img src="https://img.shields.io/badge/Chrome%20Extension-MV3-4285F4?logo=googlechrome&logoColor=white" alt="Chrome MV3">&nbsp;
 <img src="https://img.shields.io/badge/providers-6-8b5cf6" alt="6 providers">&nbsp;
-<img src="https://img.shields.io/badge/build-none-22c55e" alt="no build step">&nbsp;
-<img src="https://img.shields.io/badge/version-1.0.0-64748b" alt="v1.0.0">
+<img src="https://img.shields.io/badge/languages-EN%20%C2%B7%20HE-f59e0b" alt="EN + HE UI">&nbsp;
+<img src="https://img.shields.io/badge/build-none-22c55e" alt="no build step">
 
 </div>
 
 <br>
 
-**[Features](#features) · [Architecture](#architecture) · [Providers](#providers) · [Install](#install)**
+**[What it does](#what-it-does) · [Install](#install) · [Using Aside](#using-aside) · [Providers & keys](#providers--keys) · [Privacy](#privacy)**
 
 ---
 
-## Features
+## What it does
 
-### Provider System
+Open any webpage, hit **Alt+A**, and a sidebar slides in. From there you can:
 
-- **Six AI providers** — Claude, Gemini, OpenAI, Grok, Groq, and Ollama; selected at runtime via `ProviderFactory`
-- **OOP provider hierarchy** — `BaseProvider` abstract class with concrete subclasses; `GrokProvider` and `GroqProvider` extend `OpenAIProvider` by passing a different `baseUrl` to `super()`
+- **Summarize** the page into clean bullets
+- **Extract** tables, lists, facts, contact info — whatever structured data is on the page
+- **Translate** the whole page or just a selection
+- **Find** specific information and get it quoted back with context
+- **Explain** highlighted text in plain language
+- **Reply** to an email or message with three suggested drafts
+- **Rewrite** anything for clarity, tone, or length
+- **Ask anything** — the visible page content is sent along automatically
 
-### Extension Platform
-
-- **MV3 Service Worker** — handles `Alt+A` keyboard command, context menu registration, and live `VALIDATE_KEY` requests with a 10-second `Promise.race` timeout
-- **Cross-origin `postMessage` security** — sidebar iframe validates `event.source === window.parent` before accepting any message; user-supplied text is always set via `textContent`, never `innerHTML`
-
-### Content & Rendering
-
-- **Page content extraction** — `extractPageContent()` walks semantic selectors (`article`, `main`, `[role="main"]`, `.article-body`…), strips nav/chrome nodes, and truncates at 12,000 chars
-- **Live API key validation** — settings page sends `VALIDATE_KEY` to the service worker, which instantiates the provider and calls `validate()` against the real API
-- **Custom Markdown renderer** — hand-rolled `renderMarkdown()` covers headings, bold/italic, code blocks, tables, and lists; output is sanitized by a DOM-based allowlist (`sanitizeHTML()`) before insertion
-
----
-
-## Architecture
-
-### Class Hierarchy
-
-```mermaid
-classDiagram
-    class BaseProvider {
-        +complete()
-        +completeStream()
-        +validate()
-        +getName()
-        #_handleError()
-        #_parseSSEStream()
-        #_parseNDJSONStream()
-    }
-    BaseProvider <|-- ClaudeProvider
-    BaseProvider <|-- GeminiProvider
-    BaseProvider <|-- OpenAIProvider
-    BaseProvider <|-- OllamaProvider
-    OpenAIProvider <|-- GrokProvider
-    OpenAIProvider <|-- GroqProvider
-```
-
-### Runtime Flow
-
-```mermaid
-flowchart LR
-    A["Alt+A\nor Context Menu"] --> SW["Service Worker"]
-    SW -->|"chrome.tabs\n.sendMessage"| CS["content.js"]
-    CS -->|"creates iframe"| SB["sidebar.js"]
-    SB <-->|"postMessage\nPAGE_CONTENT\nSELECTED_TEXT"| CS
-    SB --> PF["ProviderFactory\n.get()"]
-    PF --> PR["Provider"]
-    PR -->|"fetch + SSE"| API["AI API"]
-    API -.->|"token stream"| PR
-    PR -.->|"onChunk"| SB
-```
-
-`ProviderFactory.get(name, apiKeys, selectedModels)` applies the **Strategy pattern** — the sidebar calls `provider.completeStream()` with no knowledge of which class is running. `GrokProvider` and `GroqProvider` are one-liners that pass a different `baseUrl` to `super()`, reusing the entire `OpenAIProvider` implementation. Switching providers requires only a single `chrome.storage.sync` write.
-
----
-
-## Providers
-
-| Provider | Default model | Additional models |
-|---|---|---|
-| **Claude** (Anthropic) | `claude-sonnet-4-6` | `claude-haiku-4-5-20251001` · `claude-opus-4-7` |
-| **Gemini** (Google) | `gemini-2.0-flash` | `gemini-1.5-flash` · `gemini-1.5-pro` · `gemini-2.5-pro` |
-| **OpenAI** | `gpt-4o-mini` | `gpt-4o` · `o4-mini` |
-| **Grok** (xAI) † | `grok-3-mini` | `grok-3` |
-| **Groq** † | `llama-3.3-70b-versatile` | `llama-3.1-8b-instant` · `gemma2-9b-it` |
-| **Ollama** (local) | `llama3.2` | any locally pulled model |
-
-<sup>† Grok and Groq use OpenAI-compatible APIs — `GrokProvider` and `GroqProvider` extend `OpenAIProvider`.</sup>
+The sidebar streams responses token-by-token, keeps your chat history per tab, and never blocks the page underneath.
 
 ---
 
@@ -101,8 +43,78 @@ flowchart LR
 
 1. Clone or download this repository
 2. Open `chrome://extensions`
-3. Enable **Developer mode** (top-right toggle)
-4. Click **Load unpacked** → select the `ai-sidebar` folder
+3. Enable **Developer mode** (top-right)
+4. Click **Load unpacked** and pick the `ai-sidebar` folder
+5. Click the toolbar icon → **Settings** → paste an API key for at least one provider
 
-> [!NOTE]
-> No build step required — plain HTML, CSS, and JS.
+> No build step. Plain HTML, CSS, and JS.
+
+---
+
+## Using Aside
+
+### Open and close
+- **Alt+A** toggles the sidebar on the current tab
+- Or click the extension icon, or right-click anywhere → *Open AI Sidebar*
+
+> If Alt+A doesn't work, another extension probably grabbed it. Re-bind at `chrome://extensions/shortcuts`.
+
+### Quick actions
+- **Tools tab** — one-click cards for Summarize, Extract, Find, Translate, Explain, Reply, Rewrite
+- **Selection actions** — highlight text on the page first, then use the Selection cards (Explain, Translate, Rewrite, Reply)
+- **Composer** — type any question; the page content is attached automatically
+
+### Language
+
+Aside auto-detects the page language from `<html lang>` and matches the sidebar's UI and responses to it.
+
+- **Globe icon** in the header → pick **Auto** or a specific language
+- Eight supported response languages: English, Hebrew, Spanish, French, German, Chinese, Arabic, Japanese
+- The sidebar UI itself currently switches between **English** and **Hebrew** (with full RTL layout for Hebrew)
+
+### Model switching
+Click the model name in the composer area to switch providers or models on the fly. Your last choice is remembered per provider.
+
+---
+
+## Providers & keys
+
+Aside supports six AI providers. You only need a key for the ones you actually use.
+
+| Provider | Default model | Where to get a key |
+|---|---|---|
+| **Claude** (Anthropic) | `claude-sonnet-4-6` | [console.anthropic.com](https://console.anthropic.com/) |
+| **Gemini** (Google) | `gemini-2.0-flash` | [aistudio.google.com](https://aistudio.google.com/apikey) |
+| **OpenAI** | `gpt-4o-mini` | [platform.openai.com](https://platform.openai.com/api-keys) |
+| **Grok** (xAI) | `grok-3-mini` | [console.x.ai](https://console.x.ai/) |
+| **Groq** | `llama-3.3-70b-versatile` | [console.groq.com](https://console.groq.com/keys) |
+| **Ollama** (local) | `llama3.2` | runs locally — no key needed |
+
+Keys are validated live against each provider's API when you save them, so you'll know immediately if a key is bad.
+
+---
+
+## Privacy
+
+- **Keys stay on your device** — stored in `chrome.storage.sync`, never sent anywhere except the provider you're calling
+- **Page content goes only to your chosen provider** — Aside has no backend of its own
+- **No telemetry, no analytics, no tracking**
+
+The extension requests `<all_urls>` host permission because it needs to read page content on whatever site you're on. It only does that when you actually open the sidebar.
+
+---
+
+## Keyboard shortcuts
+
+| Shortcut | Action |
+|---|---|
+| **Alt+A** | Toggle sidebar |
+| **Enter** | Send message |
+| **Shift+Enter** | New line in composer |
+| **Esc** | Close sidebar |
+
+---
+
+<div align="center">
+<sub>Aside can make mistakes. Check important info.</sub>
+</div>
