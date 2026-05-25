@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="sidebar.css">
+  <script src="../preview/chrome-shim.js"></script>
 
 </head>
 <body>
@@ -37,12 +38,23 @@
         <button class="sb-icon-btn" id="new-chat-btn" title="New chat" aria-label="New chat">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
         </button>
+        <button class="sb-icon-btn" id="compare-btn" title="Compare two models" aria-label="Compare" aria-pressed="false">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M17 4v16M3 8h8M13 16h8"/></svg>
+        </button>
+        <button class="sb-icon-btn" id="history-btn" title="Chat history" aria-label="Chat history">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/></svg>
+        </button>
+        <button class="sb-icon-btn" id="theme-btn" title="Theme" aria-label="Toggle theme">
+          <!-- icon swapped at runtime: sun / moon / auto -->
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" data-icon="auto"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        </button>
         <div class="sb-lang-wrap" id="lang-picker-host-wrap">
           <button class="sb-icon-btn sb-lang-btn" id="lang-btn" title="Language" aria-label="Language" aria-haspopup="listbox" aria-expanded="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           </button>
           <div id="lang-picker-host"></div>
         </div>
+        <div class="sb-header-divider" aria-hidden="true"></div>
         <button class="sb-icon-btn" id="settings-btn" title="Settings" aria-label="Settings">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.7l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.7-.3 1.6 1.6 0 0 0-1 1.4V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.4 1.6 1.6 0 0 0-1.7.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.7 1.6 1.6 0 0 0-1.4-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.4-1 1.6 1.6 0 0 0-.3-1.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.7.3H9a1.6 1.6 0 0 0 1-1.4V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.4 1.6 1.6 0 0 0 1.7-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.7V9a1.6 1.6 0 0 0 1.4 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.4 1z"/></svg>
         </button>
@@ -52,21 +64,63 @@
       </div>
     </header>
 
-    <!-- Onboarding -->
+    <!-- Onboarding (3-step guided flow) -->
     <div class="sb-onboarding" id="onboarding" style="display:none">
-      <svg width="40" height="40" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="ob-g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="var(--accent)"/>
-            <stop offset="1" stop-color="var(--accent-2)"/>
-          </linearGradient>
-        </defs>
-        <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="url(#ob-g)"/>
-        <circle cx="16" cy="27" r="1.7" fill="var(--accent)"/>
-      </svg>
-      <h3 data-i18n="onboarding_title">Set up your AI</h3>
-      <p data-i18n="onboarding_sub">Pick a provider (Claude, Gemini, Groq, etc.) and add your API key. Keys stay on your device.</p>
-      <button class="sb-primary-btn" id="onboarding-settings-btn" data-i18n="onboarding_cta">Open Settings</button>
+      <div class="sb-onboarding-progress" id="onboarding-progress">
+        <span class="sb-onboarding-step is-active" data-step="1"></span>
+        <span class="sb-onboarding-step" data-step="2"></span>
+        <span class="sb-onboarding-step" data-step="3"></span>
+      </div>
+
+      <!-- Step 1: Choose provider -->
+      <div class="sb-onb-pane" data-pane="1">
+        <div class="sb-onb-mark" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 32 32" fill="none">
+            <defs>
+              <linearGradient id="ob-g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="var(--accent)"/>
+                <stop offset="1" stop-color="var(--accent-2)"/>
+              </linearGradient>
+            </defs>
+            <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="url(#ob-g)"/>
+            <circle cx="16" cy="27" r="1.7" fill="var(--accent)"/>
+          </svg>
+        </div>
+        <h3 class="sb-onb-title" data-i18n="onb_step1_title">Choose your AI</h3>
+        <p class="sb-onb-sub" data-i18n="onb_step1_sub">Free options included. You can switch later.</p>
+        <div class="sb-onb-providers" id="onb-providers"></div>
+        <button class="sb-primary-btn sb-onb-cta" id="onb-step1-next" disabled data-i18n="onb_step1_cta">Continue</button>
+        <button class="sb-onb-link" id="onb-advanced" data-i18n="onb_advanced">Advanced setup</button>
+      </div>
+
+      <!-- Step 2: API key -->
+      <div class="sb-onb-pane" data-pane="2" hidden>
+        <div class="sb-onb-mark" id="onb-step2-mark" aria-hidden="true"></div>
+        <h3 class="sb-onb-title" id="onb-step2-title">Connect</h3>
+        <p class="sb-onb-sub" id="onb-step2-sub" data-i18n="onb_step2_sub">Paste your API key below. Keys are stored locally and never shared.</p>
+        <div class="sb-onb-key">
+          <input type="password" id="onb-key-input" class="sb-onb-input" autocomplete="off" spellcheck="false"/>
+          <div class="sb-onb-key-status" id="onb-key-status"></div>
+        </div>
+        <a class="sb-onb-link" id="onb-key-help" target="_blank" rel="noopener" data-i18n="onb_key_help">Where do I get a key?</a>
+        <div class="sb-onb-row">
+          <button class="sb-onb-link" id="onb-step2-back" data-i18n="onb_back">Back</button>
+          <button class="sb-primary-btn sb-onb-cta" id="onb-step2-next" disabled data-i18n="onb_step2_cta">Connect</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Try it -->
+      <div class="sb-onb-pane" data-pane="3" hidden>
+        <div class="sb-onb-mark" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
+        </div>
+        <h3 class="sb-onb-title" data-i18n="onb_step3_title">You\u2019re all set</h3>
+        <p class="sb-onb-sub" data-i18n="onb_step3_sub">Try one of these to see what Aside can do.</p>
+        <div class="sb-onb-tries" id="onb-tries"></div>
+        <button class="sb-primary-btn sb-onb-cta" id="onb-step3-done" data-i18n="onb_step3_cta">Start chatting</button>
+      </div>
     </div>
 
     <!-- Tabs -->
@@ -86,12 +140,39 @@
 
       <!-- Chat tab content -->
       <div class="sb-scroll" id="tab-chat">
+        <!-- Per-page memory banner (shown when prior threads exist on this URL) -->
+        <button class="sb-page-memory" id="page-memory" hidden>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 2"/>
+          </svg>
+          <span class="sb-page-memory-text" id="page-memory-text"></span>
+          <svg class="sb-page-memory-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>
+          </svg>
+        </button>
         <!-- Hero (empty state) -->
         <div class="sb-hero" id="hero">
-          <div class="sb-hero-mark">
-            <svg width="36" height="36" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <div class="sb-hero-mark" aria-hidden="true">
+            <svg class="sb-hero-mark-glow" width="120" height="120" viewBox="0 0 120 120" fill="none">
+              <defs>
+                <radialGradient id="hero-glow" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0" stop-color="var(--accent)" stop-opacity="0.35"/>
+                  <stop offset="0.6" stop-color="var(--accent)" stop-opacity="0.05"/>
+                  <stop offset="1" stop-color="var(--accent)" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <circle cx="60" cy="60" r="60" fill="url(#hero-glow)"/>
+            </svg>
+            <svg class="sb-hero-mark-icon" width="56" height="56" viewBox="0 0 32 32" fill="none">
+              <defs>
+                <linearGradient id="bm-g" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="var(--accent)"/>
+                  <stop offset="1" stop-color="var(--accent-2)"/>
+                </linearGradient>
+              </defs>
               <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="url(#bm-g)"/>
               <circle cx="16" cy="27" r="1.7" fill="var(--accent)"/>
+              <path class="sb-hero-mark-sparkle" d="M24 8 24.6 9.4 26 10 24.6 10.6 24 12 23.4 10.6 22 10 23.4 9.4z" fill="var(--accent)" opacity="0.7"/>
             </svg>
           </div>
           <h1 class="sb-hero-title" data-i18n="hero_title">How can I help with this page?</h1>
@@ -152,11 +233,20 @@
         </div>
       </div>
 
-      <!-- Command bar -->
-      <div class="sb-cmdbar" id="cmdbar"></div>
-
       <!-- Composer -->
       <div class="sb-composer">
+        <!-- Quick prompt templates (shown when input is empty) -->
+        <div class="sb-templates" id="templates" hidden>
+          <div class="sb-templates-scroll" id="templates-scroll"></div>
+        </div>
+        <!-- Page context indicator -->
+        <button class="sb-context-pill" id="context-pill" type="button" hidden>
+          <svg class="sb-context-pill-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16v12H5.17L4 17.17V4z"/>
+          </svg>
+          <span class="sb-context-pill-text" id="context-pill-text">Page context</span>
+          <span class="sb-context-pill-toggle" id="context-pill-toggle" aria-hidden="true"></span>
+        </button>
         <div class="sb-composer-inner">
             <textarea
             id="ask-input"
@@ -184,10 +274,39 @@
 
     <!-- Provider picker (overlay) -->
     <div id="picker-host"></div>
+
+    <!-- History overlay -->
+    <div class="sb-history-overlay" id="history-overlay" hidden>
+      <header class="sb-history-head">
+        <button class="sb-icon-btn" id="history-back" title="Close history" aria-label="Back">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        </button>
+        <span class="sb-history-title" data-i18n="history_title">Chat history</span>
+        <button class="sb-icon-btn" id="history-clear" title="Clear all" aria-label="Clear all">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </header>
+      <div class="sb-history-search-wrap">
+        <svg class="sb-history-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg>
+        <input id="history-search" class="sb-history-search" type="search" placeholder="Search threads…" data-i18n-placeholder="history_search_placeholder"/>
+      </div>
+      <div class="sb-history-filter" id="history-filter" hidden>
+        <span class="sb-history-filter-text" id="history-filter-text"></span>
+        <button class="sb-history-filter-clear" id="history-filter-clear" aria-label="Clear filter">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="sb-history-list" id="history-list">
+        <!-- populated by JS -->
+      </div>
+    </div>
   </div>
 
   <script src="translations.js"></script>
   <script src="i18n.js"></script>
+  <script src="../shared/provider-marks.js"></script>
+  <script src="history.js"></script>
+  <script src="prompt-templates.js"></script>
   <script src="../providers/base-provider.js"></script>
   <script src="../providers/claude-provider.js"></script>
   <script src="../providers/gemini-provider.js"></script>

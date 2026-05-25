@@ -18,7 +18,7 @@
   --shadow-md: 0 2px 6px rgba(20,18,14,0.05), 0 8px 22px rgba(20,18,14,0.06);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #1f1e1b; --bg-elev: #2a2925; --bg-sunk: #1a1917;
     --surface: #26241f; --surface-2: #2f2d28; --surface-3: #3a3832;
     --line: rgba(255,250,240,0.07); --line-strong: rgba(255,250,240,0.13);
@@ -29,6 +29,19 @@
   }
 }
 
+/* Explicit dark override (wins over auto) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1f1e1b; --bg-elev: #2a2925; --bg-sunk: #1a1917;
+  --surface: #26241f; --surface-2: #2f2d28; --surface-3: #3a3832;
+  --line: rgba(255,250,240,0.07); --line-strong: rgba(255,250,240,0.13);
+  --ink: #f5f2e9; --ink-2: #d8d4c7; --ink-3: #a09c8e; --ink-4: #7a766b; --ink-5: #56544d;
+  --accent: #d97757; --accent-2: #e88862; --accent-soft: rgba(217,119,87,0.16); --accent-ink: #f9d8c8;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 2px 6px rgba(0,0,0,0.35), 0 8px 22px rgba(0,0,0,0.25);
+}
+:root[data-theme="light"] { color-scheme: light; }
+
 html, body {
   background: var(--bg-sunk);
   color: var(--ink);
@@ -38,6 +51,15 @@ html, body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Focus rings — clay accent, keyboard-only */
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.set-key-input input:focus-visible { outline-offset: 0; }
+.set-provider:focus-visible { border-radius: 12px; }
 
 .set-shell {
   max-width: 1080px;
@@ -102,13 +124,25 @@ html, body {
 @keyframes fadein { from { opacity: 0; transform: translateY(2px); } }
 
 .set-save {
-  background: var(--ink); color: var(--bg);
-  border: none; border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  border-radius: 10px;
   padding: 9px 18px;
   font-family: inherit; font-size: 13px; font-weight: 600;
-  cursor: pointer; transition: background .15s;
+  cursor: pointer; transition: background .15s, color .15s, border-color .15s, opacity .15s;
 }
-.set-save:hover { background: var(--accent); }
+.set-save:hover { background: var(--surface-3); color: var(--ink-2); border-color: var(--line-strong); }
+.set-save.is-dirty {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.set-save.is-dirty:hover { background: var(--accent); border-color: var(--accent); }
+.set-save:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 .set-section { display: flex; flex-direction: column; gap: 14px; }
 .set-h2 {
@@ -132,6 +166,7 @@ html, body {
   background: var(--surface);
   border: 1px solid var(--line); border-radius: 12px;
   cursor: pointer; font-family: inherit; text-align: start;
+  color: var(--ink);
   transition: border-color .15s, box-shadow .15s;
 }
 .set-provider:hover { border-color: var(--line-strong); }
@@ -146,14 +181,28 @@ html, body {
   flex-shrink: 0;
 }
 .set-provider-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-.set-provider-name { font-weight: 600; font-size: 13.5px; }
+.set-provider-name { font-weight: 600; font-size: 13.5px; color: var(--ink); }
 .set-provider-model { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
 .set-tier {
   font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em;
   font-weight: 600; padding: 2px 6px; border-radius: 4px;
 }
-.set-tier--paid { background: var(--surface-2); color: var(--ink-3); }
-.set-tier--free { background: rgba(74,143,90,0.14); color: var(--success); }
+.set-tier--paid {
+  background: var(--surface-2);
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+}
+.set-tier--free {
+  background: rgba(74,143,90,0.15);
+  color: var(--success);
+  border: 1px solid rgba(74,143,90,0.25);
+}
+:root[data-theme="dark"] .set-tier--free,
+:root:not([data-theme="light"]) .set-tier--free {
+  background: rgba(127,200,142,0.18);
+  color: #7fc88e;
+  border-color: rgba(127,200,142,0.3);
+}
 
 /* Keys */
 .set-keys { display: flex; flex-direction: column; gap: 4px; }

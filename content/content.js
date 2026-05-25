@@ -66,10 +66,16 @@
     if (btn) return btn;
     btn = document.createElement('button');
     btn.id = TRIGGER_ID;
+    btn.type = 'button';
+    btn.setAttribute('aria-label', 'Ask Aside about this selection');
     btn.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-        <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="white"/>
-      </svg>
+      <span class="aside-fab-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 32 32" fill="none">
+          <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="white"/>
+          <circle cx="16" cy="27" r="1.5" fill="white" opacity="0.85"/>
+        </svg>
+      </span>
+      <span class="aside-fab-label">Ask Aside</span>
     `;
     btn.onclick = (e) => {
       e.preventDefault();
@@ -81,6 +87,8 @@
         iframe?.contentWindow?.postMessage({ type: 'SELECTION_TRIGGER', text }, '*');
       }, 250);
     };
+    // Don't let the FAB's own click-events bubble into the page's clear-selection logic
+    btn.onmousedown = (e) => e.stopPropagation();
     document.body.appendChild(btn);
     return btn;
   }
@@ -103,14 +111,32 @@
 
       const lastRect = rects[rects.length - 1];
       const btn = createTrigger();
-      
-      // Position relative to the viewport + scroll
-      const x = lastRect.right + window.scrollX + 10;
-      const y = lastRect.bottom + window.scrollY + 10;
-      
-      btn.style.left = `${x}px`;
-      btn.style.top = `${y}px`;
+      // Briefly clear inline pos so we can measure natural width
+      btn.style.left = '-9999px';
+      btn.style.top  = '-9999px';
       btn.classList.add('is-active');
+      const bw = btn.offsetWidth || 110;
+      const bh = btn.offsetHeight || 32;
+
+      // Prefer placement to the right of selection's end, just below it.
+      // Clamp to viewport (with 8px padding) so the FAB never slides offscreen.
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const padding = 8;
+
+      let x = lastRect.right + 10;          // viewport-relative
+      let y = lastRect.bottom + 8;
+      // If would overflow right edge, try left of selection start
+      if (x + bw > vw - padding) {
+        x = Math.max(padding, lastRect.left - bw - 10);
+      }
+      // If would overflow bottom, place above the selection
+      if (y + bh > vh - padding) {
+        y = Math.max(padding, lastRect.top - bh - 8);
+      }
+      // Convert to page coords
+      btn.style.left = (x + window.scrollX) + 'px';
+      btn.style.top  = (y + window.scrollY) + 'px';
     } catch (e) {
       hideTrigger();
     }
@@ -120,7 +146,6 @@
     const btn = document.getElementById(TRIGGER_ID);
     if (btn) {
       btn.classList.remove('is-active');
-      // Briefly keep it in DOM but inactive
     }
   }
 
@@ -149,6 +174,11 @@
     const iframe = document.getElementById(IFRAME_ID);
     if (!iframe) return;
     iframe.contentWindow?.postMessage({ type: 'PAGE_CONTENT', content: extractPageContent() }, '*');
+    iframe.contentWindow?.postMessage({
+      type: 'PAGE_META',
+      url: location.href,
+      title: document.title || '',
+    }, '*');
   }
 
   function sendSelectedText() {
@@ -172,6 +202,18 @@
   // Listeners
   document.addEventListener('mouseup', () => {
     setTimeout(positionTrigger, 10);
+  });
+
+  // Dismiss FAB on scroll or when user clicks elsewhere
+  let scrollDismissTimer;
+  document.addEventListener('scroll', () => {
+    // Throttle: only hide if user keeps scrolling
+    clearTimeout(scrollDismissTimer);
+    scrollDismissTimer = setTimeout(hideTrigger, 50);
+  }, { passive: true, capture: true });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hideTrigger();
   });
 
   document.addEventListener('selectionchange', () => {

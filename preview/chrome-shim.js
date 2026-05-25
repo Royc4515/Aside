@@ -82,6 +82,7 @@
   window.chrome.storage = {
     sync:  { get, set, clear, remove: () => Promise.resolve() },
     local: { get, set, clear, remove: () => Promise.resolve() },
+    onChanged: { addListener: () => {}, removeListener: () => {} },
   };
   window.chrome.i18n = {
     getMessage: (k) => (I18N[lang] && I18N[lang][k]) || (I18N.en[k] || ''),
@@ -90,39 +91,82 @@
   window.chrome.commands = { onCommand: { addListener: () => {} } };
   window.chrome.tabs = { query: () => Promise.resolve([]), sendMessage: () => Promise.resolve() };
 
-  // Seed reasonable defaults for the preview so we don't show onboarding by default
-  get(['activeProvider','apiKeys']).then(({ activeProvider, apiKeys }) => {
-    if (!activeProvider) {
-      set({ activeProvider: 'gemini', apiKeys: { ...(apiKeys||{}), gemini: 'demo-key' }, language: lang === 'he' ? 'he' : 'auto' });
+  // Seed reasonable defaults SYNCHRONOUSLY before sidebar.js runs init()
+  (function seedDefaults() {
+    const all = readStore();
+    if (!all.activeProvider) {
+      writeStore({
+        activeProvider: 'gemini',
+        apiKeys: { ...(all.apiKeys||{}), gemini: 'demo-key' },
+        language: lang === 'he' ? 'he' : 'auto',
+      });
     }
-  });
+  })();
 
   // Override ProviderFactory once it loads so preview returns canned responses
   // instead of hitting real APIs (which would fail without a key).
-  function installFakeProvider() {
-    if (!window.ProviderFactory) return setTimeout(installFakeProvider, 50);
-    const real = window.ProviderFactory.get;
-    window.ProviderFactory.get = function (id) {
+  // Uses a getter/setter on window.ProviderFactory so we patch synchronously
+  // the moment provider-factory.js assigns it — no race against sidebar.js init.
+  let __PF;
+  function patchFactory(factory) {
+    if (!factory || factory.__shimmed) return factory;
+    factory.__shimmed = true;
+    factory.get = function (id) {
+      function cannedResponse(prompt) {
+        const p = (prompt || '').toLowerCase();
+        if (lang === 'he') {
+          if (p.includes('summar')) return 'דוגמה: סיכום קצר של העמוד.\n\n- נקודה ראשונה\n- נקודה שנייה\n- נקודה שלישית';
+          if (p.includes('translat')) return 'תרגום לדוגמה של הטקסט הנבחר.';
+          if (p.includes('explain')) return 'הסבר ברור: זוהי תצוגה מקדימה של הצ׳אט. כשתתקינו את התוסף האמיתי עם מפתח API, התשובות יהיו אמיתיות.';
+          if (p.includes('hello world') || p.includes('javascript')) return 'דוגמת **Hello World** ב-JavaScript:\n\n```js\nconsole.log("Hello, world!");\n```\n\nשורת הקוד מדפיסה את הטקסט לקונסולה.';
+          return 'זו תצוגה מקדימה. הוסיפו מפתח API דרך ההגדרות כדי לקבל תשובות אמיתיות.';
+        }
+        if (p.includes('summar')) return 'Here\'s a quick summary of the page:\n\n- This is a **preview** of the redesigned sidebar.\n- The chat thread, tools tab, and command bar are wired up.\n- Markdown, tables, and code blocks all render.\n\n```js\nconsole.log("ready");\n```';
+        if (p.includes('translat')) return 'This is the translated text. Real translations will come from your selected provider.';
+        if (p.includes('explain')) return 'Sure — this is the **preview mode**. The real extension calls your chosen provider (Claude, GPT-4o, Gemini…) with your API key. For now, responses are canned so you can see the layout.';
+        if (p.includes('extract')) return '| Field | Value |\n|---|---|\n| Title | Sample Page |\n| Author | Demo |\n| Tags | preview, design |';
+        if (p.includes('reply')) return '1. Sounds good — let\'s do it.\n2. Could you share more context first?\n3. I\'ll need to think on this and get back to you.';
+        if (p.includes('hello world') || p.includes('javascript')) return 'Here\'s a classic **Hello World** in JavaScript:\n\n```js\nfunction greet(name) {\n  console.log(`Hello, ${name}!`);\n}\n\ngreet("world");\n```\n\nThe `greet` function takes a `name` parameter and uses a template literal to log a friendly message. Call it with any string to get a personalised greeting.';
+        return 'This is a preview response. Install Aside as a Chrome extension and add your API key to get real answers.';
+      }
+      function lastUserPrompt(messages) {
+        if (!Array.isArray(messages)) return '';
+        for (let i = messages.length - 1; i >= 0; i--) {
+          if (messages[i].role === 'user') return messages[i].content || '';
+        }
+        return '';
+      }
       return {
         async complete(prompt) {
-          // Tiny canned demo responses based on prompt verb
-          const p = (prompt || '').toLowerCase();
           await new Promise(r => setTimeout(r, 700));
-          if (lang === 'he') {
-            if (p.includes('summar')) return 'דוגמה: סיכום קצר של העמוד.\n\n- נקודה ראשונה\n- נקודה שנייה\n- נקודה שלישית';
-            if (p.includes('translat')) return 'תרגום לדוגמה של הטקסט הנבחר.';
-            if (p.includes('explain')) return 'הסבר ברור: זוהי תצוגה מקדימה של הצ׳אט. כשתתקינו את התוסף האמיתי עם מפתח API, התשובות יהיו אמיתיות.';
-            return 'זו תצוגה מקדימה. הוסיפו מפתח API דרך ההגדרות כדי לקבל תשובות אמיתיות.';
+          return cannedResponse(prompt);
+        },
+        async completeStream(messages, system, onChunk) {
+          const full = cannedResponse(lastUserPrompt(messages));
+          let i = 0;
+          while (i < full.length) {
+            const next = Math.min(i + (16 + Math.floor(Math.random() * 12)), full.length);
+            onChunk(full.slice(i, next));
+            i = next;
+            await new Promise(r => setTimeout(r, 18));
           }
-          if (p.includes('summar')) return 'Here\'s a quick summary of the page:\n\n- This is a **preview** of the redesigned sidebar.\n- The chat thread, tools tab, and command bar are wired up.\n- Markdown, tables, and code blocks all render.\n\n```js\nconsole.log("ready");\n```';
-          if (p.includes('translat')) return 'This is the translated text. Real translations will come from your selected provider.';
-          if (p.includes('explain')) return 'Sure — this is the **preview mode**. The real extension calls your chosen provider (Claude, GPT-4o, Gemini…) with your API key. For now, responses are canned so you can see the layout.';
-          if (p.includes('extract')) return '| Field | Value |\n|---|---|\n| Title | Sample Page |\n| Author | Demo |\n| Tags | preview, design |';
-          if (p.includes('reply')) return '1. Sounds good — let\'s do it.\n2. Could you share more context first?\n3. I\'ll need to think on this and get back to you.';
-          return 'This is a preview response. Install Aside as a Chrome extension and add your API key to get real answers.';
+        },
+        buildSystemPrompt(context, lang) {
+          return [context, lang ? `Respond in ${lang}.` : ''].filter(Boolean).join('\n\n');
         }
       };
     };
+    return factory;
   }
-  installFakeProvider();
+  // Intercept ProviderFactory assignment (provider-factory.js does `self.ProviderFactory = ...`)
+  if (Object.getOwnPropertyDescriptor(window, 'ProviderFactory')?.value) {
+    __PF = patchFactory(window.ProviderFactory);
+  } else {
+    Object.defineProperty(window, 'ProviderFactory', {
+      configurable: true,
+      enumerable: true,
+      get() { return __PF; },
+      set(v)  { __PF = patchFactory(v); },
+    });
+  }
 })();

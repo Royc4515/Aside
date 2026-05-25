@@ -34,9 +34,31 @@ let state = {
   theme: 'auto',
   pageContext: true,
 };
+let baseline = null; // snapshot of state from last save / load
 let activePage = 'provider';
 
+function snapshotBaseline() {
+  baseline = JSON.stringify({ ...state, apiKeys: { ...state.apiKeys } });
+  updateDirtyState();
+}
+function isDirty() {
+  if (!baseline) return false;
+  return JSON.stringify({ ...state, apiKeys: { ...state.apiKeys } }) !== baseline;
+}
+function updateDirtyState() {
+  const btn = document.getElementById('save-btn');
+  if (!btn) return;
+  btn.classList.toggle('is-dirty', isDirty());
+  btn.disabled = !isDirty();
+}
+
 // ── Init ────────────────────────────────────────────────────────────
+function applyTheme(theme) {
+  const html = document.documentElement;
+  if (theme === 'light' || theme === 'dark') html.setAttribute('data-theme', theme);
+  else html.removeAttribute('data-theme');
+}
+
 async function init() {
   const stored = await chrome.storage.sync.get([
     'activeProvider','apiKeys','language','position','width','theme','pageContext'
@@ -46,6 +68,7 @@ async function init() {
     ...stored,
     apiKeys: stored.apiKeys || {},
   };
+  applyTheme(state.theme);
   renderNav();
   renderProviders();
   renderKeys();
@@ -53,12 +76,14 @@ async function init() {
   renderLanguage();
   renderAdvanced();
   bindGlobal();
+  snapshotBaseline();
   showPage(activePage);
 }
 
 function bindGlobal() {
   document.getElementById('save-btn').onclick = async () => {
     await chrome.storage.sync.set(state);
+    snapshotBaseline();
     flashSaved();
   };
   document.getElementById('reset-btn').onclick = async () => {
@@ -107,7 +132,7 @@ function renderProviders() {
   const root = document.getElementById('providers');
   root.innerHTML = PROVIDERS.map(p => `
     <button class="set-provider${p.id===state.activeProvider?' is-active':''}" data-id="${p.id}">
-      <span class="set-provider-mark" style="background:${p.hue}">${p.letter}</span>
+      ${window.providerChip ? window.providerChip(p.id, 36, p.hue) : `<span class="set-provider-mark" style="background:${p.hue}">${p.letter}</span>`}
       <span class="set-provider-body">
         <span class="set-provider-name">${p.name}</span>
         <span class="set-provider-model">${p.model}</span>
@@ -119,6 +144,7 @@ function renderProviders() {
     b.onclick = async () => {
       state.activeProvider = b.dataset.id;
       await chrome.storage.sync.set({ activeProvider: state.activeProvider });
+      snapshotBaseline(); // active provider auto-saves, so re-baseline
       renderProviders();
     };
   });
@@ -129,7 +155,7 @@ function renderKeys() {
   root.innerHTML = PROVIDERS.filter(p => p.id !== 'ollama').map(p => `
     <div class="set-key-row">
       <div class="set-key-label">
-        <span class="dot" style="background:${p.hue}"></span>
+        ${window.providerChip ? window.providerChip(p.id, 22, p.hue) : `<span class="dot" style="background:${p.hue}"></span>`}
         <span>${p.name}</span>
       </div>
       <div class="set-key-input">
@@ -146,11 +172,12 @@ function renderKeys() {
     </div>
   `).join('');
   root.querySelectorAll('input[data-id]').forEach(inp => {
-    inp.oninput = () => { state.apiKeys[inp.dataset.id] = inp.value; };
+    inp.oninput = () => { state.apiKeys[inp.dataset.id] = inp.value; updateDirtyState(); };
   });
   root.querySelectorAll('.set-key-validate').forEach(btn => {
     btn.onclick = async () => {
       await chrome.storage.sync.set({ apiKeys: state.apiKeys, activeProvider: state.activeProvider });
+      snapshotBaseline();
       btn.textContent = '✓ Saved';
       btn.classList.add('is-valid');
       setTimeout(() => { btn.classList.remove('is-valid'); btn.textContent = 'Save'; }, 1500);
@@ -166,6 +193,8 @@ function renderAppearance() {
       b.classList.toggle('is-active', b.dataset.value === state[setting]);
       b.onclick = () => {
         state[setting] = b.dataset.value;
+        if (setting === 'theme') applyTheme(state.theme);
+        updateDirtyState();
         renderAppearance();
       };
     });
@@ -177,6 +206,7 @@ function renderAppearance() {
   slider.oninput = () => {
     state.width = +slider.value;
     val.textContent = `${state.width}px`;
+    updateDirtyState();
   };
 }
 
@@ -184,14 +214,14 @@ function renderAppearance() {
 function renderLanguage() {
   const sel = document.getElementById('language-select');
   sel.value = state.language || 'auto';
-  sel.onchange = () => { state.language = sel.value; };
+  sel.onchange = () => { state.language = sel.value; updateDirtyState(); };
 }
 
 // ── Advanced ──────────────────────────────────────────────────────
 function renderAdvanced() {
   const t = document.getElementById('page-context-toggle');
   t.checked = state.pageContext !== false;
-  t.onchange = () => { state.pageContext = t.checked; };
+  t.onchange = () => { state.pageContext = t.checked; updateDirtyState(); };
 }
 
 init();
