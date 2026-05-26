@@ -282,15 +282,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 
 .sb-hero-title {
   font-family: var(--font-serif);
-  font-size: 26px; letter-spacing: -0.015em;
-  color: var(--ink); margin: 0 0 6px;
+  font-size: 26px; font-weight: 600; letter-spacing: -0.015em;
+  color: var(--ink); margin: 0 0 8px;
   line-height: 1.15;
   text-wrap: balance;
   max-width: 280px;
   transition: opacity .15s;
 }
 .sb-hero-sub {
-  font-size: 13px; color: var(--ink-3);
+  font-size: 13.5px; color: var(--ink-2);
   max-width: 260px; margin: 0 0 20px;
   line-height: 1.55;
   text-wrap: pretty;
@@ -605,10 +605,6 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   box-shadow: var(--shadow-sm);
   transition: border-color .15s, box-shadow .15s;
 }
-.sb-composer-inner:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
 .sb-composer-input {
   width: 100%;
   background: transparent; border: none; outline: none;
@@ -618,6 +614,13 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   font-family: inherit;
   font-size: 13.5px; line-height: 1.5;
   max-height: 180px;
+  transition: background .15s;
+  border-radius: 12px 12px 0 0;
+}
+.sb-composer-input:focus,
+.sb-composer-input:focus-visible {
+  outline: none;
+  background: var(--surface-2);
 }
 .sb-composer-input::placeholder { color: var(--ink-4); }
 .sb-composer-toolbar {
@@ -649,7 +652,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 .sb-send:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .sb-foot-note {
-  text-align: center; font-size: 10.5px; color: var(--ink-4);
+  text-align: center; font-size: 11px; color: var(--ink-3);
   padding: 4px 0 6px;
 }
 
