@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="marketing/hero.png" alt="Aside — AI in your sidebar" width="100%"/>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="marketing/hero-dark.png">
+  <img src="marketing/hero-light.png" alt="Aside — AI in your sidebar" width="100%"/>
+</picture>
 
 # Aside
 
