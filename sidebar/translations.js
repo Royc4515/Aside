@@ -58,6 +58,10 @@ const TRANSLATIONS = {
     compare_off:      'Compare mode off',
     compare_no_key:   'No API key configured.',
     compare_needs_two:'Compare needs API keys for two providers. Add another in Settings.',
+    compare_use_this: 'Use this',
+    compare_use_this_title: 'Continue with this model',
+    compare_kept:     'Continuing with',
+    picker_compare_against: 'Compare against',
 
     // ── hero suggestions ──────────────────────────────────────────────────
     hero_summarize:   'Summarize this page',
@@ -167,6 +171,10 @@ const TRANSLATIONS = {
     compare_off:      'מצב השוואה כבוי',
     compare_no_key:   'לא הוגדר מפתח API.',
     compare_needs_two:'השוואה דורשת מפתחות API לשני ספקים. הוסיפו עוד אחד בהגדרות.',
+    compare_use_this: 'בחר זה',
+    compare_use_this_title: 'המשך עם המודל הזה',
+    compare_kept:     'ממשיך עם',
+    picker_compare_against: 'השווה מול',
 
     // ── hero suggestions ──────────────────────────────────────────────────
     hero_summarize:   'סכמו את העמוד',
@@ -806,3 +814,6 @@ function setUILanguage(lang) {
 function t(key) {
   return TRANSLATIONS[_uiLang]?.[key] ?? TRANSLATIONS.en[key] ?? '';
 }
+
+window.t = t;
+window.setUILanguage = setUILanguage;

@@ -117,7 +117,8 @@ function bindUI() {
   };
   document.getElementById('theme-btn').onclick = cycleTheme;
   document.getElementById('lang-btn').onclick = () => toggleLangPicker();
-  document.getElementById('model-btn').onclick = () => togglePicker();
+  document.getElementById('model-btn').onclick = () => togglePicker('a');
+  document.getElementById('model-btn-b').onclick = () => togglePicker('b');
 
   document.getElementById('ask-btn').onclick = handleAsk;
   const input = document.getElementById('ask-input');
@@ -471,6 +472,39 @@ function providerInfoById(id) {
   return PROVIDERS.find(p => p.id === id) || PROVIDERS[0];
 }
 
+async function useThisAnswer(turnIdx) {
+  const chosen = turns[turnIdx];
+  if (!chosen || !chosen.compareSide) return;
+  const otherSide = chosen.compareSide === 'A' ? 'B' : 'A';
+  // Find the paired turn (closest sibling with the other compareSide, same neighbourhood).
+  let pairedIdx = -1;
+  for (let d = 1; d <= 2; d++) {
+    if (turns[turnIdx - d]?.compareSide === otherSide) { pairedIdx = turnIdx - d; break; }
+    if (turns[turnIdx + d]?.compareSide === otherSide) { pairedIdx = turnIdx + d; break; }
+  }
+  // Promote the chosen model to active.
+  const chosenId = chosen.model?.id;
+  if (chosenId && chosenId !== settings.activeProvider) {
+    settings.activeProvider = chosenId;
+    try { provider = ProviderFactory.get(chosenId, settings.apiKeys); } catch (e) {}
+    await chrome.storage.sync.set({ activeProvider: chosenId });
+  }
+  // Strip compare metadata from the kept turn so it renders as a normal answer.
+  delete chosen.compareSide;
+  chosen.action = chosen.action ? chosen.action.split(' · ')[0] : chosen.action;
+  // Remove the other side.
+  if (pairedIdx !== -1) turns.splice(pairedIdx, 1);
+  // Exit compare mode.
+  compareMode = false;
+  const btn = document.getElementById('compare-btn');
+  btn.setAttribute('aria-pressed', 'false');
+  btn.classList.remove('is-active');
+  renderHeader();
+  renderTurns();
+  persistCurrentThread();
+  showToast(`${t('compare_kept') || 'Continuing with'} ${(chosen.model || activeProviderInfo()).name}`);
+}
+
 let _toastTimer;
 function showToast(text) {
   let el = document.getElementById('sb-toast');
@@ -646,47 +680,97 @@ function renderHeader() {
   document.getElementById('model-dot').style.background = p.hue;
   document.getElementById('composer-model-name').textContent = p.name;
   document.getElementById('composer-dot').style.background = p.hue;
+
+  const arrow = document.getElementById('compare-arrow');
+  const btnB  = document.getElementById('model-btn-b');
+  if (compareMode && compareProviderId) {
+    const b = providerInfoById(compareProviderId);
+    document.getElementById('model-name-b').textContent =
+      (b.id === p.id) ? `${b.name} (B)` : b.name;
+    document.getElementById('model-dot-b').style.background = b.hue;
+    arrow.hidden = false;
+    btnB.hidden  = false;
+  } else {
+    arrow.hidden = true;
+    btnB.hidden  = true;
+  }
 }
 
-function togglePicker() {
+let pickerSlot = 'a'; // 'a' = activeProvider, 'b' = compareProviderId
+
+function togglePicker(slot = 'a') {
+  // Reopen with a different slot if already open
+  if (pickerOpen && slot !== pickerSlot) {
+    pickerSlot = slot;
+    renderPicker();
+    document.getElementById('model-btn').setAttribute('aria-expanded', String(slot === 'a'));
+    document.getElementById('model-btn-b').setAttribute('aria-expanded', String(slot === 'b'));
+    return;
+  }
   pickerOpen = !pickerOpen;
+  pickerSlot = slot;
   const host = document.getElementById('picker-host');
-  document.getElementById('model-btn').setAttribute('aria-expanded', String(pickerOpen));
+  const btnA = document.getElementById('model-btn');
+  const btnB = document.getElementById('model-btn-b');
+  btnA.setAttribute('aria-expanded', String(pickerOpen && slot === 'a'));
+  if (btnB) btnB.setAttribute('aria-expanded', String(pickerOpen && slot === 'b'));
   if (!pickerOpen) { host.innerHTML = ''; return; }
+  renderPicker();
+}
+
+function renderPicker() {
+  const host = document.getElementById('picker-host');
+  const isB = pickerSlot === 'b';
+  const currentId = isB ? compareProviderId : settings.activeProvider;
+  const label = isB
+    ? (t('picker_compare_against') || 'Compare against')
+    : t('picker_switch_model');
+
+  // For slot B, show only providers with a key; allow same as A (self-compare)
+  const list = isB
+    ? PROVIDERS.filter(p => hasProviderKey(p.id))
+    : PROVIDERS;
 
   host.innerHTML = `
     <div class="sb-picker-veil" id="picker-veil"></div>
-    <div class="sb-picker" role="listbox">
-      <div class="sb-picker-label">${t('picker_switch_model')}</div>
-      ${PROVIDERS.map(p => `
-        <button class="sb-picker-row${p.id===settings.activeProvider?' is-active':''}" data-id="${p.id}">
+    <div class="sb-picker${isB ? ' sb-picker--b' : ''}" role="listbox">
+      <div class="sb-picker-label">${label}</div>
+      ${list.map(p => {
+        const isActive = p.id === currentId;
+        const isSelf   = isB && p.id === settings.activeProvider;
+        return `
+        <button class="sb-picker-row${isActive?' is-active':''}" data-id="${p.id}">
           ${window.providerChip ? window.providerChip(p.id, 22, p.hue) : `<span class="dot" style="background:${p.hue}"></span>`}
-          <span class="sb-picker-name">${p.name}</span>
+          <span class="sb-picker-name">${p.name}${isSelf ? ' <span class="sb-picker-model">(self)</span>' : ''}</span>
           <span class="sb-picker-model">${p.model}</span>
-          ${p.id===settings.activeProvider?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>':''}
+          ${isActive?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>':''}
         </button>
-      `).join('')}
+      `;}).join('')}
     </div>
   `;
-  document.getElementById('picker-veil').onclick = () => togglePicker();
+  document.getElementById('picker-veil').onclick = () => togglePicker(pickerSlot);
   host.querySelectorAll('.sb-picker-row').forEach(b => {
     b.onclick = async () => {
       const id = b.dataset.id;
-      if (id === settings.activeProvider) { togglePicker(); return; }
+      if (isB) {
+        compareProviderId = id;
+        renderHeader();
+        togglePicker('b');
+        return;
+      }
+      if (id === settings.activeProvider) { togglePicker('a'); return; }
       if (!settings.apiKeys[id] && id !== 'ollama') {
-        togglePicker(); chrome.runtime.openOptionsPage(); return;
+        togglePicker('a'); chrome.runtime.openOptionsPage(); return;
       }
       settings.activeProvider = id;
       await chrome.storage.sync.set({ activeProvider: id });
       try { provider = ProviderFactory.get(id, settings.apiKeys); } catch(e){}
-      if (compareMode) {
-        if (!hasProviderKey(compareProviderId)) {
-          const eligible = PROVIDERS.filter(p => p.id !== id && hasProviderKey(p.id));
-          compareProviderId = eligible[0]?.id || id;
-        }
+      if (compareMode && !hasProviderKey(compareProviderId)) {
+        const eligible = PROVIDERS.filter(p => p.id !== id && hasProviderKey(p.id));
+        compareProviderId = eligible[0]?.id || id;
       }
       renderHeader();
-      togglePicker();
+      togglePicker('a');
     };
   });
 }
@@ -1032,8 +1116,11 @@ async function runComparePrompt(label) {
   try { bProvider = ProviderFactory.get(compareProviderId, settings.apiKeys); }
   catch (e) { /* fall through; we'll mark error on B */ }
 
-  const skelA = pushTurn({ role: 'assistant', loading: true, action: `${actionLabel(label)} · ${aInfo.name}`, compareSide: 'A' });
-  const skelB = pushTurn({ role: 'assistant', loading: true, action: `${actionLabel(label)} · ${bInfo.name}`, compareSide: 'B' });
+  const sameProvider = aInfo.id === bInfo.id;
+  const aLabel = sameProvider ? `${aInfo.name} (A)` : aInfo.name;
+  const bLabel = sameProvider ? `${bInfo.name} (B)` : bInfo.name;
+  const skelA = pushTurn({ role: 'assistant', loading: true, action: `${actionLabel(label)} · ${aLabel}`, compareSide: 'A' });
+  const skelB = pushTurn({ role: 'assistant', loading: true, action: `${actionLabel(label)} · ${bLabel}`, compareSide: 'B' });
 
   async function streamOne(skel, prov, info) {
     let accum = '';
@@ -1163,6 +1250,9 @@ function renderTurns() {
       }).catch(() => {});
     };
   });
+  root.querySelectorAll('[data-use-this]').forEach(b => {
+    b.onclick = () => useThisAnswer(+b.dataset.useThis);
+  });
   // Code block copy buttons (markdown ```fences```)
   root.querySelectorAll('.sb-codeblock-copy').forEach(b => {
     b.onclick = () => {
@@ -1218,6 +1308,10 @@ function turnHtml(t, i) {
         </span>` : ''}
       </span>
       <div class="sb-turn-foot-actions">
+        ${t.compareSide ? `<button class="sb-use-this-btn" data-use-this="${i}" title="${window.t('compare_use_this_title') || 'Continue with this model'}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>
+          <span>${window.t('compare_use_this') || 'Use this'}</span>
+        </button>` : ''}
         <button class="sb-mini-btn" data-copy="${i}" title="Copy">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
         </button>
