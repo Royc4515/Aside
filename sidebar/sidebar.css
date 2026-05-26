@@ -162,6 +162,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   border-radius: 10px;
   font-size: 12px;
 }
+.sb-compare-bar[hidden] { display: none; }
 .sb-compare-bar-label {
   color: var(--accent-on-soft); font-weight: 600;
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
