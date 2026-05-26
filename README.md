@@ -92,6 +92,8 @@ real API before saving. Switch providers any time from the sidebar header.
 
 No build step. No npm install. No accounts. Just unzip and load.
 
+**Want a slim install zip?** Run `pwsh ./scripts/build-zip.ps1` (or `bash ./scripts/build-zip.sh`) — it produces `dist/aside-<version>.zip` containing only the runtime files, ready to share.
+
 ---
 
 ## How it works
@@ -141,7 +143,7 @@ own model selection.
 
 Aside is a vanilla MV3 Chrome extension — no build step, no bundler, no
 framework. The full architecture, provider class hierarchy, and runtime
-flow are documented in **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+flow are documented in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
 ```
 background.js       MV3 service worker (Alt+A, context menu, API-key validation)
