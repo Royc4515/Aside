@@ -36,7 +36,10 @@ don't have to paste anything. You pick the model. You stay on the page.
 <br/>
 
 <div align="center">
-  <img src="marketing/features-dark.png" alt="Context-aware AI sidebar for Chrome" width="92%"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="marketing/features-dark.png">
+    <img src="marketing/features-light.png" alt="Context-aware AI sidebar for Chrome" width="92%"/>
+  </picture>
 </div>
 
 <br/>
@@ -53,7 +56,10 @@ don't have to paste anything. You pick the model. You stay on the page.
 ## Providers
 
 <div align="center">
-  <img src="marketing/providers-dark.png" alt="Six providers, one sidebar" width="90%"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="marketing/providers-dark.png">
+    <img src="marketing/providers-light.png" alt="Six providers, one sidebar" width="90%"/>
+  </picture>
 </div>
 
 | Provider | What you need | Default model |
