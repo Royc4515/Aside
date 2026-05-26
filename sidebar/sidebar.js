@@ -117,9 +117,9 @@ function bindUI() {
   };
   document.getElementById('theme-btn').onclick = cycleTheme;
   document.getElementById('lang-btn').onclick = () => toggleLangPicker();
-  document.getElementById('model-btn').onclick = () => togglePicker('a');
-  document.getElementById('compare-slot-a').onclick = () => togglePicker('a');
-  document.getElementById('compare-slot-b').onclick = () => togglePicker('b');
+  document.getElementById('model-btn').onclick = (e) => togglePicker('a', e.currentTarget);
+  document.getElementById('compare-slot-a').onclick = (e) => togglePicker('a', e.currentTarget);
+  document.getElementById('compare-slot-b').onclick = (e) => togglePicker('b', e.currentTarget);
   document.getElementById('compare-bar-close').onclick = () => { if (compareMode) toggleCompareMode(); };
 
   document.getElementById('ask-btn').onclick = handleAsk;
@@ -700,8 +700,9 @@ function renderCompareBar() {
 }
 
 let pickerSlot = 'a'; // 'a' = activeProvider, 'b' = compareProviderId
+let pickerAnchor = null; // element that opened the picker
 
-function togglePicker(slot = 'a') {
+function togglePicker(slot = 'a', anchor = null) {
   const triggers = {
     a: [document.getElementById('model-btn'), document.getElementById('compare-slot-a')],
     b: [document.getElementById('compare-slot-b')],
@@ -717,16 +718,46 @@ function togglePicker(slot = 'a') {
   // Reopen with a different slot if already open
   if (pickerOpen && slot !== pickerSlot) {
     pickerSlot = slot;
+    pickerAnchor = anchor || triggers[slot][0];
     renderPicker();
     setAria(true, slot);
     return;
   }
   pickerOpen = !pickerOpen;
   pickerSlot = slot;
+  pickerAnchor = pickerOpen ? (anchor || triggers[slot][0]) : null;
   setAria(pickerOpen, slot);
   const host = document.getElementById('picker-host');
   if (!pickerOpen) { host.innerHTML = ''; return; }
   renderPicker();
+}
+
+function positionPickerNearAnchor() {
+  const anchor = pickerAnchor;
+  const pickerEl = document.querySelector('#picker-host .sb-picker');
+  if (!anchor || !pickerEl) return;
+  const r = anchor.getBoundingClientRect();
+  const vh = window.innerHeight;
+  const vw = window.innerWidth;
+  // Reset static positioning from CSS.
+  pickerEl.style.top = 'auto';
+  pickerEl.style.bottom = 'auto';
+  pickerEl.style.left = 'auto';
+  pickerEl.style.right = 'auto';
+  pickerEl.style.insetInlineEnd = 'auto';
+  pickerEl.style.insetInlineStart = 'auto';
+  // Open above if anchor is in the bottom half of the viewport.
+  const openUp = r.top > vh / 2;
+  if (openUp) {
+    pickerEl.style.bottom = `${vh - r.top + 6}px`;
+  } else {
+    pickerEl.style.top = `${r.bottom + 6}px`;
+  }
+  // Horizontal alignment: clamp the picker to the viewport.
+  const pickerW = pickerEl.offsetWidth || 246;
+  let left = r.left;
+  if (left + pickerW > vw - 8) left = Math.max(8, vw - pickerW - 8);
+  pickerEl.style.left = `${left}px`;
 }
 
 function renderPicker() {
@@ -759,6 +790,7 @@ function renderPicker() {
       `;}).join('')}
     </div>
   `;
+  positionPickerNearAnchor();
   document.getElementById('picker-veil').onclick = () => togglePicker(pickerSlot);
   host.querySelectorAll('.sb-picker-row').forEach(b => {
     b.onclick = async () => {

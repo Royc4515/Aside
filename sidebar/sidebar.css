@@ -217,9 +217,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 #lang-picker-host .sb-picker { width: 190px; }
 
 /* Picker */
-.sb-picker-veil { position: absolute; inset: 0; z-index: 9; }
+.sb-picker-veil { position: fixed; inset: 0; z-index: 9; }
 .sb-picker {
-  position: absolute; top: 46px; inset-inline-end: 12px;
+  position: fixed; top: 46px; inset-inline-end: 12px;
   width: 246px; background: var(--bg-elev);
   border: 1px solid var(--line); border-radius: var(--r-md);
   box-shadow: var(--shadow-lg);
