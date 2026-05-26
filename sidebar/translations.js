@@ -61,6 +61,7 @@ const TRANSLATIONS = {
     compare_use_this: 'Use this',
     compare_use_this_title: 'Continue with this model',
     compare_kept:     'Continuing with',
+    compare_label:    'Compare',
     picker_compare_against: 'Compare against',
 
     // ── hero suggestions ──────────────────────────────────────────────────
@@ -174,6 +175,7 @@ const TRANSLATIONS = {
     compare_use_this: 'בחר זה',
     compare_use_this_title: 'המשך עם המודל הזה',
     compare_kept:     'ממשיך עם',
+    compare_label:    'השוואה',
     picker_compare_against: 'השווה מול',
 
     // ── hero suggestions ──────────────────────────────────────────────────
