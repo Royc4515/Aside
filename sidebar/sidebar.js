@@ -71,7 +71,9 @@ async function init() {
 function applyUILanguage() {
   const lang = getEffectiveLang(settings.language, detectedLang) || 'en';
   setUILanguage(lang);
+  document.documentElement.lang = lang;
   document.documentElement.dir = (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr';
+  delete pickHeroTitle._pick;
   applyI18n();
   renderHero();
   renderTools();
@@ -436,17 +438,28 @@ async function cycleTheme() {
 }
 
 // ── Compare mode ───────────────────────────────────────────────────────
+function hasProviderKey(id) {
+  if (id === 'ollama') return true;
+  return Boolean(settings.apiKeys && settings.apiKeys[id]);
+}
+
 function toggleCompareMode() {
-  compareMode = !compareMode;
+  const next = !compareMode;
+  if (next) {
+    if (!hasProviderKey(settings.activeProvider)) {
+      showToast(t('compare_no_key') || 'No API key configured.');
+      return;
+    }
+    const others = PROVIDERS.filter(p => p.id !== settings.activeProvider && hasProviderKey(p.id));
+    if (!compareProviderId || !hasProviderKey(compareProviderId)) {
+      compareProviderId = others[0]?.id || settings.activeProvider;
+    }
+  }
+  compareMode = next;
   const btn = document.getElementById('compare-btn');
   btn.setAttribute('aria-pressed', String(compareMode));
   btn.classList.toggle('is-active', compareMode);
   if (compareMode) {
-    // Default the comparison model to the next provider in PROVIDERS that isn't current
-    if (!compareProviderId || compareProviderId === settings.activeProvider) {
-      const others = PROVIDERS.filter(p => p.id !== settings.activeProvider);
-      compareProviderId = others[0]?.id || null;
-    }
     showToast(`${t('compare_on') || 'Compare mode on'} · ${activeProviderInfo().name} ↔ ${providerInfoById(compareProviderId).name}`);
   } else {
     showToast(t('compare_off') || 'Compare mode off');
@@ -666,6 +679,12 @@ function togglePicker() {
       settings.activeProvider = id;
       await chrome.storage.sync.set({ activeProvider: id });
       try { provider = ProviderFactory.get(id, settings.apiKeys); } catch(e){}
+      if (compareMode) {
+        if (!hasProviderKey(compareProviderId)) {
+          const eligible = PROVIDERS.filter(p => p.id !== id && hasProviderKey(p.id));
+          compareProviderId = eligible[0]?.id || id;
+        }
+      }
       renderHeader();
       togglePicker();
     };
@@ -1068,7 +1087,7 @@ async function runComparePrompt(label) {
 
 // ── Core prompt runner (streaming) ────────────────────────────────────
 async function runPrompt(label) {
-  if (compareMode && compareProviderId && compareProviderId !== settings.activeProvider) {
+  if (compareMode && compareProviderId) {
     return runComparePrompt(label);
   }
   busy = true;
