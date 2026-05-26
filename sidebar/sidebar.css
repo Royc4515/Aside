@@ -152,6 +152,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 .sb-model:hover { background: var(--surface-3); border-color: var(--line-strong); }
 .sb-model-name { font-weight: 600; }
 .sb-model-sub  { color: var(--ink-3); font-size: 11.5px; }
+.sb-compare-arrow {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--accent); padding: 0 2px; flex-shrink: 0;
+}
+.sb-model--b { border-color: var(--accent-soft); }
+.sb-model--b:hover { border-color: var(--accent); }
 
 .sb-icon-btn {
   width: 28px; height: 28px;
@@ -574,6 +580,17 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   display: inline-flex; align-items: center; justify-content: center;
 }
 .sb-mini-btn:hover { background: var(--surface-2); color: var(--ink); }
+.sb-use-this-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 22px; padding: 0 8px;
+  border-radius: 999px;
+  background: var(--accent-soft); border: 1px solid transparent;
+  color: var(--accent-on-soft);
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  transition: background .12s, border-color .12s;
+}
+.sb-use-this-btn:hover { background: var(--accent); color: #fff; }
+.sb-use-this-btn svg { width: 11px; height: 11px; }
 
 /* ── Skeleton (replaces bouncing dots) ─────────────────────────── */
 .sb-skeleton {
