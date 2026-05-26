@@ -35,14 +35,6 @@
           <span class="sb-model-name" id="model-name">—</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        <span class="sb-compare-arrow" id="compare-arrow" hidden aria-hidden="true">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l-4 4 4 4M3 11h14"/><path d="M17 17l4-4-4-4M21 13H7"/></svg>
-        </span>
-        <button class="sb-model sb-model--b" id="model-btn-b" hidden aria-haspopup="listbox" aria-expanded="false">
-          <span class="dot" id="model-dot-b"></span>
-          <span class="sb-model-name" id="model-name-b">—</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
         <button class="sb-icon-btn" id="new-chat-btn" title="New chat" aria-label="New chat">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
         </button>
@@ -246,6 +238,26 @@
         <!-- Quick prompt templates (shown when input is empty) -->
         <div class="sb-templates" id="templates" hidden>
           <div class="sb-templates-scroll" id="templates-scroll"></div>
+        </div>
+        <!-- Compare bar (visible only in compare mode) -->
+        <div class="sb-compare-bar" id="compare-bar" hidden>
+          <span class="sb-compare-bar-label" data-i18n="compare_label">Compare</span>
+          <button class="sb-compare-slot" id="compare-slot-a" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dot" id="compare-dot-a"></span>
+            <span id="compare-name-a">—</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <span class="sb-compare-bar-arrow" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l-4 4 4 4M3 11h14"/><path d="M17 17l4-4-4-4M21 13H7"/></svg>
+          </span>
+          <button class="sb-compare-slot" id="compare-slot-b" type="button" aria-haspopup="listbox" aria-expanded="false">
+            <span class="dot" id="compare-dot-b"></span>
+            <span id="compare-name-b">—</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <button class="sb-compare-bar-close" id="compare-bar-close" type="button" aria-label="Exit compare">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
         </div>
         <!-- Page context indicator -->
         <button class="sb-context-pill" id="context-pill" type="button" hidden>

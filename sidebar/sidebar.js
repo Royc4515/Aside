@@ -118,7 +118,9 @@ function bindUI() {
   document.getElementById('theme-btn').onclick = cycleTheme;
   document.getElementById('lang-btn').onclick = () => toggleLangPicker();
   document.getElementById('model-btn').onclick = () => togglePicker('a');
-  document.getElementById('model-btn-b').onclick = () => togglePicker('b');
+  document.getElementById('compare-slot-a').onclick = () => togglePicker('a');
+  document.getElementById('compare-slot-b').onclick = () => togglePicker('b');
+  document.getElementById('compare-bar-close').onclick = () => { if (compareMode) toggleCompareMode(); };
 
   document.getElementById('ask-btn').onclick = handleAsk;
   const input = document.getElementById('ask-input');
@@ -680,40 +682,49 @@ function renderHeader() {
   document.getElementById('model-dot').style.background = p.hue;
   document.getElementById('composer-model-name').textContent = p.name;
   document.getElementById('composer-dot').style.background = p.hue;
+  renderCompareBar();
+}
 
-  const arrow = document.getElementById('compare-arrow');
-  const btnB  = document.getElementById('model-btn-b');
-  if (compareMode && compareProviderId) {
-    const b = providerInfoById(compareProviderId);
-    document.getElementById('model-name-b').textContent =
-      (b.id === p.id) ? `${b.name} (B)` : b.name;
-    document.getElementById('model-dot-b').style.background = b.hue;
-    arrow.hidden = false;
-    btnB.hidden  = false;
-  } else {
-    arrow.hidden = true;
-    btnB.hidden  = true;
-  }
+function renderCompareBar() {
+  const bar = document.getElementById('compare-bar');
+  if (!bar) return;
+  if (!compareMode || !compareProviderId) { bar.hidden = true; return; }
+  const a = activeProviderInfo();
+  const b = providerInfoById(compareProviderId);
+  const sameProv = a.id === b.id;
+  document.getElementById('compare-name-a').textContent = sameProv ? `${a.name} (A)` : a.name;
+  document.getElementById('compare-dot-a').style.background = a.hue;
+  document.getElementById('compare-name-b').textContent = sameProv ? `${b.name} (B)` : b.name;
+  document.getElementById('compare-dot-b').style.background = b.hue;
+  bar.hidden = false;
 }
 
 let pickerSlot = 'a'; // 'a' = activeProvider, 'b' = compareProviderId
 
 function togglePicker(slot = 'a') {
+  const triggers = {
+    a: [document.getElementById('model-btn'), document.getElementById('compare-slot-a')],
+    b: [document.getElementById('compare-slot-b')],
+  };
+  const setAria = (open, activeSlot) => {
+    for (const s of ['a', 'b']) {
+      for (const el of triggers[s]) {
+        if (el) el.setAttribute('aria-expanded', String(open && activeSlot === s));
+      }
+    }
+  };
+
   // Reopen with a different slot if already open
   if (pickerOpen && slot !== pickerSlot) {
     pickerSlot = slot;
     renderPicker();
-    document.getElementById('model-btn').setAttribute('aria-expanded', String(slot === 'a'));
-    document.getElementById('model-btn-b').setAttribute('aria-expanded', String(slot === 'b'));
+    setAria(true, slot);
     return;
   }
   pickerOpen = !pickerOpen;
   pickerSlot = slot;
+  setAria(pickerOpen, slot);
   const host = document.getElementById('picker-host');
-  const btnA = document.getElementById('model-btn');
-  const btnB = document.getElementById('model-btn-b');
-  btnA.setAttribute('aria-expanded', String(pickerOpen && slot === 'a'));
-  if (btnB) btnB.setAttribute('aria-expanded', String(pickerOpen && slot === 'b'));
   if (!pickerOpen) { host.innerHTML = ''; return; }
   renderPicker();
 }
