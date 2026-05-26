@@ -1,141 +1,154 @@
 <div align="center">
 
-# Aside — AI Sidebar
+<img src="marketing/hero.png" alt="Aside — AI in your sidebar" width="100%"/>
 
-**Chrome extension that injects a context-aware AI assistant sidebar into any webpage,
-routing prompts to one of six AI providers with streaming responses, conversation history, and bilingual UI (EN / HE).**
+# Aside
 
-<br>
+**AI in your sidebar. On any webpage.**
+
+Ask any AI about the page you're reading — summarize, extract, translate,
+or just chat. Six providers, one keystroke, zero context-switching.
+
+<br/>
 
 <img src="https://img.shields.io/badge/Chrome%20Extension-MV3-4285F4?logo=googlechrome&logoColor=white" alt="Chrome MV3">&nbsp;
-<img src="https://img.shields.io/badge/providers-6-8b5cf6" alt="6 providers">&nbsp;
-<img src="https://img.shields.io/badge/i18n-EN%20%C2%B7%20HE-0ea5e9" alt="EN / HE">&nbsp;
-<img src="https://img.shields.io/badge/build-none-22c55e" alt="no build step">&nbsp;
-<img src="https://img.shields.io/badge/version-1.0.0-64748b" alt="v1.0.0">
+<img src="https://img.shields.io/badge/providers-6-d97757" alt="6 providers">&nbsp;
+<img src="https://img.shields.io/badge/themes-Light%20%C2%B7%20Dark%20%C2%B7%20Auto-8b5cf6" alt="3 themes">&nbsp;
+<img src="https://img.shields.io/badge/languages-EN%20%C2%B7%20HE-0ea5e9" alt="EN / HE">&nbsp;
+<img src="https://img.shields.io/badge/license-MIT-22c55e" alt="MIT">
+
+<br/><br/>
+
+**[Why Aside](#why-aside) · [Install](#install) · [How it works](#how-it-works) · [Privacy](#privacy) · [For developers](#for-developers)**
 
 </div>
 
-<br>
-
-**[Features](#features) · [Architecture](#architecture) · [Providers](#providers) · [Install](#install)**
-
 ---
 
-## Features
+## Why Aside
 
-### Provider System
+You're reading something — an article, a research paper, an API doc, a long
+email thread — and you want an AI's take *now*, without losing your place.
 
-- **Six AI providers** — Claude, Gemini, OpenAI, Grok, Groq, and Ollama; selected at runtime via `ProviderFactory`
-- **Shared OpenAI-compatible base** — `OpenAICompatProvider` implements the chat-completions wire format once; `OpenAIProvider`, `GrokProvider`, and `GroqProvider` are thin subclasses that set `url` and `model`
-- **Uniform message-array API** — every provider takes `(messages[], systemPrompt)`; the sidebar never branches on which class is running
+Aside opens a sidebar **right where you are**. It reads the page so you
+don't have to paste anything. You pick the model. You stay on the page.
 
-### Conversation & UI
+<br/>
 
-- **Streaming responses** — token-by-token via SSE (`_streamSSE`) for OpenAI-style providers and NDJSON for Ollama; cancellable from the UI
-- **Multi-turn conversation history** — threads persisted to `chrome.storage.local` (5MB), with an in-sidebar history panel, search, per-page filter, and restore
-- **Quick page actions** — one-tap chips for summarize / explain / key-points / translate / find on page, plus a curated prompt-template menu
-- **Bilingual UI (EN / HE)** — `translations.js` table + runtime `i18n.js` helper; UI flips RTL when Hebrew is active. Includes page-language auto-detection via `PAGE_LANG` message
-- **Per-provider model picker** — Settings page lets each provider keep its own selected model
+<div align="center">
+  <img src="marketing/features-dark.png" alt="Context-aware AI sidebar for Chrome" width="92%"/>
+</div>
 
-### Extension Platform
+<br/>
 
-- **MV3 service worker** — `background.js` handles the `Alt+A` keyboard command, context-menu registration, and live `VALIDATE_KEY` requests with a 10-second `Promise.race` timeout
-- **Cross-origin `postMessage` security** — sidebar iframe validates `event.source === window.parent` before accepting any message; user-supplied text is always set via `textContent`, never `innerHTML`
-- **Page content extraction** — `extractPageContent()` walks semantic selectors (`article`, `main`, `[role="main"]`, `.article-body`…), strips nav/chrome nodes, and truncates at 12,000 chars
-- **Live API-key validation** — Settings sends `VALIDATE_KEY` to the service worker, which instantiates the provider and calls `validate()` against the real API
-- **Custom Markdown renderer** — hand-rolled `renderMarkdown()` covers headings, bold/italic, code blocks, tables, and lists; output is sanitized by a DOM-based allowlist (`sanitizeHTML()`) before insertion
-
----
-
-## Architecture
-
-### Class Hierarchy
-
-```mermaid
-classDiagram
-    class BaseProvider {
-        +buildSystemPrompt()
-        +complete(messages, systemPrompt)
-        +completeStream(messages, systemPrompt, onChunk)
-        +validate()
-        #_streamSSE()
-        #_fetchJson()
-    }
-    class OpenAICompatProvider {
-        +complete()
-        +completeStream()
-    }
-    BaseProvider <|-- OpenAICompatProvider
-    BaseProvider <|-- ClaudeProvider
-    BaseProvider <|-- GeminiProvider
-    BaseProvider <|-- OllamaProvider
-    OpenAICompatProvider <|-- OpenAIProvider
-    OpenAICompatProvider <|-- GrokProvider
-    OpenAICompatProvider <|-- GroqProvider
-```
-
-### Runtime Flow
-
-```mermaid
-flowchart LR
-    A["Alt+A\nor Context Menu"] --> SW["Service Worker\n(background.js)"]
-    SW -->|"chrome.tabs\n.sendMessage"| CS["content.js"]
-    CS -->|"creates iframe"| SB["sidebar.js"]
-    SB <-->|"postMessage\nPAGE_CONTENT\nSELECTED_TEXT\nPAGE_LANG"| CS
-    SB <-->|"chrome.storage\n.local"| H["history.js\n(threads)"]
-    SB --> PF["ProviderFactory\n.get()"]
-    PF --> PR["Provider"]
-    PR -->|"fetch + SSE / NDJSON"| API["AI API"]
-    API -.->|"token stream"| PR
-    PR -.->|"onChunk"| SB
-```
-
-`ProviderFactory.get(name, apiKeys, selectedModels)` applies the **Strategy pattern** — the sidebar calls `provider.completeStream(messages, systemPrompt, onChunk)` with no knowledge of which class is running. `OpenAIProvider`, `GrokProvider`, and `GroqProvider` reuse the entire `OpenAICompatProvider` implementation by only declaring their endpoint URL and default model. Switching providers requires a single `chrome.storage.sync` write.
-
-### Project Layout
-
-```
-background.js              ← MV3 service worker
-manifest.json              ← MV3 manifest (Alt+A command, context menu, options_ui)
-_locales/{en,he}/          ← chrome.i18n message catalogs
-content/                   ← page-injected content script + iframe host CSS
-sidebar/
-  sidebar.{html,css,js}    ← main chat UI (Variant C)
-  history.js               ← thread storage layer
-  i18n.js + translations.js← runtime UI translation
-  action-config.js         ← page-action chip definitions
-  prompt-templates.js      ← one-tap prompt presets
-options/                   ← settings page (API keys, model picker, language)
-popup/                     ← toolbar popup
-providers/                 ← BaseProvider + 6 concrete providers + factory
-shared/provider-marks.js   ← shared SVG provider monograms
-```
+- **One keystroke.** `Alt + A` on any page. The sidebar slides in, already aware of what you're looking at.
+- **Six AI providers.** Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama — switch in a click, no separate logins.
+- **Reads the page for you.** Summarize, extract key points, translate, find on page, or run a custom prompt. No copy-paste.
+- **Streaming answers.** Tokens arrive as the model thinks — cancel any time.
+- **Your theme. Your language.** Light, dark, or auto. English or Hebrew, with full RTL.
+- **History that follows the page.** Conversations are saved per-site so you can pick up where you left off.
 
 ---
 
 ## Providers
 
-| Provider | Default model | Additional models |
-|---|---|---|
-| **Claude** (Anthropic) | `claude-sonnet-4-6` | `claude-haiku-4-5-20251001` · `claude-opus-4-7` |
-| **Gemini** (Google) | `gemini-2.0-flash` | `gemini-1.5-flash` · `gemini-1.5-pro` · `gemini-2.5-pro` |
-| **OpenAI** | `gpt-4o-mini` | `gpt-4o` · `o4-mini` |
-| **Grok** (xAI) † | `grok-3-mini` | `grok-3` |
-| **Groq** † | `llama-3.3-70b-versatile` | `llama-3.1-8b-instant` · `gemma2-9b-it` |
-| **Ollama** (local) | `llama3.2` | any locally pulled model |
+<div align="center">
+  <img src="marketing/providers-dark.png" alt="Six providers, one sidebar" width="90%"/>
+</div>
 
-<sup>† Grok, Groq, and OpenAI all extend `OpenAICompatProvider` — the chat-completions wire format is shared in one place.</sup>
+| Provider | What you need | Default model |
+|---|---|---|
+| **Claude** (Anthropic) | API key | `claude-sonnet-4-6` |
+| **Gemini** (Google) | API key | `gemini-2.0-flash` |
+| **OpenAI** | API key | `gpt-4o-mini` |
+| **Grok** (xAI) | API key | `grok-3-mini` |
+| **Groq** | API key | `llama-3.3-70b-versatile` |
+| **Ollama** | Nothing — runs on your machine | `llama3.2` |
+
+Add a key once in **Settings → Provider**. Aside validates it live against the
+real API before saving. Switch providers any time from the sidebar header.
 
 ---
 
 ## Install
 
-1. Clone or download this repository
-2. Open `chrome://extensions`
-3. Enable **Developer mode** (top-right toggle)
-4. Click **Load unpacked** → select the `ai-sidebar` folder
-5. Click the extension's **Details → Extension options** to add API keys (or use the toolbar popup)
-6. Open any page and press **Alt + A** (or right-click → *Open AI Sidebar*)
+> Aside is open source and not yet on the Chrome Web Store. For now, install it as an unpacked extension — it takes about 30 seconds.
 
-> [!NOTE]
-> No build step required — plain HTML, CSS, and JS. Ollama runs locally with no key; all other providers need an API key entered in the options page.
+1. **Download** this repository ([latest ZIP](https://github.com/Royc4515/ai-sidebar/archive/refs/heads/main.zip)) and unzip it, or `git clone https://github.com/Royc4515/ai-sidebar.git`
+2. Open Chrome and go to `chrome://extensions`
+3. Turn on **Developer mode** (top-right toggle)
+4. Click **Load unpacked** and pick the `ai-sidebar` folder
+5. Pin Aside to your toolbar, then open **Settings** and paste at least one API key
+6. Open any page and press **`Alt + A`** — or right-click the page and choose *Open AI Sidebar*
+
+No build step. No npm install. No accounts. Just unzip and load.
+
+---
+
+## How it works
+
+<div align="center">
+  <img src="marketing/dark-light.png" alt="Light and dark themes" width="92%"/>
+</div>
+
+<br/>
+
+**Press `Alt + A`** and a slim sidebar appears on the right of the page (or
+left — your choice). It already knows what's on the page, what language
+the page is in, and what text you have selected.
+
+**Tap a chip** — *Summarize*, *Key points*, *Translate*, *Explain*, *Find on page* —
+or type your own prompt. Answers stream in token-by-token. Cancel any
+time. Hit again on a different page and you're in a fresh conversation;
+the history panel keeps the old one safe.
+
+**Need a different provider?** The header dropdown switches between Claude,
+Gemini, GPT-4o, Grok, Groq, and Ollama with one click. Each remembers its
+own model selection.
+
+---
+
+## Privacy
+
+- **Your API keys live on your machine.** Aside stores them in Chrome's encrypted local storage and sends them only to the provider you chose, over HTTPS. No analytics, no telemetry, no proxy server — your requests go straight from your browser to OpenAI / Anthropic / Google / xAI / Groq / your local Ollama.
+- **Page content is sent only on your prompt.** When you press *Summarize* (or any action that needs the page), Aside grabs the readable body of the current tab, trims it to 12 000 characters, and includes it in **that one request**. Nothing is uploaded in the background.
+- **Conversation history stays local.** Threads are saved to Chrome's `storage.local` on your device. Nothing leaves your browser until you ask the model another question.
+- **Ollama mode is fully offline.** No key, no network call — your prompt and the page text go to the model running on your own computer.
+
+---
+
+## Keyboard shortcuts
+
+| Shortcut | What it does |
+|---|---|
+| **`Alt + A`** | Toggle the sidebar on any page |
+| `Esc` (inside sidebar) | Close the sidebar |
+| `Ctrl/Cmd + Enter` | Send your prompt |
+| Right-click → *Open AI Sidebar* | Open with selected text pre-filled |
+
+---
+
+## For developers
+
+Aside is a vanilla MV3 Chrome extension — no build step, no bundler, no
+framework. The full architecture, provider class hierarchy, and runtime
+flow are documented in **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+
+```
+background.js       MV3 service worker (Alt+A, context menu, API-key validation)
+content/            page-injected script + iframe host
+sidebar/            main chat UI (HTML/CSS/JS, no framework)
+options/            settings page (API keys, model picker, language)
+popup/              toolbar popup
+providers/          BaseProvider + 6 concrete providers + factory
+shared/             provider monograms, helpers
+_locales/{en,he}/   chrome.i18n message catalogs
+```
+
+Contributions welcome — open an issue or PR.
+
+---
+
+<div align="center">
+  <sub>Built with care. MIT licensed. © 2026 Roy Carmelli.</sub>
+</div>
