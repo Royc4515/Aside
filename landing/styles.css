@@ -240,7 +240,7 @@ kbd {
   font-size: 1.05rem;
   letter-spacing: -0.01em;
 }
-.brand img { border-radius: 7px; }
+.brand-mark { color: var(--brand); }
 
 .nav-links {
   display: flex;
@@ -473,6 +473,12 @@ kbd {
   box-shadow: var(--shadow-lg);
 }
 .showcase img { width: 100%; }
+
+/* Light / dark image pairs. The inline head script sets data-theme
+   before paint, so only one of the pair ever takes layout. */
+.art-light, .art-dark { display: none; }
+:root[data-theme="light"] .art-light { display: block; }
+:root[data-theme="dark"]  .art-dark  { display: block; }
 .showcase-wide { background: transparent; border: 0; box-shadow: none; }
 .showcase-wide img { border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
 
@@ -754,9 +760,9 @@ kbd {
 .theme-toggle:hover { border-color: var(--brand); color: var(--brand); box-shadow: var(--shadow-sm); }
 .theme-toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .theme-toggle svg { display: none; }
-.theme-toggle[data-theme="system"] .theme-icon-system { display: block; }
-.theme-toggle[data-theme="light"]  .theme-icon-light  { display: block; }
-.theme-toggle[data-theme="dark"]   .theme-icon-dark   { display: block; }
+/* Show the icon of the OPPOSITE theme (i.e. what clicking will switch to). */
+.theme-toggle[data-theme="light"] .theme-icon-dark  { display: block; }
+.theme-toggle[data-theme="dark"]  .theme-icon-light { display: block; }
 
 .lang-toggle {
   display: inline-flex;
