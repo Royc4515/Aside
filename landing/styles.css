@@ -401,9 +401,9 @@ kbd {
 .section-head h2 {
   font-family: 'Source Serif 4', 'Tiempos Headline', Georgia, serif;
   font-weight: 400;
-  font-size: clamp(1.9rem, 3.5vw, 2.6rem);
-  line-height: 1.15;
-  letter-spacing: -0.018em;
+  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.022em;
 }
 .kicker {
   display: inline-flex;
@@ -524,10 +524,7 @@ kbd {
   align-self: flex-start;
   border: 1px solid var(--border);
 }
-.provider-local {
-  border-color: var(--brand);
-  background: linear-gradient(180deg, var(--brand-soft), transparent 80%), var(--surface);
-}
+/* Ollama (local provider) — no special highlight; visually equal to the others */
 
 /* ----- Steps --------------------------------------------- */
 
@@ -760,9 +757,9 @@ kbd {
 .theme-toggle:hover { border-color: var(--brand); color: var(--brand); box-shadow: var(--shadow-sm); }
 .theme-toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .theme-toggle svg { display: none; }
-/* Show the icon of the OPPOSITE theme (i.e. what clicking will switch to). */
-.theme-toggle[data-theme="light"] .theme-icon-dark  { display: block; }
-.theme-toggle[data-theme="dark"]  .theme-icon-light { display: block; }
+/* Show the icon of the CURRENT theme. */
+.theme-toggle[data-theme="light"] .theme-icon-light { display: block; }
+.theme-toggle[data-theme="dark"]  .theme-icon-dark  { display: block; }
 
 .lang-toggle {
   display: inline-flex;
