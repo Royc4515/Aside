@@ -33,8 +33,11 @@
   --gutter: clamp(20px, 4vw, 40px);
 }
 
+/* Dark-theme variables. Applied EITHER when the system prefers dark and the
+   user hasn't picked a manual override (data-theme not set), OR when the user
+   has explicitly picked dark via the toggle. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --bg: #0f0e10;
     --bg-alt: #15141a;
     --surface: #1a1920;
@@ -52,6 +55,25 @@
     --brand-soft: rgba(217, 119, 87, 0.16);
   }
 }
+:root[data-theme="dark"] {
+  --bg: #0f0e10;
+  --bg-alt: #15141a;
+  --surface: #1a1920;
+  --surface-hi: #20202a;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.13);
+  --text: #f0eee9;
+  --text-muted: #b3b1ba;
+  --text-soft: #8a8895;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, 0.6), 0 10px 24px -8px rgba(0, 0, 0, 0.4);
+  --kbd-bg: #1e1d25;
+  --kbd-border: rgba(255, 255, 255, 0.2);
+  --brand-soft: rgba(217, 119, 87, 0.16);
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
 
 /* ----- Skip link (a11y) ---------------------------------- */
 
@@ -721,6 +743,27 @@ kbd {
   align-items: center;
   gap: 10px;
 }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.theme-toggle:hover { border-color: var(--brand); color: var(--brand); box-shadow: var(--shadow-sm); }
+.theme-toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.theme-toggle svg { display: none; }
+.theme-toggle[data-theme="system"] .theme-icon-system { display: block; }
+.theme-toggle[data-theme="light"]  .theme-icon-light  { display: block; }
+.theme-toggle[data-theme="dark"]   .theme-icon-dark   { display: block; }
 
 .lang-toggle {
   display: inline-flex;
