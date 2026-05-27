@@ -671,3 +671,62 @@ kbd {
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ----- Language toggle ----------------------------------- */
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+.lang-toggle:hover { border-color: var(--brand); box-shadow: var(--shadow-sm); }
+.lang-toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.lang-opt { color: var(--text-soft); transition: color .15s ease; }
+.lang-opt.is-active { color: var(--brand); }
+.lang-sep { color: var(--border-strong); }
+
+/* ----- RTL (Hebrew) overrides ---------------------------- */
+
+html[lang="he"] body {
+  font-family: 'Heebo', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Lists with auto-positioned markers need the marker on the right in RTL */
+html[dir="rtl"] .install-steps {
+  padding-left: 0;
+  padding-right: 22px;
+}
+
+/* Reverse the hero columns so the visual stays on the side it "feels" from */
+html[dir="rtl"] .hero-inner {
+  direction: rtl;
+}
+
+/* Keep code/kbd/mono strings rendered LTR even inside RTL paragraphs */
+html[dir="rtl"] code,
+html[dir="rtl"] kbd,
+html[dir="rtl"] .p-model {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* The em-dash separators in CTA links flip nicely with logical text;
+   the arrow glyph itself was rewritten in the HE strings. */
