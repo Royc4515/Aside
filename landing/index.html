@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
 
-  <title data-i18n="meta.title">Aside — AI in your sidebar. On any webpage.</title>
+  <title data-i18n="meta.title">Aside — AI sidebar for Chrome. Claude, Gemini, GPT-4o, Grok, Groq, Ollama.</title>
   <meta name="description" data-i18n-attr="content" data-i18n="meta.description" content="Aside is a Chrome extension that puts six AI providers — Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama — one keystroke away on any page." />
 
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png" />
@@ -28,6 +28,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Aside",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "Chrome 116+",
+    "url": "https://royc4515.github.io/Aside/",
+    "description": "AI sidebar Chrome extension. Six providers — Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama — one keystroke on any page.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Roy Carmelli" },
+    "license": "https://opensource.org/licenses/MIT",
+    "inLanguage": ["en", "he"]
+  }
+  </script>
 </head>
 <body>
 
@@ -43,6 +59,7 @@
         <a href="#features" data-i18n="nav.features">Features</a>
         <a href="#providers" data-i18n="nav.providers">Providers</a>
         <a href="#how" data-i18n="nav.how">How it works</a>
+        <a href="#faq" data-i18n="nav.faq">FAQ</a>
         <a href="#privacy" data-i18n="nav.privacy">Privacy</a>
         <a href="#install" data-i18n="nav.install">Install</a>
       </nav>
@@ -71,10 +88,15 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-copy">
-          <span class="eyebrow">
-            <span class="dot"></span>
-            <span data-i18n="hero.eyebrow">Chrome extension · MV3 · Open source</span>
-          </span>
+          <div class="eyebrow-row">
+            <span class="eyebrow">
+              <span class="dot"></span>
+              <span data-i18n="hero.eyebrow">Chrome extension · MV3 · Open source</span>
+            </span>
+            <span class="eyebrow eyebrow-free">
+              <span data-i18n="hero.eyebrow.free">Free · MIT licensed</span>
+            </span>
+          </div>
           <h1 data-i18n-html="hero.title">
             AI in your sidebar.<br />
             <span class="accent">On any webpage.</span>
@@ -282,6 +304,42 @@
             <h3 data-i18n="privacy.c4.h">Fully offline mode</h3>
             <p data-i18n-html="privacy.c4.p">Pick <strong>Ollama</strong> and nothing leaves your computer — your prompt and the page text stay on your machine.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="container">
+        <header class="section-head">
+          <span class="kicker" data-i18n="faq.kicker">FAQ</span>
+          <h2 data-i18n="faq.h2">Common questions.</h2>
+        </header>
+
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary data-i18n="faq.q1.q">Is Aside really free?</summary>
+            <div class="faq-a" data-i18n="faq.q1.a">Yes. Aside itself is open source under the MIT license and costs nothing. You pay only what your chosen AI provider charges for API usage — Anthropic, Google, OpenAI, xAI, and Groq each have their own pricing. If you pick Ollama and run it locally, the whole stack is free.</div>
+          </details>
+          <details class="faq-item">
+            <summary data-i18n="faq.q2.q">Are my API keys safe?</summary>
+            <div class="faq-a" data-i18n="faq.q2.a">Keys live in Chrome's encrypted local storage on your device and are sent only to the provider that issued them, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry. Read the full <a href="PRIVACY.html">Privacy Policy</a>.</div>
+          </details>
+          <details class="faq-item">
+            <summary data-i18n="faq.q3.q">Do I need an account to use Aside?</summary>
+            <div class="faq-a" data-i18n="faq.q3.a">No account, no sign-up, no email. Install the extension, paste at least one provider API key, and you're in. Aside has no auth layer of its own.</div>
+          </details>
+          <details class="faq-item">
+            <summary data-i18n="faq.q4.q">Which browsers are supported?</summary>
+            <div class="faq-a" data-i18n="faq.q4.a">Aside is a Manifest V3 extension and runs on any Chromium-based browser — Google Chrome, Microsoft Edge, Brave, Arc, Opera. Firefox is on the roadmap once we port the manifest.</div>
+          </details>
+          <details class="faq-item">
+            <summary data-i18n="faq.q5.q">Can I use Aside fully offline?</summary>
+            <div class="faq-a" data-i18n="faq.q5.a">Yes. Pick Ollama as the provider and Aside makes no network calls outside localhost. Your prompts, selected text, and page content stay on your machine.</div>
+          </details>
+          <details class="faq-item">
+            <summary data-i18n="faq.q6.q">Where is my conversation history stored?</summary>
+            <div class="faq-a" data-i18n="faq.q6.a">Threads are saved per-site in Chrome's <code>storage.local</code> on your device. They aren't synced to any cloud and can be cleared from Settings or by uninstalling the extension.</div>
+          </details>
         </div>
       </div>
     </section>
