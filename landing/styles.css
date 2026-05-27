@@ -53,6 +53,28 @@
   }
 }
 
+/* ----- Skip link (a11y) ---------------------------------- */
+
+.skip-link {
+  position: absolute;
+  inset-block-start: -100px;
+  inset-inline-start: 1rem;
+  z-index: 100;
+  background: var(--brand);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 16px -6px rgba(217, 119, 87, 0.55);
+  transition: inset-block-start .15s ease;
+}
+.skip-link:focus-visible {
+  inset-block-start: 1rem;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
 /* ----- Reset & base -------------------------------------- */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -290,6 +312,13 @@ kbd {
   color: var(--text-soft);
 }
 .hero-meta .sep { color: var(--border-strong); }
+
+.hero-store-note {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  font-style: italic;
+}
 
 .hero-art {
   position: relative;

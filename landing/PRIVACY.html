@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+
+  <title>Privacy Policy — Aside</title>
+  <meta name="description" content="Aside's privacy policy. No telemetry, no analytics, no servers. Your API keys and conversations stay on your device." />
+  <meta name="robots" content="index, follow" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .legal {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: clamp(48px, 6vw, 96px) var(--gutter);
+    }
+    .legal h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 8px; }
+    .legal .meta { color: var(--text-soft); font-size: 0.9rem; margin-bottom: 40px; }
+    .legal h2 { font-size: 1.4rem; margin: 36px 0 12px; }
+    .legal p, .legal li { color: var(--text); font-size: 1rem; line-height: 1.7; }
+    .legal ul { padding-left: 22px; }
+    .legal a { color: var(--brand); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .legal a:hover { color: var(--brand-strong); }
+    .legal .back { display: inline-flex; align-items: center; gap: 6px; margin-top: 48px; font-weight: 600; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <header class="nav" role="banner">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html" aria-label="Aside home">
+        <img src="assets/icon-32.png" alt="" width="28" height="28" />
+        <span>Aside</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="legal">
+    <h1>Privacy Policy</h1>
+    <p class="meta">Effective: 27 May 2026</p>
+
+    <p>Aside is a Chrome extension built on a single principle: your data stays
+    on your device. This policy explains, in plain language, what that means
+    in practice.</p>
+
+    <h2>1. What Aside collects</h2>
+    <p><strong>Nothing.</strong> Aside has no analytics, no telemetry, no error
+    reporting, no usage tracking, no first- or third-party cookies. The author
+    has no servers and no way to see who installed the extension or what
+    anyone does with it.</p>
+
+    <h2>2. API keys</h2>
+    <p>When you paste a provider API key into <em>Settings</em>, it is stored
+    in Chrome's <code>chrome.storage.local</code> — the browser's encrypted
+    per-extension storage on your device. Keys are only ever sent to the
+    provider whose key it is (Anthropic, Google, OpenAI, xAI, Groq, or your
+    local Ollama instance), over HTTPS, with the API request you initiated.
+    Keys never reach any server operated by the author.</p>
+
+    <h2>3. Page content</h2>
+    <p>When you press an action that needs the page — <em>Summarize</em>,
+    <em>Key points</em>, <em>Translate</em>, <em>Extract</em>, <em>Find on
+    page</em>, or a custom prompt — Aside reads the visible text of the
+    current tab, trims it to roughly 12,000 characters, and includes it in
+    <strong>that single API request</strong> to your selected provider.
+    Nothing is uploaded in the background. Nothing is sent unless you press a
+    button.</p>
+
+    <h2>4. Conversation history</h2>
+    <p>Threads are saved per-origin in <code>chrome.storage.local</code> on
+    your device. They are not synced to any cloud, are not visible to the
+    author, and can be cleared from <em>Settings</em> or by uninstalling the
+    extension.</p>
+
+    <h2>5. Fully offline mode</h2>
+    <p>Select <strong>Ollama</strong> as your provider and Aside makes no
+    network calls outside <code>localhost</code>. Your prompts, your selected
+    text, and the page content stay on your computer.</p>
+
+    <h2>6. Third-party providers</h2>
+    <p>When you choose a cloud provider, requests go directly from your
+    browser to that provider's API. Their handling of your data is governed
+    by their own privacy policy:</p>
+    <ul>
+      <li><a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer">Anthropic (Claude)</a></li>
+      <li><a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener noreferrer">Google (Gemini)</a></li>
+      <li><a href="https://openai.com/policies/row-privacy-policy" target="_blank" rel="noopener noreferrer">OpenAI (GPT-4o)</a></li>
+      <li><a href="https://x.ai/legal/privacy-policy" target="_blank" rel="noopener noreferrer">xAI (Grok)</a></li>
+      <li><a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Groq</a></li>
+      <li>Ollama runs locally and has no privacy policy because it sends nothing anywhere.</li>
+    </ul>
+
+    <h2>7. Permissions Aside requests</h2>
+    <p>Aside is a Manifest V3 extension and requests only the permissions it
+    needs to function: <code>activeTab</code> to read the current page when
+    you ask, <code>storage</code> to save your settings and history locally,
+    and host permissions for the six provider API endpoints listed in
+    <code>manifest.json</code>. No broader access is requested.</p>
+
+    <h2>8. Children</h2>
+    <p>Aside is not directed at children under 13 and does not knowingly
+    collect any personal data from anyone.</p>
+
+    <h2>9. Changes to this policy</h2>
+    <p>If this policy changes in any meaningful way, the new version will
+    replace this page and the effective date above will be updated. Because
+    Aside collects nothing, changes are likely to clarify wording rather than
+    expand data handling.</p>
+
+    <h2>10. Contact</h2>
+    <p>Questions, security disclosures, or concerns:
+    <a href="https://github.com/Royc4515/Aside/issues" target="_blank" rel="noopener noreferrer">open an issue on GitHub</a>.</p>
+
+    <a class="back" href="index.html">← Back to Aside</a>
+  </main>
+
+</body>
+</html>

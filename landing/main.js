@@ -19,13 +19,13 @@ const STRINGS = {
     'hero.eyebrow': 'Chrome extension · MV3 · Open source',
     'hero.title': 'AI in your sidebar.<br /><span class="accent">On any webpage.</span>',
     'hero.lede': "Ask any AI about the page you're reading — summarize, extract, translate, or just chat. Six providers, one keystroke, zero context-switching.",
-    'hero.cta.add': 'Add to Chrome',
-    'hero.cta.soon': 'Soon',
-    'hero.cta.soonTitle': 'Coming soon',
-    'hero.cta.github': 'View on GitHub',
+    'hero.cta.install': 'Install from GitHub',
+    'hero.cta.howToInstall': 'How to install →',
+    'hero.cta.storeSoon': 'Coming to the Chrome Web Store soon.',
     'hero.meta.shortcut': '<kbd>Alt</kbd> <span>+</span> <kbd>A</kbd> on any page',
     'hero.meta.nobuild': 'No build · No accounts',
     'hero.meta.mit': 'MIT licensed',
+    'a11y.skip': 'Skip to content',
 
     'strip.providers': 'Providers',
     'strip.keystroke': 'Keystroke',
@@ -82,9 +82,9 @@ const STRINGS = {
     'install.c1.btn': 'Add to Chrome',
     'install.c2.h': 'Load unpacked',
     'install.c2.pill': 'Available now',
-    'install.c2.s1': 'Download the repo — <a href="https://github.com/Royc4515/ai-sidebar/archive/refs/heads/main.zip">latest ZIP</a> — and unzip it.',
+    'install.c2.s1': 'Download the repo — <a href="https://github.com/Royc4515/Aside/archive/refs/heads/main.zip">latest ZIP</a> — and unzip it.',
     'install.c2.s2': 'Open <code>chrome://extensions</code> and turn on <strong>Developer mode</strong>.',
-    'install.c2.s3': 'Click <strong>Load unpacked</strong> and pick the <code>ai-sidebar</code> folder.',
+    'install.c2.s3': 'Click <strong>Load unpacked</strong> and pick the <code>Aside-main</code> folder.',
     'install.c2.s4': 'Open <strong>Settings</strong> and paste at least one API key.',
     'install.c2.s5': 'Hit <kbd>Alt</kbd>+<kbd>A</kbd> on any page.',
     'install.c2.btn': 'Open repository →',
@@ -96,6 +96,7 @@ const STRINGS = {
     'cta.btn2': 'Read the architecture →',
 
     'footer.architecture': 'Architecture',
+    'footer.privacy': 'Privacy Policy',
     'footer.copy': 'Built with care. MIT licensed. © 2026 Roy Carmelli.',
   },
 
@@ -113,10 +114,10 @@ const STRINGS = {
     'hero.eyebrow': 'תוסף Chrome · MV3 · קוד פתוח',
     'hero.title': 'בינה מלאכותית בסרגל הצד.<br /><span class="accent">בכל דף באינטרנט.</span>',
     'hero.lede': 'שאלו כל מודל AI על הדף שאתם קוראים — סכמו, חלצו, תרגמו או פשוט שוחחו. שישה ספקים, הקשה אחת, בלי לקפוץ בין חלונות.',
-    'hero.cta.add': 'הוסיפו לכרום',
-    'hero.cta.soon': 'בקרוב',
-    'hero.cta.soonTitle': 'בקרוב',
-    'hero.cta.github': 'צפו ב-GitHub',
+    'hero.cta.install': 'התקינו מ-GitHub',
+    'hero.cta.howToInstall': '← איך מתקינים',
+    'hero.cta.storeSoon': 'בקרוב גם ב-Chrome Web Store.',
+    'a11y.skip': 'דלגו לתוכן',
     'hero.meta.shortcut': '<kbd>Alt</kbd> <span>+</span> <kbd>A</kbd> בכל דף',
     'hero.meta.nobuild': 'בלי build · בלי חשבונות',
     'hero.meta.mit': 'רישיון MIT',
@@ -176,9 +177,9 @@ const STRINGS = {
     'install.c1.btn': 'הוסיפו לכרום',
     'install.c2.h': 'טעינה ידנית',
     'install.c2.pill': 'זמין עכשיו',
-    'install.c2.s1': 'הורידו את הריפו — <a href="https://github.com/Royc4515/ai-sidebar/archive/refs/heads/main.zip">קובץ ה-ZIP האחרון</a> — ופתחו אותו.',
+    'install.c2.s1': 'הורידו את הריפו — <a href="https://github.com/Royc4515/Aside/archive/refs/heads/main.zip">קובץ ה-ZIP האחרון</a> — ופתחו אותו.',
     'install.c2.s2': 'פתחו את <code>chrome://extensions</code> והפעילו <strong>מצב מפתחים</strong>.',
-    'install.c2.s3': 'לחצו <strong>טעינה לא ארוזה</strong> ובחרו את התיקייה <code>ai-sidebar</code>.',
+    'install.c2.s3': 'לחצו <strong>טעינה לא ארוזה</strong> ובחרו את התיקייה <code>Aside-main</code>.',
     'install.c2.s4': 'פתחו <strong>הגדרות</strong> והדביקו לפחות מפתח API אחד.',
     'install.c2.s5': 'הקישו <kbd>Alt</kbd>+<kbd>A</kbd> בכל דף.',
     'install.c2.btn': '← פתחו את הריפו',
@@ -190,6 +191,7 @@ const STRINGS = {
     'cta.btn2': '← קראו את הארכיטקטורה',
 
     'footer.architecture': 'ארכיטקטורה',
+    'footer.privacy': 'מדיניות פרטיות',
     'footer.copy': 'נבנה בקפידה. רישיון MIT. © 2026 Roy Carmelli.',
   },
 };
@@ -276,7 +278,9 @@ const targets = document.querySelectorAll(
 );
 targets.forEach((el) => el.classList.add('reveal'));
 
-if ('IntersectionObserver' in window) {
+const revealAll = () => targets.forEach((el) => el.classList.add('is-visible'));
+
+if ('IntersectionObserver' in window && !navigator.webdriver) {
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -289,6 +293,9 @@ if ('IntersectionObserver' in window) {
     { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
   );
   targets.forEach((el) => io.observe(el));
+  // Safety net for headless crawlers that run JS but never scroll
+  // (social preview bots, some SEO crawlers).
+  setTimeout(revealAll, 1500);
 } else {
-  targets.forEach((el) => el.classList.add('is-visible'));
+  revealAll();
 }
