@@ -319,28 +319,32 @@
 
         <div class="faq-list">
           <details class="faq-item">
-            <summary data-i18n="faq.q1.q">Is Aside really free?</summary>
-            <div class="faq-a" data-i18n="faq.q1.a">Yes. Aside itself is open source under the MIT license and costs nothing. You pay only what your chosen AI provider charges for API usage — Anthropic, Google, OpenAI, xAI, and Groq each have their own pricing. If you pick Ollama and run it locally, the whole stack is free.</div>
+            <summary data-i18n-html="faq.q1.q">Is Aside really free?</summary>
+            <div class="faq-a" data-i18n-html="faq.q1.a">Yes. Aside itself is open source under the MIT license and costs nothing. You pay only what your chosen AI provider charges for API usage — Anthropic, Google, OpenAI, xAI, and Groq each have their own pricing. If you pick Ollama and run it locally, the whole stack is free.</div>
           </details>
           <details class="faq-item">
-            <summary data-i18n="faq.q2.q">Are my API keys safe?</summary>
-            <div class="faq-a" data-i18n="faq.q2.a">Keys live in Chrome's encrypted local storage on your device and are sent only to the provider that issued them, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry. Read the full <a href="PRIVACY.html">Privacy Policy</a>.</div>
+            <summary data-i18n-html="faq.q2.q">Are my API keys safe?</summary>
+            <div class="faq-a" data-i18n-html="faq.q2.a">Keys live in Chrome's encrypted local storage on your device and are sent only to the provider that issued them, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry. Read the full <a href="PRIVACY.html">Privacy Policy</a>.</div>
           </details>
           <details class="faq-item">
-            <summary data-i18n="faq.q3.q">Do I need an account to use Aside?</summary>
-            <div class="faq-a" data-i18n="faq.q3.a">No account, no sign-up, no email. Install the extension, paste at least one provider API key, and you're in. Aside has no auth layer of its own.</div>
+            <summary data-i18n-html="faq.q3.q">Do I need an account to use Aside?</summary>
+            <div class="faq-a" data-i18n-html="faq.q3.a">No account, no sign-up, no email. Install the extension, paste at least one provider API key, and you're in. Aside has no auth layer of its own.</div>
           </details>
           <details class="faq-item">
-            <summary data-i18n="faq.q4.q">Which browsers are supported?</summary>
-            <div class="faq-a" data-i18n="faq.q4.a">Aside is a Manifest V3 extension and runs on any Chromium-based browser — Google Chrome, Microsoft Edge, Brave, Arc, Opera. Firefox is on the roadmap once we port the manifest.</div>
+            <summary data-i18n-html="faq.q4.q">Which browsers are supported?</summary>
+            <div class="faq-a" data-i18n-html="faq.q4.a">Aside is a Manifest V3 extension and runs on any Chromium-based browser — Google Chrome, Microsoft Edge, Brave, Arc, Opera. Firefox is on the roadmap once we port the manifest.</div>
           </details>
           <details class="faq-item">
-            <summary data-i18n="faq.q5.q">Can I use Aside fully offline?</summary>
-            <div class="faq-a" data-i18n="faq.q5.a">Yes. Pick Ollama as the provider and Aside makes no network calls outside localhost. Your prompts, selected text, and page content stay on your machine.</div>
+            <summary data-i18n-html="faq.q5.q">Can I use Aside fully offline?</summary>
+            <div class="faq-a" data-i18n-html="faq.q5.a">Yes. Pick Ollama as the provider and Aside makes no network calls outside localhost. Your prompts, selected text, and page content stay on your machine.</div>
           </details>
           <details class="faq-item">
-            <summary data-i18n="faq.q6.q">Where is my conversation history stored?</summary>
-            <div class="faq-a" data-i18n="faq.q6.a">Threads are saved per-site in Chrome's <code>storage.local</code> on your device. They aren't synced to any cloud and can be cleared from Settings or by uninstalling the extension.</div>
+            <summary data-i18n-html="faq.q6.q">Where is my conversation history stored?</summary>
+            <div class="faq-a" data-i18n-html="faq.q6.a">Threads are saved per-site in Chrome's <code>storage.local</code> on your device. They aren't synced to any cloud and can be cleared from Settings or by uninstalling the extension.</div>
+          </details>
+          <details class="faq-item">
+            <summary data-i18n-html="faq.q7.q"><kbd>Alt</kbd>+<kbd>A</kbd> doesn't open the sidebar — how do I fix it?</summary>
+            <div class="faq-a" data-i18n-html="faq.q7.a">Chrome doesn't always auto-assign keyboard shortcuts to extensions loaded unpacked (it does for Chrome Web Store installs). Open <code>chrome://extensions/shortcuts</code>, find <strong>Aside</strong>, and set the shortcut for <em>Toggle the AI sidebar</em> to <kbd>Alt</kbd>+<kbd>A</kbd> (or any key combo you prefer). Takes 10 seconds.</div>
           </details>
         </div>
       </div>
@@ -374,6 +378,7 @@
               <li data-i18n-html="install.c2.s3">Click <strong>Load unpacked</strong> and pick the folder that contains <code>manifest.json</code> (the <code>Aside-main</code> folder you just unzipped — not a subfolder).</li>
               <li data-i18n-html="install.c2.s4">Open <strong>Settings</strong> and paste at least one API key.</li>
               <li data-i18n-html="install.c2.s5">Hit <kbd>Alt</kbd>+<kbd>A</kbd> on any page.</li>
+              <li data-i18n-html="install.c2.s6">If the shortcut doesn't respond, open <code>chrome://extensions/shortcuts</code> and set <kbd>Alt</kbd>+<kbd>A</kbd> for <em>Toggle the AI sidebar</em> — Chrome doesn't always auto-assign keys to unpacked extensions.</li>
             </ol>
             <a class="btn btn-secondary" href="https://github.com/Royc4515/Aside" target="_blank" rel="noopener noreferrer" data-i18n="install.c2.btn">Open repository →</a>
           </div>

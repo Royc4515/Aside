@@ -89,6 +89,7 @@ real API before saving. Switch providers any time from the sidebar header.
 4. Click **Load unpacked** and pick the folder that contains `manifest.json` — this is the `Aside-main` folder you just unzipped (not a subfolder inside it)
 5. Pin Aside to your toolbar, then open **Settings** and paste at least one API key
 6. Open any page and press **`Alt + A`** — or right-click the page and choose *Open AI Sidebar*
+7. **If `Alt + A` does nothing:** open `chrome://extensions/shortcuts`, find Aside, and set the shortcut for *Toggle the AI sidebar* manually. Chrome doesn't always auto-assign shortcuts to unpacked extensions.
 
 No build step. No npm install. No accounts. Just unzip and load.
 

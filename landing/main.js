@@ -90,6 +90,8 @@ const STRINGS = {
     'faq.q5.a': 'Yes. Pick Ollama as the provider and Aside makes no network calls outside localhost. Your prompts, selected text, and page content stay on your machine.',
     'faq.q6.q': 'Where is my conversation history stored?',
     'faq.q6.a': "Threads are saved per-site in Chrome's <code>storage.local</code> on your device. They aren't synced to any cloud and can be cleared from Settings or by uninstalling the extension.",
+    'faq.q7.q': "<kbd>Alt</kbd>+<kbd>A</kbd> doesn't open the sidebar — how do I fix it?",
+    'faq.q7.a': "Chrome doesn't always auto-assign keyboard shortcuts to extensions loaded unpacked (it does for Chrome Web Store installs). Open <code>chrome://extensions/shortcuts</code>, find <strong>Aside</strong>, and set the shortcut for <em>Toggle the AI sidebar</em> to <kbd>Alt</kbd>+<kbd>A</kbd> (or any key combo you prefer). Takes 10 seconds.",
 
     'install.kicker': 'Install',
     'install.h2': 'Two ways in. Both take about a minute.',
@@ -104,6 +106,7 @@ const STRINGS = {
     'install.c2.s3': 'Click <strong>Load unpacked</strong> and pick the folder that contains <code>manifest.json</code> (the <code>Aside-main</code> folder you just unzipped — not a subfolder).',
     'install.c2.s4': 'Open <strong>Settings</strong> and paste at least one API key.',
     'install.c2.s5': 'Hit <kbd>Alt</kbd>+<kbd>A</kbd> on any page.',
+    'install.c2.s6': "If the shortcut doesn't respond, open <code>chrome://extensions/shortcuts</code> and set <kbd>Alt</kbd>+<kbd>A</kbd> for <em>Toggle the AI sidebar</em> — Chrome doesn't always auto-assign keys to unpacked extensions.",
     'install.c2.btn': 'Open repository →',
     'install.footnote': 'No build step. No npm install. No accounts. Just unzip and load.',
 
@@ -202,6 +205,8 @@ const STRINGS = {
     'faq.q5.a': 'כן. בוחרים Ollama כספק, ו-Aside לא עושה שום קריאת רשת מחוץ ל-localhost. הפרומפטים, הטקסט שסימנתם ותוכן הדף נשארים על המחשב שלכם.',
     'faq.q6.q': 'איפה נשמרת היסטוריית השיחות?',
     'faq.q6.a': 'שיחות נשמרות לפי אתר ב-<code>storage.local</code> של Chrome במחשב שלכם. הן לא מסונכרנות לענן וניתן לנקות אותן מההגדרות או על-ידי הסרת התוסף.',
+    'faq.q7.q': '<kbd>Alt</kbd>+<kbd>A</kbd> לא פותח את הסרגל — איך מתקנים?',
+    'faq.q7.a': 'Chrome לא תמיד מקצה אוטומטית קיצורי מקלדת לתוספים שנטענו ידנית (זה עובד אוטומטית רק להתקנה מ-Chrome Web Store). פתחו <code>chrome://extensions/shortcuts</code>, מצאו את <strong>Aside</strong>, והגדירו את הקיצור עבור <em>Toggle the AI sidebar</em> ל-<kbd>Alt</kbd>+<kbd>A</kbd> (או כל צירוף שתרצו). 10 שניות עבודה.',
 
     'install.kicker': 'התקנה',
     'install.h2': 'שתי דרכים להתקין. שתיהן לוקחות בערך דקה.',
@@ -216,6 +221,7 @@ const STRINGS = {
     'install.c2.s3': 'לחצו <strong>טעינה לא ארוזה</strong> ובחרו את התיקייה שמכילה את <code>manifest.json</code> (התיקייה <code>Aside-main</code> שפתחתם — לא תת-תיקייה בתוכה).',
     'install.c2.s4': 'פתחו <strong>הגדרות</strong> והדביקו לפחות מפתח API אחד.',
     'install.c2.s5': 'הקישו <kbd>Alt</kbd>+<kbd>A</kbd> בכל דף.',
+    'install.c2.s6': 'אם הקיצור לא מגיב, פתחו <code>chrome://extensions/shortcuts</code> והגדירו <kbd>Alt</kbd>+<kbd>A</kbd> ל-<em>Toggle the AI sidebar</em> — Chrome לא תמיד מקצה אוטומטית מקשים לתוספים שנטענו ידנית.',
     'install.c2.btn': '← פתחו את הריפו',
     'install.footnote': 'בלי build. בלי npm install. בלי חשבונות. רק לפתוח ולטעון.',
 
