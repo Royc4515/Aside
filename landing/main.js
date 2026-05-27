@@ -303,35 +303,26 @@ if (langToggle) {
   });
 }
 
-// ---------- Theme (light / dark / system) ------------------
+// ---------- Theme (light / dark) ---------------------------
+// System preference is the implicit default (resolved by the inline
+// head script before paint); the toggle only flips between explicit
+// light and dark and saves the choice.
 
 const THEME_KEY = 'aside.theme';
-const THEMES = ['system', 'light', 'dark'];
 
-function readTheme() {
-  try {
-    const v = localStorage.getItem(THEME_KEY);
-    return THEMES.includes(v) ? v : 'system';
-  } catch { return 'system'; }
+function currentTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
 }
 
 function applyTheme(theme) {
   const html = document.documentElement;
-  if (theme === 'light' || theme === 'dark') {
-    html.setAttribute('data-theme', theme);
-  } else {
-    html.removeAttribute('data-theme');
-  }
+  html.setAttribute('data-theme', theme);
   const btn = document.getElementById('theme-toggle');
   if (btn) {
     btn.setAttribute('data-theme', theme);
-    const labels = {
-      system: 'Theme: system (click for light)',
-      light:  'Theme: light (click for dark)',
-      dark:   'Theme: dark (click for system)',
-    };
-    btn.title = labels[theme];
-    btn.setAttribute('aria-label', labels[theme]);
+    const label = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
   }
 }
 
@@ -340,14 +331,12 @@ function setTheme(theme) {
   applyTheme(theme);
 }
 
-applyTheme(readTheme());
+applyTheme(currentTheme());
 
 const themeBtn = document.getElementById('theme-toggle');
 if (themeBtn) {
   themeBtn.addEventListener('click', () => {
-    const cur = readTheme();
-    const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
-    setTheme(next);
+    setTheme(currentTheme() === 'dark' ? 'light' : 'dark');
   });
 }
 
