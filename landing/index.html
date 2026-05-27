@@ -27,7 +27,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Heebo:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
 
@@ -101,23 +101,19 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-copy">
-          <div class="eyebrow-row">
-            <span class="eyebrow">
-              <span class="dot"></span>
-              <span data-i18n="hero.eyebrow">Chrome extension · MV3 · Open source</span>
-            </span>
-            <span class="eyebrow eyebrow-free">
-              <span data-i18n="hero.eyebrow.free">Free · MIT licensed</span>
-            </span>
-          </div>
+          <p class="hero-eyebrow"><span data-i18n="hero.eyebrow.short">A Chrome extension</span></p>
           <h1 data-i18n-html="hero.title">
-            AI in your sidebar.<br />
-            <span class="accent">On any webpage.</span>
+            AI in your <em>sidebar.</em>
           </h1>
           <p class="lede" data-i18n="hero.lede">
-            Ask any AI about the page you're reading — summarize, extract,
-            translate, or just chat. Six providers, one keystroke,
-            zero context-switching.
+            Context-aware AI for any webpage. Summarize, extract, translate,
+            or just chat — with the provider you choose.
+          </p>
+
+          <p class="hero-meta-line">
+            <span data-i18n="hero.meta.mit">MIT licensed</span>
+            <span data-i18n="hero.meta.notelemetry">No telemetry</span>
+            <span data-i18n="hero.meta.langs">8 UI languages</span>
           </p>
 
           <div class="cta-row">
@@ -130,35 +126,16 @@
             </a>
           </div>
 
-          <p class="hero-store-note" data-i18n="hero.cta.storeSoon">Coming to the Chrome Web Store soon.</p>
-
-          <ul class="hero-meta">
-            <li data-i18n-html="hero.meta.shortcut"><kbd>Alt</kbd> <span>+</span> <kbd>A</kbd> on any page</li>
-            <li><span class="sep">·</span></li>
-            <li data-i18n="hero.meta.nobuild">No build · No accounts</li>
-            <li><span class="sep">·</span></li>
-            <li data-i18n="hero.meta.mit">MIT licensed</li>
-          </ul>
+          <p class="hero-store-note" data-i18n-html="hero.cta.storeSoon"><strong>Coming to the Chrome Web Store</strong> · Free, MIT licensed.</p>
         </div>
 
         <div class="hero-art" aria-hidden="true">
           <picture>
-            <source type="image/webp" media="(prefers-color-scheme: dark)" srcset="assets/hero-dark-960.webp 960w, assets/hero-dark-1920.webp 1920w" sizes="(max-width: 960px) 100vw, 50vw" />
-            <source type="image/webp" srcset="assets/hero-light-960.webp 960w, assets/hero-light-1920.webp 1920w" sizes="(max-width: 960px) 100vw, 50vw" />
-            <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark-960.png 960w, assets/hero-dark-1920.png 1920w" sizes="(max-width: 960px) 100vw, 50vw" />
-            <img src="assets/hero-light-1920.png" srcset="assets/hero-light-960.png 960w, assets/hero-light-1920.png 1920w" sizes="(max-width: 960px) 100vw, 50vw" alt="" loading="eager" width="1920" height="960" />
+            <source type="image/webp" media="(prefers-color-scheme: dark)" srcset="assets/sidebar-tight-dark-450.webp 450w, assets/sidebar-tight-dark-900.webp 900w" sizes="(max-width: 960px) 100vw, 45vw" />
+            <source type="image/webp" srcset="assets/sidebar-tight-450.webp 450w, assets/sidebar-tight-900.webp 900w" sizes="(max-width: 960px) 100vw, 45vw" />
+            <img src="assets/sidebar-tight-900.png" alt="The Aside sidebar opened, ready to take a prompt about the current page." loading="eager" width="900" height="984" />
           </picture>
         </div>
-      </div>
-    </section>
-
-    <section class="strip" aria-label="At a glance">
-      <div class="container strip-inner">
-        <div class="stat"><div class="num">6</div><div class="lbl" data-i18n="strip.providers">Providers</div></div>
-        <div class="stat"><div class="num">1</div><div class="lbl" data-i18n="strip.keystroke">Keystroke</div></div>
-        <div class="stat"><div class="num">0</div><div class="lbl" data-i18n="strip.telemetry">Telemetry</div></div>
-        <div class="stat"><div class="num">8</div><div class="lbl" data-i18n="strip.languages">UI languages</div></div>
-        <div class="stat"><div class="num">MV3</div><div class="lbl" data-i18n="strip.mv3">Manifest V3</div></div>
       </div>
     </section>
 
