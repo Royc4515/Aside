@@ -9,16 +9,16 @@
   --brand-soft: rgba(217, 119, 87, 0.12);
   --accent: #8b5cf6;
 
-  /* Light theme */
-  --bg: #fdfcfa;
-  --bg-alt: #f6f3ee;
-  --surface: #ffffff;
-  --surface-hi: #ffffff;
-  --border: rgba(20, 20, 30, 0.08);
-  --border-strong: rgba(20, 20, 30, 0.14);
-  --text: #1a1a1f;
-  --text-muted: #5b5b66;
-  --text-soft: #7a7a84;
+  /* Light theme — warm cream + warm dark brown (no pure white, no near-black) */
+  --bg: #f5f0e6;
+  --bg-alt: #ede6d8;
+  --surface: #faf6ec;
+  --surface-hi: #fbf7ee;
+  --border: rgba(44, 40, 35, 0.08);
+  --border-strong: rgba(44, 40, 35, 0.14);
+  --text: #2c2823;
+  --text-muted: #5e5953;
+  --text-soft: #948f85;
   --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.04), 0 1px 1px rgba(20, 20, 30, 0.03);
   --shadow-md: 0 4px 14px rgba(20, 20, 30, 0.06), 0 1px 3px rgba(20, 20, 30, 0.04);
   --shadow-lg: 0 24px 60px -20px rgba(20, 20, 30, 0.18), 0 8px 20px -8px rgba(20, 20, 30, 0.10);
@@ -38,39 +38,39 @@
    has explicitly picked dark via the toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --bg: #0f0e10;
-    --bg-alt: #15141a;
-    --surface: #1a1920;
-    --surface-hi: #20202a;
-    --border: rgba(255, 255, 255, 0.07);
-    --border-strong: rgba(255, 255, 255, 0.13);
-    --text: #f0eee9;
-    --text-muted: #b3b1ba;
-    --text-soft: #8a8895;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, 0.6), 0 10px 24px -8px rgba(0, 0, 0, 0.4);
-    --kbd-bg: #1e1d25;
-    --kbd-border: rgba(255, 255, 255, 0.2);
-    --brand-soft: rgba(217, 119, 87, 0.16);
+    --bg: #2a2620;
+    --bg-alt: #322d26;
+    --surface: #38332c;
+    --surface-hi: #423d34;
+    --border: rgba(230, 223, 208, 0.08);
+    --border-strong: rgba(230, 223, 208, 0.14);
+    --text: #e6dfd0;
+    --text-muted: #b0aa9c;
+    --text-soft: #807a70;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.34);
+    --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, 0.50), 0 10px 24px -8px rgba(0, 0, 0, 0.34);
+    --kbd-bg: #38332c;
+    --kbd-border: rgba(230, 223, 208, 0.22);
+    --brand-soft: rgba(217, 119, 87, 0.18);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f0e10;
-  --bg-alt: #15141a;
-  --surface: #1a1920;
-  --surface-hi: #20202a;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.13);
-  --text: #f0eee9;
-  --text-muted: #b3b1ba;
-  --text-soft: #8a8895;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, 0.6), 0 10px 24px -8px rgba(0, 0, 0, 0.4);
-  --kbd-bg: #1e1d25;
-  --kbd-border: rgba(255, 255, 255, 0.2);
-  --brand-soft: rgba(217, 119, 87, 0.16);
+  --bg: #2a2620;
+  --bg-alt: #322d26;
+  --surface: #38332c;
+  --surface-hi: #423d34;
+  --border: rgba(230, 223, 208, 0.08);
+  --border-strong: rgba(230, 223, 208, 0.14);
+  --text: #e6dfd0;
+  --text-muted: #b0aa9c;
+  --text-soft: #807a70;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.34);
+  --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, 0.50), 0 10px 24px -8px rgba(0, 0, 0, 0.34);
+  --kbd-bg: #38332c;
+  --kbd-border: rgba(230, 223, 208, 0.22);
+  --brand-soft: rgba(217, 119, 87, 0.18);
   color-scheme: dark;
 }
 :root[data-theme="light"] { color-scheme: light; }
