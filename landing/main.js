@@ -19,13 +19,13 @@ const STRINGS = {
     'hero.eyebrow': 'Chrome extension · MV3 · Open source',
     'hero.title': 'AI in your sidebar.<br /><span class="accent">On any webpage.</span>',
     'hero.lede': "Ask any AI about the page you're reading — summarize, extract, translate, or just chat. Six providers, one keystroke, zero context-switching.",
-    'hero.cta.add': 'Add to Chrome',
-    'hero.cta.soon': 'Soon',
-    'hero.cta.soonTitle': 'Coming soon',
-    'hero.cta.github': 'View on GitHub',
+    'hero.cta.install': 'Install from GitHub',
+    'hero.cta.howToInstall': 'How to install →',
+    'hero.cta.storeSoon': 'Coming to the Chrome Web Store soon.',
     'hero.meta.shortcut': '<kbd>Alt</kbd> <span>+</span> <kbd>A</kbd> on any page',
     'hero.meta.nobuild': 'No build · No accounts',
     'hero.meta.mit': 'MIT licensed',
+    'a11y.skip': 'Skip to content',
 
     'strip.providers': 'Providers',
     'strip.keystroke': 'Keystroke',
@@ -96,6 +96,7 @@ const STRINGS = {
     'cta.btn2': 'Read the architecture →',
 
     'footer.architecture': 'Architecture',
+    'footer.privacy': 'Privacy Policy',
     'footer.copy': 'Built with care. MIT licensed. © 2026 Roy Carmelli.',
   },
 
@@ -113,10 +114,10 @@ const STRINGS = {
     'hero.eyebrow': 'תוסף Chrome · MV3 · קוד פתוח',
     'hero.title': 'בינה מלאכותית בסרגל הצד.<br /><span class="accent">בכל דף באינטרנט.</span>',
     'hero.lede': 'שאלו כל מודל AI על הדף שאתם קוראים — סכמו, חלצו, תרגמו או פשוט שוחחו. שישה ספקים, הקשה אחת, בלי לקפוץ בין חלונות.',
-    'hero.cta.add': 'הוסיפו לכרום',
-    'hero.cta.soon': 'בקרוב',
-    'hero.cta.soonTitle': 'בקרוב',
-    'hero.cta.github': 'צפו ב-GitHub',
+    'hero.cta.install': 'התקינו מ-GitHub',
+    'hero.cta.howToInstall': '← איך מתקינים',
+    'hero.cta.storeSoon': 'בקרוב גם ב-Chrome Web Store.',
+    'a11y.skip': 'דלגו לתוכן',
     'hero.meta.shortcut': '<kbd>Alt</kbd> <span>+</span> <kbd>A</kbd> בכל דף',
     'hero.meta.nobuild': 'בלי build · בלי חשבונות',
     'hero.meta.mit': 'רישיון MIT',
@@ -190,6 +191,7 @@ const STRINGS = {
     'cta.btn2': '← קראו את הארכיטקטורה',
 
     'footer.architecture': 'ארכיטקטורה',
+    'footer.privacy': 'מדיניות פרטיות',
     'footer.copy': 'נבנה בקפידה. רישיון MIT. © 2026 Roy Carmelli.',
   },
 };
@@ -276,7 +278,9 @@ const targets = document.querySelectorAll(
 );
 targets.forEach((el) => el.classList.add('reveal'));
 
-if ('IntersectionObserver' in window) {
+const revealAll = () => targets.forEach((el) => el.classList.add('is-visible'));
+
+if ('IntersectionObserver' in window && !navigator.webdriver) {
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -289,6 +293,9 @@ if ('IntersectionObserver' in window) {
     { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
   );
   targets.forEach((el) => io.observe(el));
+  // Safety net for headless crawlers that run JS but never scroll
+  // (social preview bots, some SEO crawlers).
+  setTimeout(revealAll, 1500);
 } else {
-  targets.forEach((el) => el.classList.add('is-visible'));
+  revealAll();
 }
