@@ -32,7 +32,7 @@ const STRINGS = {
     'strip.providers': 'Providers',
     'strip.keystroke': 'Keystroke',
     'strip.telemetry': 'Telemetry',
-    'strip.languages': 'Languages · EN / HE',
+    'strip.languages': 'UI languages',
     'strip.mv3': 'Manifest V3',
 
     'features.kicker': 'Why Aside',
@@ -47,7 +47,7 @@ const STRINGS = {
     'features.f4.h': 'Streaming answers',
     'features.f4.p': 'Tokens arrive as the model thinks — cancel any time, edit, and ask again.',
     'features.f5.h': 'Your theme, your language',
-    'features.f5.p': 'Light, dark, or auto. English or Hebrew, with full RTL support.',
+    'features.f5.p': 'Light or dark, defaulting to your system. Eight UI languages — English, Hebrew, Spanish, French, German, Chinese, Arabic, Japanese — with full RTL support.',
     'features.f6.h': 'History that follows the page',
     'features.f6.p': 'Conversations are saved per-site so you can pick up where you left off.',
 
@@ -147,7 +147,7 @@ const STRINGS = {
     'strip.providers': 'ספקים',
     'strip.keystroke': 'הקשה',
     'strip.telemetry': 'טלמטריה',
-    'strip.languages': 'שפות · עב / EN',
+    'strip.languages': 'שפות ממשק',
     'strip.mv3': 'Manifest V3',
 
     'features.kicker': 'למה Aside',
@@ -162,7 +162,7 @@ const STRINGS = {
     'features.f4.h': 'תשובות בסטרימינג',
     'features.f4.p': 'טוקנים מגיעים תוך כדי שהמודל חושב — אפשר לבטל, לערוך ולשאול שוב בכל רגע.',
     'features.f5.h': 'העיצוב והשפה שלכם',
-    'features.f5.p': 'מצב בהיר, כהה או אוטומטי. אנגלית או עברית, עם תמיכה מלאה ב-RTL.',
+    'features.f5.p': 'בהיר או כהה, ברירת מחדל לפי המערכת. שמונה שפות ממשק — אנגלית, עברית, ספרדית, צרפתית, גרמנית, סינית, ערבית, יפנית — עם תמיכה מלאה ב-RTL.',
     'features.f6.h': 'היסטוריה לפי דף',
     'features.f6.p': 'השיחות נשמרות לפי אתר כך שתוכלו להמשיך מהמקום שעצרתם.',
 
@@ -301,6 +301,54 @@ if (langToggle) {
   langToggle.addEventListener('click', () => {
     const current = document.documentElement.getAttribute('lang') === 'he' ? 'he' : 'en';
     setLang(current === 'he' ? 'en' : 'he');
+  });
+}
+
+// ---------- Theme (light / dark / system) ------------------
+
+const THEME_KEY = 'aside.theme';
+const THEMES = ['system', 'light', 'dark'];
+
+function readTheme() {
+  try {
+    const v = localStorage.getItem(THEME_KEY);
+    return THEMES.includes(v) ? v : 'system';
+  } catch { return 'system'; }
+}
+
+function applyTheme(theme) {
+  const html = document.documentElement;
+  if (theme === 'light' || theme === 'dark') {
+    html.setAttribute('data-theme', theme);
+  } else {
+    html.removeAttribute('data-theme');
+  }
+  const btn = document.getElementById('theme-toggle');
+  if (btn) {
+    btn.setAttribute('data-theme', theme);
+    const labels = {
+      system: 'Theme: system (click for light)',
+      light:  'Theme: light (click for dark)',
+      dark:   'Theme: dark (click for system)',
+    };
+    btn.title = labels[theme];
+    btn.setAttribute('aria-label', labels[theme]);
+  }
+}
+
+function setTheme(theme) {
+  try { localStorage.setItem(THEME_KEY, theme); } catch {}
+  applyTheme(theme);
+}
+
+applyTheme(readTheme());
+
+const themeBtn = document.getElementById('theme-toggle');
+if (themeBtn) {
+  themeBtn.addEventListener('click', () => {
+    const cur = readTheme();
+    const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+    setTheme(next);
   });
 }
 

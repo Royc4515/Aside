@@ -1,0 +1,378 @@
+<!doctype html>
+<!--
+  MOCKUP — not deployed. A proposed Claude-style redesign of the landing.
+  Compare against index.html; if approved, the production page is rebuilt
+  along the same lines.
+-->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Aside — mockup</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #f5f1eb;
+      --bg-soft: #efeae1;
+      --ink: #1c1b1a;
+      --ink-soft: #5a5853;
+      --ink-mute: #8a877f;
+      --rule: #d9d3c7;
+      --accent: #c96442;
+      --accent-soft: rgba(201, 100, 66, 0.08);
+
+      --serif: 'Source Serif 4', 'Tiempos Headline', Georgia, serif;
+      --sans: 'Inter', -apple-system, system-ui, sans-serif;
+
+      --gutter: clamp(24px, 5vw, 56px);
+      --measure: 640px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1d1c1a;
+        --bg-soft: #25231f;
+        --ink: #f0ece4;
+        --ink-soft: #b8b3a8;
+        --ink-mute: #837f76;
+        --rule: rgba(255,255,255,0.08);
+        --accent: #e0805c;
+        --accent-soft: rgba(224, 128, 92, 0.10);
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Nav ─────────────────────────────────────────────────── */
+    .nav {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px var(--gutter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+    .brand-mark {
+      width: 22px; height: 22px;
+      border-radius: 4px;
+      background: var(--accent);
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      font-size: 0.93rem;
+      color: var(--ink-soft);
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.88rem;
+      color: var(--ink-mute);
+    }
+    .nav-right a:hover { color: var(--ink); }
+    @media (max-width: 720px) {
+      .nav-links { display: none; }
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: clamp(48px, 8vw, 96px) var(--gutter) clamp(64px, 9vw, 120px);
+    }
+    .hero-kicker {
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(2.6rem, 6vw, 4.4rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin: 0 0 28px;
+      max-width: 14ch;
+    }
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+    .hero-lede {
+      max-width: var(--measure);
+      font-size: 1.18rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin: 0 0 40px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 46px;
+      padding: 0 22px;
+      border-radius: 6px;
+      font-family: var(--sans);
+      font-weight: 500;
+      font-size: 0.96rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease, color .15s ease;
+    }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: var(--accent); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--rule);
+    }
+    .btn-ghost:hover { border-color: var(--ink); }
+    .hero-store-line {
+      margin-top: 24px;
+      font-size: 0.88rem;
+      color: var(--ink-mute);
+    }
+
+    /* ── Editorial content rows ─────────────────────────────── */
+    .row {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: clamp(56px, 8vw, 96px) var(--gutter);
+      border-top: 1px solid var(--rule);
+    }
+    .row-eyebrow {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 18px;
+    }
+    .row h2 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      margin: 0 0 22px;
+      max-width: 20ch;
+    }
+    .row-body {
+      max-width: var(--measure);
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+    }
+    .row-body p { margin: 0 0 18px; }
+    .row-body p:last-child { margin-bottom: 0; }
+
+    /* ── Three-up content (alternative to feature grid) ─────── */
+    .three-up {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px 40px;
+      margin-top: 40px;
+    }
+    @media (max-width: 800px) { .three-up { grid-template-columns: 1fr; gap: 32px; } }
+    .three-up h3 {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 1rem;
+      margin: 0 0 10px;
+      letter-spacing: -0.005em;
+    }
+    .three-up p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 0.97rem;
+      line-height: 1.55;
+    }
+
+    /* ── Image figure ─────────────────────────────────────── */
+    .figure {
+      margin-top: 48px;
+    }
+    .figure-shell {
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .figure img {
+      display: block;
+      width: 100%;
+      border-radius: 6px;
+    }
+    .figure-cap {
+      margin-top: 14px;
+      font-size: 0.86rem;
+      color: var(--ink-mute);
+      font-style: italic;
+    }
+
+    /* ── Quiet closer (replaces gradient CTA band) ──────────── */
+    .closer {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: clamp(72px, 10vw, 128px) var(--gutter);
+      border-top: 1px solid var(--rule);
+      text-align: left;
+    }
+    .closer h2 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      margin: 0 0 28px;
+      max-width: 18ch;
+    }
+
+    .foot {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 40px var(--gutter) 64px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--rule);
+      font-size: 0.86rem;
+      color: var(--ink-mute);
+    }
+    .foot-links { display: flex; gap: 24px; }
+    .foot-links a:hover { color: var(--ink); }
+
+    /* tiny inline mark */
+    kbd {
+      display: inline-block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--bg-soft);
+      border: 1px solid var(--rule);
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="nav">
+    <a class="brand" href="#"><span class="brand-mark"></span> Aside</a>
+    <nav class="nav-links">
+      <a href="#">Features</a>
+      <a href="#">Providers</a>
+      <a href="#">Privacy</a>
+      <a href="#">Install</a>
+    </nav>
+    <div class="nav-right">
+      <a href="#">EN / עב</a>
+      <a href="#">GitHub →</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <p class="hero-kicker">A Chrome extension</p>
+    <h1>AI in your sidebar, <em>on any webpage.</em></h1>
+    <p class="hero-lede">
+      Ask any model about the page you're reading — summarize, extract,
+      translate, or just chat. Six providers, one keystroke, no
+      context-switching.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn btn-primary">Install from GitHub</a>
+      <a href="#" class="btn btn-ghost">How it works</a>
+    </div>
+    <p class="hero-store-line">Coming to the Chrome Web Store soon. Free and open source under the MIT license.</p>
+  </section>
+
+  <section class="row">
+    <p class="row-eyebrow">Why Aside</p>
+    <h2>Built to disappear into your reading.</h2>
+    <div class="row-body">
+      <p>You're in the middle of an article, a research paper, an API doc, or a long email thread, and you want a model's take — now, without losing your place. Aside opens a slim sidebar on the page you're already on, already aware of what you're looking at.</p>
+      <p>Press <kbd>Alt</kbd>+<kbd>A</kbd> and ask. The response streams in token-by-token; you can cancel, edit, and ask again. Conversations are saved per-site so you can pick up where you left off.</p>
+    </div>
+
+    <div class="three-up">
+      <div>
+        <h3>One keystroke</h3>
+        <p><kbd>Alt</kbd>+<kbd>A</kbd> on any page. The sidebar slides in, already aware of what you're reading.</p>
+      </div>
+      <div>
+        <h3>Six providers</h3>
+        <p>Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama. Switch in a click, no separate logins.</p>
+      </div>
+      <div>
+        <h3>Page-aware</h3>
+        <p>Summarize, extract key points, translate, find on page, or run a custom prompt. No copy-paste.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="row">
+    <p class="row-eyebrow">Privacy</p>
+    <h2>Your keys, your machine, your data.</h2>
+    <div class="row-body">
+      <p>API keys live in Chrome's encrypted local storage and are sent only to the provider you chose, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry.</p>
+      <p>Page content is included only when <em>you</em> ask, trimmed to twelve thousand characters, and sent with that single request. Pick Ollama and nothing leaves your computer.</p>
+    </div>
+  </section>
+
+  <section class="closer">
+    <h2>Open source, MIT licensed, free forever.</h2>
+    <div class="hero-actions">
+      <a href="#" class="btn btn-primary">Get Aside on GitHub</a>
+      <a href="#" class="btn btn-ghost">Read the architecture →</a>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>© 2026 Roy Carmelli · MIT</span>
+    <nav class="foot-links">
+      <a href="#">Privacy</a>
+      <a href="#">GitHub</a>
+      <a href="#">Architecture</a>
+    </nav>
+  </footer>
+
+</body>
+</html>

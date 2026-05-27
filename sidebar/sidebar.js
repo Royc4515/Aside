@@ -85,6 +85,10 @@ async function loadSettings() {
   settings.apiKeys = settings.apiKeys || {};
   settings.theme = settings.theme || 'auto';
   applyTheme(settings.theme);
+  // Keep the icon in sync if the user is still on 'auto' and the OS flips.
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (settings.theme !== 'light' && settings.theme !== 'dark') applyTheme(settings.theme);
+  });
   renderContextPill();
   if (!settings.activeProvider || (!settings.apiKeys[settings.activeProvider] && settings.activeProvider !== 'ollama')) {
     showOnboarding(); return;
@@ -404,12 +408,19 @@ function hideOnboarding() {
 }
 
 // ── Theme ──────────────────────────────────────────────────────────────
+// The icon shown is always the *effective* theme (i.e. what the user actually
+// sees). 'auto' is the implicit default until the user explicitly picks a
+// side; from then on it toggles light ↔ dark.
 const THEME_ICONS = {
-  auto:  '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
   light: '<circle cx="12" cy="12" r="4"/><path d="M12 3v1M12 20v1M3 12h1M20 12h1M5.6 5.6l.7.7M17.7 17.7l.7.7M5.6 18.4l.7-.7M17.7 6.3l.7-.7"/>',
   dark:  '<path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/>',
 };
-const THEME_TITLES = { auto: 'Theme: Auto', light: 'Theme: Light', dark: 'Theme: Dark' };
+const THEME_TITLES = { light: 'Theme: Light (click for dark)', dark: 'Theme: Dark (click for light)' };
+
+function effectiveTheme(theme) {
+  if (theme === 'light' || theme === 'dark') return theme;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
 function applyTheme(theme) {
   const html = document.documentElement;
@@ -418,23 +429,21 @@ function applyTheme(theme) {
   } else {
     html.removeAttribute('data-theme');
   }
-  // Update icon
   const btn = document.getElementById('theme-btn');
   if (btn) {
+    const eff = effectiveTheme(theme);
     const svg = btn.querySelector('svg');
     if (svg) {
-      svg.setAttribute('data-icon', theme);
-      svg.innerHTML = THEME_ICONS[theme] || THEME_ICONS.auto;
+      svg.setAttribute('data-icon', eff);
+      svg.innerHTML = THEME_ICONS[eff];
     }
-    btn.title = THEME_TITLES[theme] || THEME_TITLES.auto;
+    btn.title = THEME_TITLES[eff];
     btn.setAttribute('aria-label', btn.title);
   }
 }
 
 async function cycleTheme() {
-  const order = ['auto', 'light', 'dark'];
-  const cur = settings.theme || 'auto';
-  const next = order[(order.indexOf(cur) + 1) % order.length];
+  const next = effectiveTheme(settings.theme) === 'dark' ? 'light' : 'dark';
   settings.theme = next;
   applyTheme(next);
   await chrome.storage.sync.set({ theme: next });

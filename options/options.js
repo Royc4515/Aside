@@ -59,6 +59,13 @@ function applyTheme(theme) {
   else html.removeAttribute('data-theme');
 }
 
+// When the stored theme is 'auto' (system follows), the segmented control
+// should still highlight whichever button matches the current system theme.
+function effectiveTheme(theme) {
+  if (theme === 'light' || theme === 'dark') return theme;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 async function init() {
   const stored = await chrome.storage.sync.get([
     'activeProvider','apiKeys','language','position','width','theme','pageContext'
@@ -78,6 +85,12 @@ async function init() {
   bindGlobal();
   snapshotBaseline();
   showPage(activePage);
+
+  // Re-render the theme segment when the system pref flips while we're
+  // following it (state.theme === 'auto').
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (state.theme !== 'light' && state.theme !== 'dark') renderAppearance();
+  });
 }
 
 function bindGlobal() {
@@ -189,8 +202,9 @@ function renderKeys() {
 function renderAppearance() {
   document.querySelectorAll('.set-segments').forEach(seg => {
     const setting = seg.dataset.setting;
+    const compareValue = setting === 'theme' ? effectiveTheme(state[setting]) : state[setting];
     seg.querySelectorAll('.set-seg').forEach(b => {
-      b.classList.toggle('is-active', b.dataset.value === state[setting]);
+      b.classList.toggle('is-active', b.dataset.value === compareValue);
       b.onclick = () => {
         state[setting] = b.dataset.value;
         if (setting === 'theme') applyTheme(state.theme);
