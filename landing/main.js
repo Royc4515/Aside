@@ -132,7 +132,7 @@ const STRINGS = {
     'nav.github': 'GitHub',
 
     'hero.eyebrow.short': 'תוסף Chrome',
-    'hero.title': 'בינה מלאכותית <em>בסרגל הצד.</em>',
+    'hero.title': 'בינה מלאכותית <span class="accent">בסרגל הצד.</span>',
     'hero.lede': 'AI מודע-הקשר לכל דף באינטרנט. סכמו, חלצו, תרגמו או פשוט שוחחו — עם הספק שאתם בוחרים.',
     'hero.cta.install': 'התקינו מ-GitHub',
     'hero.cta.howToInstall': '← איך מתקינים',
