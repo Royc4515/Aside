@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap-0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://royc4515.github.io/Aside/</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://royc4515.github.io/Aside/" />
+    <xhtml:link rel="alternate" hreflang="he" href="https://royc4515.github.io/Aside/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://royc4515.github.io/Aside/" />
+  </url>
+  <url>
+    <loc>https://royc4515.github.io/Aside/PRIVACY.html</loc>
+    <lastmod>2026-05-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>
