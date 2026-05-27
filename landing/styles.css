@@ -264,6 +264,12 @@ kbd {
   .hero-inner { grid-template-columns: 1fr; }
 }
 
+.eyebrow-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -281,6 +287,13 @@ kbd {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--brand);
   box-shadow: 0 0 0 4px var(--brand-soft);
+}
+.eyebrow-free {
+  background: var(--brand-soft);
+  border-color: transparent;
+  color: var(--brand-strong);
+  font-weight: 600;
+  padding: 6px 12px;
 }
 
 .hero h1 { margin-top: 18px; }
@@ -755,6 +768,74 @@ html[dir="rtl"] kbd,
 html[dir="rtl"] .p-model {
   direction: ltr;
   unicode-bidi: isolate;
+}
+
+/* ----- FAQ ----------------------------------------------- */
+
+.faq-list {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.faq-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.faq-item[open] {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+.faq-item summary {
+  cursor: pointer;
+  padding: 18px 22px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: "+";
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--text-soft);
+  line-height: 1;
+  transition: transform .2s ease;
+}
+.faq-item[open] summary::after {
+  content: "−";
+  color: var(--brand);
+}
+.faq-item summary:hover { color: var(--brand); }
+.faq-item summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+  border-radius: var(--radius);
+}
+.faq-a {
+  padding: 0 22px 20px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+.faq-a a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.faq-a a:hover { color: var(--brand-strong); }
+.faq-a code {
+  font-size: 0.88em;
 }
 
 /* The em-dash separators in CTA links flip nicely with logical text;

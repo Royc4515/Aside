@@ -6,17 +6,19 @@
 
 const STRINGS = {
   en: {
-    'meta.title': 'Aside — AI in your sidebar. On any webpage.',
+    'meta.title': 'Aside — AI sidebar for Chrome. Claude, Gemini, GPT-4o, Grok, Groq, Ollama.',
     'meta.description': 'Aside is a Chrome extension that puts six AI providers — Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama — one keystroke away on any page.',
 
     'nav.features': 'Features',
     'nav.providers': 'Providers',
     'nav.how': 'How it works',
+    'nav.faq': 'FAQ',
     'nav.privacy': 'Privacy',
     'nav.install': 'Install',
     'nav.github': 'GitHub',
 
     'hero.eyebrow': 'Chrome extension · MV3 · Open source',
+    'hero.eyebrow.free': 'Free · MIT licensed',
     'hero.title': 'AI in your sidebar.<br /><span class="accent">On any webpage.</span>',
     'hero.lede': "Ask any AI about the page you're reading — summarize, extract, translate, or just chat. Six providers, one keystroke, zero context-switching.",
     'hero.cta.install': 'Install from GitHub',
@@ -74,6 +76,21 @@ const STRINGS = {
     'privacy.c4.h': 'Fully offline mode',
     'privacy.c4.p': 'Pick <strong>Ollama</strong> and nothing leaves your computer — your prompt and the page text stay on your machine.',
 
+    'faq.kicker': 'FAQ',
+    'faq.h2': 'Common questions.',
+    'faq.q1.q': 'Is Aside really free?',
+    'faq.q1.a': "Yes. Aside itself is open source under the MIT license and costs nothing. You pay only what your chosen AI provider charges for API usage — Anthropic, Google, OpenAI, xAI, and Groq each have their own pricing. If you pick Ollama and run it locally, the whole stack is free.",
+    'faq.q2.q': 'Are my API keys safe?',
+    'faq.q2.a': "Keys live in Chrome's encrypted local storage on your device and are sent only to the provider that issued them, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry. Read the full <a href=\"PRIVACY.html\">Privacy Policy</a>.",
+    'faq.q3.q': 'Do I need an account to use Aside?',
+    'faq.q3.a': "No account, no sign-up, no email. Install the extension, paste at least one provider API key, and you're in. Aside has no auth layer of its own.",
+    'faq.q4.q': 'Which browsers are supported?',
+    'faq.q4.a': 'Aside is a Manifest V3 extension and runs on any Chromium-based browser — Google Chrome, Microsoft Edge, Brave, Arc, Opera. Firefox is on the roadmap once we port the manifest.',
+    'faq.q5.q': 'Can I use Aside fully offline?',
+    'faq.q5.a': 'Yes. Pick Ollama as the provider and Aside makes no network calls outside localhost. Your prompts, selected text, and page content stay on your machine.',
+    'faq.q6.q': 'Where is my conversation history stored?',
+    'faq.q6.a': "Threads are saved per-site in Chrome's <code>storage.local</code> on your device. They aren't synced to any cloud and can be cleared from Settings or by uninstalling the extension.",
+
     'install.kicker': 'Install',
     'install.h2': 'Two ways in. Both take about a minute.',
     'install.c1.h': 'Chrome Web Store',
@@ -101,17 +118,19 @@ const STRINGS = {
   },
 
   he: {
-    'meta.title': 'Aside — בינה מלאכותית בסרגל הצד. בכל דף באינטרנט.',
+    'meta.title': 'Aside — סרגל AI לכרום. Claude, Gemini, GPT-4o, Grok, Groq, Ollama.',
     'meta.description': 'Aside היא תוסף לכרום שמביא שישה ספקי AI — Claude, Gemini, GPT-4o, Grok, Groq ו-Ollama מקומי — במרחק הקשה אחת מכל דף.',
 
     'nav.features': 'תכונות',
     'nav.providers': 'ספקים',
     'nav.how': 'איך זה עובד',
+    'nav.faq': 'שאלות נפוצות',
     'nav.privacy': 'פרטיות',
     'nav.install': 'התקנה',
     'nav.github': 'GitHub',
 
     'hero.eyebrow': 'תוסף Chrome · MV3 · קוד פתוח',
+    'hero.eyebrow.free': 'חינמי · רישיון MIT',
     'hero.title': 'בינה מלאכותית בסרגל הצד.<br /><span class="accent">בכל דף באינטרנט.</span>',
     'hero.lede': 'שאלו כל מודל AI על הדף שאתם קוראים — סכמו, חלצו, תרגמו או פשוט שוחחו. שישה ספקים, הקשה אחת, בלי לקפוץ בין חלונות.',
     'hero.cta.install': 'התקינו מ-GitHub',
@@ -168,6 +187,21 @@ const STRINGS = {
     'privacy.c3.p': 'תוכן הדף נשלח רק כש<em>אתם</em> מבקשים. נחתך ל-12,000 תווים ונשלח עם הבקשה הבודדת הזו.',
     'privacy.c4.h': 'מצב אופליין מלא',
     'privacy.c4.p': 'בחרו ב-<strong>Ollama</strong> ושום דבר לא יוצא מהמחשב שלכם — ה-prompt וטקסט הדף נשארים אצלכם.',
+
+    'faq.kicker': 'שאלות נפוצות',
+    'faq.h2': 'שאלות שחוזרות.',
+    'faq.q1.q': 'באמת חינמי?',
+    'faq.q1.a': 'כן. Aside עצמו הוא קוד פתוח ברישיון MIT, ללא עלות. אתם משלמים רק על שימוש ב-API של הספק שבחרתם — לכל אחד מהם (Anthropic, Google, OpenAI, xAI, Groq) מחירון משלו. אם אתם בוחרים ב-Ollama מקומי, כל הסטאק חינמי.',
+    'faq.q2.q': 'מפתחות ה-API שלי בטוחים?',
+    'faq.q2.a': 'המפתחות נשמרים באחסון המוצפן המקומי של Chrome במחשב שלכם ונשלחים רק לספק שהנפיק אותם, ב-HTTPS. אין שרת של Aside, אין proxy, אין אנליטיקס, אין טלמטריה. קראו את <a href="PRIVACY.html">מדיניות הפרטיות המלאה</a>.',
+    'faq.q3.q': 'צריך חשבון כדי להשתמש ב-Aside?',
+    'faq.q3.a': 'אין חשבון, אין הרשמה, אין אימייל. מתקינים את התוסף, מדביקים לפחות מפתח API אחד, ויוצאים לדרך. ל-Aside אין שכבת autenticantion משלו.',
+    'faq.q4.q': 'אילו דפדפנים נתמכים?',
+    'faq.q4.a': 'Aside הוא תוסף Manifest V3 ורץ על כל דפדפן מבוסס Chromium — Google Chrome, Microsoft Edge, Brave, Arc, Opera. Firefox במפת הדרכים ברגע שנפורט את ה-manifest.',
+    'faq.q5.q': 'אפשר להשתמש לגמרי אופליין?',
+    'faq.q5.a': 'כן. בוחרים Ollama כספק, ו-Aside לא עושה שום קריאת רשת מחוץ ל-localhost. הפרומפטים, הטקסט שסימנתם ותוכן הדף נשארים על המחשב שלכם.',
+    'faq.q6.q': 'איפה נשמרת היסטוריית השיחות?',
+    'faq.q6.a': 'שיחות נשמרות לפי אתר ב-<code>storage.local</code> של Chrome במחשב שלכם. הן לא מסונכרנות לענן וניתן לנקות אותן מההגדרות או על-ידי הסרת התוסף.',
 
     'install.kicker': 'התקנה',
     'install.h2': 'שתי דרכים להתקין. שתיהן לוקחות בערך דקה.',
