@@ -83,10 +83,10 @@ real API before saving. Switch providers any time from the sidebar header.
 
 > Aside is open source and not yet on the Chrome Web Store. For now, install it as an unpacked extension — it takes about 30 seconds.
 
-1. **Download** this repository ([latest ZIP](https://github.com/Royc4515/ai-sidebar/archive/refs/heads/main.zip)) and unzip it, or `git clone https://github.com/Royc4515/ai-sidebar.git`
+1. **Download** this repository ([latest ZIP](https://github.com/Royc4515/Aside/archive/refs/heads/main.zip)) and unzip it, or `git clone https://github.com/Royc4515/Aside.git`
 2. Open Chrome and go to `chrome://extensions`
 3. Turn on **Developer mode** (top-right toggle)
-4. Click **Load unpacked** and pick the `ai-sidebar` folder
+4. Click **Load unpacked** and pick the `Aside-main` folder
 5. Pin Aside to your toolbar, then open **Settings** and paste at least one API key
 6. Open any page and press **`Alt + A`** — or right-click the page and choose *Open AI Sidebar*
 
