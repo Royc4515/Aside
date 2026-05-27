@@ -17,14 +17,14 @@
 
   <style>
     :root {
-      --bg: #f5f1eb;
-      --bg-soft: #efeae1;
-      --ink: #1c1b1a;
-      --ink-soft: #5a5853;
-      --ink-mute: #8a877f;
-      --rule: #d9d3c7;
-      --accent: #c96442;
-      --accent-soft: rgba(201, 100, 66, 0.08);
+      --bg: #faf6ef;
+      --bg-soft: #f1ebe0;
+      --ink: #1a1814;
+      --ink-soft: #4f4c45;
+      --ink-mute: #8e8a80;
+      --rule: #e2dccf;
+      --accent: #cc785c;
+      --accent-soft: rgba(204, 120, 92, 0.10);
 
       --serif: 'Source Serif 4', 'Tiempos Headline', Georgia, serif;
       --sans: 'Inter', -apple-system, system-ui, sans-serif;
@@ -79,8 +79,31 @@
     }
     .brand-mark {
       width: 22px; height: 22px;
-      border-radius: 4px;
-      background: var(--accent);
+      color: var(--accent);
+    }
+    .nav-tools {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 32px; height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: var(--ink-mute);
+      cursor: pointer;
+    }
+    .icon-btn:hover { color: var(--ink); border-color: var(--rule); }
+    .lang-pill {
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      color: var(--ink-soft);
     }
     .nav-links {
       display: flex;
@@ -90,12 +113,13 @@
     }
     .nav-links a:hover { color: var(--ink); }
     .nav-right {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       font-size: 0.88rem;
       color: var(--ink-mute);
     }
+    .nav-right > * { display: inline-flex; align-items: center; height: 32px; }
     .nav-right a:hover { color: var(--ink); }
     @media (max-width: 720px) {
       .nav-links { display: none; }
@@ -103,43 +127,107 @@
 
     /* ── Hero ────────────────────────────────────────────────── */
     .hero {
-      max-width: 1080px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: clamp(48px, 8vw, 96px) var(--gutter) clamp(64px, 9vw, 120px);
+      padding: clamp(40px, 6vw, 72px) var(--gutter) clamp(56px, 8vw, 96px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: clamp(40px, 6vw, 80px);
+      align-items: center;
     }
-    .hero-kicker {
-      font-size: 0.84rem;
-      letter-spacing: 0.08em;
+    @media (max-width: 880px) {
+      .hero { grid-template-columns: 1fr; gap: 48px; }
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--ink-mute);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+    }
+    .hero-eyebrow::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
     }
     .hero h1 {
       font-family: var(--serif);
-      font-weight: 500;
+      font-weight: 400;
       font-size: clamp(2.6rem, 6vw, 4.4rem);
-      line-height: 1.08;
-      letter-spacing: -0.02em;
+      line-height: 1.04;
+      letter-spacing: -0.022em;
       margin: 0 0 28px;
-      max-width: 14ch;
+      max-width: 11ch;
     }
     .hero h1 em {
       font-style: italic;
       font-weight: 400;
-      color: var(--accent);
     }
     .hero-lede {
       max-width: var(--measure);
-      font-size: 1.18rem;
+      font-size: 1.1rem;
       line-height: 1.55;
       color: var(--ink-soft);
-      margin: 0 0 40px;
+      margin: 0 0 24px;
+    }
+    .provider-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin: 0 0 24px;
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+    }
+    .provider-line span {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .provider-line span::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--dot, var(--accent));
+    }
+    .meta-line {
+      margin: 0 0 32px;
+      font-size: 0.85rem;
+      color: var(--ink-mute);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+    }
+    .meta-line span + span::before {
+      content: "·";
+      margin-inline-end: 14px;
+      color: var(--rule);
     }
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
+      gap: 12px;
       align-items: center;
+    }
+    .hero-figure {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .hero-figure img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 18px;
+      box-shadow:
+        0 40px 70px -30px rgba(28, 24, 20, 0.28),
+        0 14px 30px -14px rgba(28, 24, 20, 0.16);
     }
     .btn {
       display: inline-flex;
@@ -167,9 +255,13 @@
     }
     .btn-ghost:hover { border-color: var(--ink); }
     .hero-store-line {
-      margin-top: 24px;
-      font-size: 0.88rem;
+      margin-top: 20px;
+      font-size: 0.85rem;
       color: var(--ink-mute);
+    }
+    .hero-store-line strong {
+      font-weight: 500;
+      color: var(--ink-soft);
     }
 
     /* ── Editorial content rows ─────────────────────────────── */
@@ -296,7 +388,12 @@
 <body>
 
   <header class="nav">
-    <a class="brand" href="#"><span class="brand-mark"></span> Aside</a>
+    <a class="brand" href="#">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 1.5 14.3 9.7 22.5 12 14.3 14.3 12 22.5 9.7 14.3 1.5 12 9.7 9.7Z"/>
+      </svg>
+      Aside
+    </a>
     <nav class="nav-links">
       <a href="#">Features</a>
       <a href="#">Providers</a>
@@ -304,24 +401,50 @@
       <a href="#">Install</a>
     </nav>
     <div class="nav-right">
-      <a href="#">EN / עב</a>
+      <div class="nav-tools">
+        <button class="icon-btn" type="button" title="Switch theme" aria-label="Switch theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </button>
+        <span class="lang-pill">EN / עב</span>
+      </div>
       <a href="#">GitHub →</a>
     </div>
   </header>
 
   <section class="hero">
-    <p class="hero-kicker">A Chrome extension</p>
-    <h1>AI in your sidebar, <em>on any webpage.</em></h1>
-    <p class="hero-lede">
-      Ask any model about the page you're reading — summarize, extract,
-      translate, or just chat. Six providers, one keystroke, no
-      context-switching.
-    </p>
-    <div class="hero-actions">
-      <a href="#" class="btn btn-primary">Install from GitHub</a>
-      <a href="#" class="btn btn-ghost">How it works</a>
+    <div class="hero-copy">
+      <p class="hero-eyebrow">A Chrome extension</p>
+      <h1>AI in your <em>sidebar.</em></h1>
+      <p class="hero-lede">
+        Context-aware AI for any webpage. Summarize, extract, translate,
+        or just chat — with the provider you choose.
+      </p>
+      <p class="provider-line">
+        <span style="--dot:#c96442">Claude</span>
+        <span style="--dot:#4285f4">Gemini</span>
+        <span style="--dot:#10a37f">GPT-4o</span>
+        <span style="--dot:#000">Grok</span>
+        <span style="--dot:#f55036">Groq</span>
+        <span style="--dot:#8b5cf6">Ollama</span>
+      </p>
+      <p class="meta-line">
+        <span>MIT licensed</span>
+        <span>No telemetry</span>
+        <span>8 UI languages</span>
+      </p>
+      <div class="hero-actions">
+        <a href="#" class="btn btn-primary">Install from GitHub</a>
+        <a href="#" class="btn btn-ghost">How it works</a>
+      </div>
+      <p class="hero-store-line"><strong>Coming to the Chrome Web Store</strong> · Free, MIT licensed.</p>
     </div>
-    <p class="hero-store-line">Coming to the Chrome Web Store soon. Free and open source under the MIT license.</p>
+    <div class="hero-figure">
+      <picture>
+        <source type="image/webp" media="(prefers-color-scheme: dark)" srcset="assets/sidebar-tight-dark-450.webp 450w, assets/sidebar-tight-dark-900.webp 900w" sizes="(max-width: 880px) 100vw, 45vw" />
+        <source type="image/webp" srcset="assets/sidebar-tight-450.webp 450w, assets/sidebar-tight-900.webp 900w" sizes="(max-width: 880px) 100vw, 45vw" />
+        <img src="assets/sidebar-tight-900.png" alt="The Aside sidebar opened, ready to take a prompt about the current page." width="900" height="984" />
+      </picture>
+    </div>
   </section>
 
   <section class="row">
