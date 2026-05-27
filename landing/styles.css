@@ -3,22 +3,21 @@
    ============================================================ */
 
 :root {
-  /* Brand */
-  --brand: #d97757;
-  --brand-strong: #c45f3f;
-  --brand-soft: rgba(217, 119, 87, 0.12);
-  --accent: #8b5cf6;
+  /* Brand — exact values from Anthropic / Claude marketing */
+  --brand: #da7756;
+  --brand-strong: #bd5d3a;
+  --brand-soft: rgba(218, 119, 86, 0.12);
 
-  /* Light theme — warm cream + warm dark brown (no pure white, no near-black) */
-  --bg: #f5f0e6;
-  --bg-alt: #ede6d8;
-  --surface: #faf6ec;
-  --surface-hi: #fbf7ee;
-  --border: rgba(44, 40, 35, 0.08);
-  --border-strong: rgba(44, 40, 35, 0.14);
-  --text: #2c2823;
-  --text-muted: #5e5953;
-  --text-soft: #948f85;
+  /* Light theme — Anthropic cream + dark brown text */
+  --bg: #eeece2;
+  --bg-alt: #e5e2d4;
+  --surface: #f4f3ee;
+  --surface-hi: #faf8f0;
+  --border: rgba(61, 57, 41, 0.10);
+  --border-strong: rgba(61, 57, 41, 0.18);
+  --text: #3d3929;
+  --text-muted: #6b6555;
+  --text-soft: #91897a;
   --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.04), 0 1px 1px rgba(20, 20, 30, 0.03);
   --shadow-md: 0 4px 14px rgba(20, 20, 30, 0.06), 0 1px 3px rgba(20, 20, 30, 0.04);
   --shadow-lg: 0 24px 60px -20px rgba(20, 20, 30, 0.18), 0 8px 20px -8px rgba(20, 20, 30, 0.10);
@@ -38,39 +37,39 @@
    has explicitly picked dark via the toggle. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-    --bg: #2a2620;
-    --bg-alt: #322d26;
-    --surface: #38332c;
-    --surface-hi: #423d34;
-    --border: rgba(230, 223, 208, 0.08);
-    --border-strong: rgba(230, 223, 208, 0.14);
-    --text: #e6dfd0;
-    --text-muted: #b0aa9c;
-    --text-soft: #807a70;
+    --bg: #262421;
+    --bg-alt: #2d2b27;
+    --surface: #34322e;
+    --surface-hi: #3d3b36;
+    --border: rgba(238, 236, 226, 0.10);
+    --border-strong: rgba(238, 236, 226, 0.18);
+    --text: #eeece2;
+    --text-muted: #b8b1a0;
+    --text-soft: #837e72;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
     --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.34);
     --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, 0.50), 0 10px 24px -8px rgba(0, 0, 0, 0.34);
-    --kbd-bg: #38332c;
-    --kbd-border: rgba(230, 223, 208, 0.22);
-    --brand-soft: rgba(217, 119, 87, 0.18);
+    --kbd-bg: #34322e;
+    --kbd-border: rgba(238, 236, 226, 0.22);
+    --brand-soft: rgba(218, 119, 86, 0.18);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #2a2620;
-  --bg-alt: #322d26;
-  --surface: #38332c;
-  --surface-hi: #423d34;
-  --border: rgba(230, 223, 208, 0.08);
-  --border-strong: rgba(230, 223, 208, 0.14);
-  --text: #e6dfd0;
-  --text-muted: #b0aa9c;
-  --text-soft: #807a70;
+  --bg: #262421;
+  --bg-alt: #2d2b27;
+  --surface: #34322e;
+  --surface-hi: #3d3b36;
+  --border: rgba(238, 236, 226, 0.10);
+  --border-strong: rgba(238, 236, 226, 0.18);
+  --text: #eeece2;
+  --text-muted: #b8b1a0;
+  --text-soft: #837e72;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
   --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.34);
   --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, 0.50), 0 10px 24px -8px rgba(0, 0, 0, 0.34);
-  --kbd-bg: #38332c;
-  --kbd-border: rgba(230, 223, 208, 0.22);
-  --brand-soft: rgba(217, 119, 87, 0.18);
+  --kbd-bg: #34322e;
+  --kbd-border: rgba(238, 236, 226, 0.22);
+  --brand-soft: rgba(218, 119, 86, 0.18);
   color-scheme: dark;
 }
 :root[data-theme="light"] { color-scheme: light; }

@@ -17,14 +17,16 @@
 
   <style>
     :root {
-      --bg: #f5f0e6;        /* warm cream, NOT white */
-      --bg-soft: #ede6d8;
-      --ink: #2c2823;       /* warm dark brown, NOT black */
-      --ink-soft: #5e5953;
-      --ink-mute: #948f85;
-      --rule: #ddd6c8;
-      --accent: #cc785c;
-      --accent-soft: rgba(204, 120, 92, 0.10);
+      /* Anthropic / Claude marketing palette (exact values) */
+      --bg: #eeece2;        /* Anthropic.com cream */
+      --bg-soft: #e5e2d4;
+      --ink: #3d3929;       /* Anthropic.com text */
+      --ink-soft: #6b6555;
+      --ink-mute: #91897a;
+      --rule: rgba(61, 57, 41, 0.14);
+      --accent: #da7756;    /* Anthropic terracotta */
+      --accent-strong: #bd5d3a;
+      --accent-soft: rgba(218, 119, 86, 0.10);
 
       --serif: 'Source Serif 4', 'Tiempos Headline', Georgia, serif;
       --sans: 'Inter', -apple-system, system-ui, sans-serif;
@@ -35,14 +37,15 @@
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #2a2620;       /* warm dark, NOT black */
-        --bg-soft: #322d26;
-        --ink: #e6dfd0;      /* dimmed cream, NOT bright white */
-        --ink-soft: #b0aa9c;
-        --ink-mute: #807a70;
-        --rule: rgba(230, 223, 208, 0.10);
-        --accent: #e08866;
-        --accent-soft: rgba(224, 136, 102, 0.12);
+        --bg: #262421;       /* warm dark, "evening conversation" */
+        --bg-soft: #2d2b27;
+        --ink: #eeece2;      /* the light bg, inverted to text */
+        --ink-soft: #b8b1a0;
+        --ink-mute: #837e72;
+        --rule: rgba(238, 236, 226, 0.12);
+        --accent: #e08866;   /* slightly brightened for dark contrast */
+        --accent-strong: #c96846;
+        --accent-soft: rgba(224, 136, 102, 0.14);
       }
     }
 
