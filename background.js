@@ -55,12 +55,41 @@ function setupContextMenus() {
   });
 }
 
+// One-time migration: earlier versions stored settings + API keys in
+// chrome.storage.sync (which syncs across the user's devices via the
+// Google account). We now keep everything strictly local so keys never
+// leave the device. Copy anything still in sync over to local and clear
+// the sync side. Idempotent — safe to run on every startup.
+const STORAGE_KEYS = ['activeProvider', 'apiKeys', 'language', 'theme', 'pageContext', 'position', 'width'];
+
+async function migrateSyncToLocal() {
+  try {
+    const synced = await chrome.storage.sync.get(STORAGE_KEYS);
+    if (!synced || Object.keys(synced).length === 0) return;
+    const localExisting = await chrome.storage.local.get(STORAGE_KEYS);
+    const toSet = {};
+    for (const k of Object.keys(synced)) {
+      // Don't clobber data the user already has on this device.
+      if (localExisting[k] === undefined) toSet[k] = synced[k];
+    }
+    if (Object.keys(toSet).length > 0) {
+      await chrome.storage.local.set(toSet);
+    }
+    await chrome.storage.sync.remove(STORAGE_KEYS);
+  } catch (err) {
+    console.warn('Aside: sync→local migration skipped:', err);
+  }
+}
+
+chrome.runtime.onStartup.addListener(() => { migrateSyncToLocal(); });
+
 // First-run / Update: open options page and setup context menus.
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   setupContextMenus();
-  
+  await migrateSyncToLocal();
+
   if (reason === 'install') {
-    const { activeProvider } = await chrome.storage.sync.get(['activeProvider']);
+    const { activeProvider } = await chrome.storage.local.get(['activeProvider']);
     if (!activeProvider) chrome.runtime.openOptionsPage();
   }
 });

@@ -237,7 +237,18 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 }
 .set-key-validate:hover { border-color: var(--line-strong); color: var(--ink); }
 .set-key-validate.is-valid { color: var(--success); border-color: rgba(74,143,90,0.4); }
+.set-key-validate.is-invalid,
 .set-key-validate.is-error { color: var(--danger); border-color: rgba(177,69,69,0.4); }
+.set-key-validate:disabled { opacity: 0.6; cursor: progress; }
+.set-key-error {
+  grid-column: 1 / -1;
+  font-size: 0.85em;
+  color: var(--danger);
+  padding: 6px 10px;
+  background: rgba(177, 69, 69, 0.08);
+  border-radius: 6px;
+  margin-top: 4px;
+}
 
 /* Form rows */
 .set-row {

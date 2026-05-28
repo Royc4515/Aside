@@ -62,14 +62,15 @@
     anyone does with it.</p>
 
     <h2>2. API keys</h2>
-    <p>When you paste a provider API key into <em>Settings</em>, it is stored
-    in Chrome's <code>chrome.storage.sync</code> — the browser's encrypted
-    per-extension storage. If you are signed into Chrome with sync enabled,
-    keys sync between your own devices through your Google account; otherwise
-    they remain on the current device only. Keys are only ever sent to the
-    provider whose key it is (Anthropic, Google, OpenAI, xAI, Groq, or your
-    local Ollama instance), over HTTPS, with the API request you initiated.
-    Keys never reach any server operated by the author.</p>
+    <p>When you paste a provider API key into <em>Settings</em>, Aside first
+    validates it against the provider's live API. If the key is rejected,
+    nothing is stored. If accepted, it is written to Chrome's
+    <code>chrome.storage.local</code> — the browser's encrypted, per-extension
+    storage that stays on this device and is never synced to any cloud. Keys
+    are only ever sent to the provider whose key it is (Anthropic, Google,
+    OpenAI, xAI, Groq, or your local Ollama instance), over HTTPS, with the
+    API request you initiated. Keys never reach any server operated by the
+    author.</p>
 
     <h2>3. Page content</h2>
     <p>When you press an action that needs the page — <em>Summarize</em>,

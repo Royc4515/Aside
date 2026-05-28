@@ -19,12 +19,12 @@ let busy         = false;
 let _renderPending = false;
 
 const PROVIDERS = [
-  { id: 'claude', name: 'Claude', model: '3.5 Sonnet',   hue: 'var(--p-claude)' },
-  { id: 'gemini', name: 'Gemini', model: '2.0 Flash',    hue: 'var(--p-gemini)' },
-  { id: 'openai', name: 'GPT-4o', model: '4o mini',      hue: 'var(--p-gpt)'    },
-  { id: 'grok',   name: 'Grok',   model: 'Grok-2',       hue: 'var(--p-grok)'   },
-  { id: 'groq',   name: 'Groq',   model: 'Llama 3.3',    hue: 'var(--p-groq)'   },
-  { id: 'ollama', name: 'Ollama', model: 'Local',         hue: 'var(--p-ollama)' },
+  { id: 'claude', name: 'Claude', model: 'Claude 3.5 Sonnet',  hue: 'var(--p-claude)' },
+  { id: 'gemini', name: 'Gemini', model: 'Gemini 2.0 Flash',   hue: 'var(--p-gemini)' },
+  { id: 'openai', name: 'GPT-4o', model: 'GPT-4o mini',        hue: 'var(--p-gpt)'    },
+  { id: 'grok',   name: 'Grok',   model: 'Grok 2',             hue: 'var(--p-grok)'   },
+  { id: 'groq',   name: 'Groq',   model: 'Llama 3.3 70B',      hue: 'var(--p-groq)'   },
+  { id: 'ollama', name: 'Ollama', model: 'Llama 3.1 (local)',  hue: 'var(--p-ollama)' },
 ];
 
 const ACTION_LABEL_KEYS = {
@@ -81,7 +81,7 @@ function applyUILanguage() {
 }
 
 async function loadSettings() {
-  settings = await chrome.storage.sync.get(['activeProvider','apiKeys','language','theme','pageContext']);
+  settings = await chrome.storage.local.get(['activeProvider','apiKeys','language','theme','pageContext']);
   settings.apiKeys = settings.apiKeys || {};
   settings.theme = settings.theme || 'auto';
   applyTheme(settings.theme);
@@ -344,7 +344,7 @@ async function commitOnboardingStep2() {
   if (key) newKeys[p.id] = key;
   settings = { ...settings, apiKeys: newKeys, activeProvider: p.id };
   try {
-    await chrome.storage.sync.set({ apiKeys: newKeys, activeProvider: p.id });
+    await chrome.storage.local.set({ apiKeys: newKeys, activeProvider: p.id });
     provider = ProviderFactory.get(p.id, newKeys);
     status.textContent = '';
     setOnbStep(3);
@@ -446,7 +446,7 @@ async function cycleTheme() {
   const next = effectiveTheme(settings.theme) === 'dark' ? 'light' : 'dark';
   settings.theme = next;
   applyTheme(next);
-  await chrome.storage.sync.set({ theme: next });
+  await chrome.storage.local.set({ theme: next });
 }
 
 // ── Compare mode ───────────────────────────────────────────────────────
@@ -498,7 +498,7 @@ async function useThisAnswer(turnIdx) {
   if (chosenId && chosenId !== settings.activeProvider) {
     settings.activeProvider = chosenId;
     try { provider = ProviderFactory.get(chosenId, settings.apiKeys); } catch (e) {}
-    await chrome.storage.sync.set({ activeProvider: chosenId });
+    await chrome.storage.local.set({ activeProvider: chosenId });
   }
   // Strip compare metadata from the kept turn so it renders as a normal answer.
   delete chosen.compareSide;
@@ -815,7 +815,7 @@ function renderPicker() {
         togglePicker('a'); chrome.runtime.openOptionsPage(); return;
       }
       settings.activeProvider = id;
-      await chrome.storage.sync.set({ activeProvider: id });
+      await chrome.storage.local.set({ activeProvider: id });
       try { provider = ProviderFactory.get(id, settings.apiKeys); } catch(e){}
       if (compareMode && !hasProviderKey(compareProviderId)) {
         const eligible = PROVIDERS.filter(p => p.id !== id && hasProviderKey(p.id));
@@ -882,7 +882,7 @@ function toggleLangPicker() {
     b.onclick = async () => {
       const code = b.dataset.lang;
       settings.language = code;
-      await chrome.storage.sync.set({ language: code });
+      await chrome.storage.local.set({ language: code });
       renderLangBtn();
       applyUILanguage();
       toggleLangPicker();
@@ -1047,7 +1047,7 @@ function renderContextPill() {
   if (tog) tog.textContent = off ? (t('context_toggle_off') || 'Off') : (t('context_toggle_on') || 'On');
   pill.onclick = async () => {
     settings.pageContext = off; // off was true → flip to enabled
-    try { await chrome.storage.sync.set({ pageContext: settings.pageContext }); } catch {}
+    try { await chrome.storage.local.set({ pageContext: settings.pageContext }); } catch {}
     renderContextPill();
   };
 }

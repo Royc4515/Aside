@@ -70,6 +70,12 @@ class BaseProvider {
     }
     return res.json();
   }
+
+  // Subclasses MUST override. Returns { ok, error? } — `ok: true` means the
+  // key (or, for Ollama, the localhost endpoint) was reachable and accepted.
+  async validateKey() {
+    return { ok: false, error: 'Validation not implemented' };
+  }
 }
 self.BaseProvider = BaseProvider;
 
@@ -99,6 +105,21 @@ class OpenAICompatProvider extends BaseProvider {
       onChunk,
       ev => ev.choices?.[0]?.delta?.content || ''
     );
+  }
+
+  // GET /v1/models with the Bearer key. 200 = key accepted, 401 = invalid.
+  async validateKey() {
+    if (!this.apiKey) return { ok: false, error: 'Missing API key' };
+    try {
+      const modelsUrl = this.url.replace(/\/chat\/completions\/?$/, '/models');
+      const res = await fetch(modelsUrl, { method: 'GET', headers: this._headers() });
+      if (res.ok) return { ok: true };
+      let msg = `${res.status} ${res.statusText}`;
+      try { const j = await res.json(); msg = j.error?.message || j.message || msg; } catch {}
+      return { ok: false, error: msg };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
   }
 }
 self.OpenAICompatProvider = OpenAICompatProvider;

@@ -52,7 +52,7 @@ const STRINGS = {
 
     'providers.kicker': 'Providers',
     'providers.h2': 'Bring the model you already pay for.',
-    'providers.intro': 'Add a key once in <strong>Settings → Provider</strong>. Keys are stored locally on your device, never sent anywhere except the provider that issued them. Switch any time, right from the sidebar.',
+    'providers.intro': 'Add a key once in <strong>Settings → Provider</strong>. Aside validates it against the live API before saving — invalid keys never get stored. Switch any time, right from the sidebar.',
     'providers.ollamaVendor': 'Local · offline',
 
     'how.kicker': 'How it works',
@@ -67,7 +67,7 @@ const STRINGS = {
     'privacy.kicker': 'Privacy',
     'privacy.h2': 'Your keys. Your machine. Your data.',
     'privacy.c1.h': 'Keys stay local',
-    'privacy.c1.p': "API keys live in Chrome's encrypted storage and are sent only to the provider you chose, over HTTPS.",
+    'privacy.c1.p': "API keys live in Chrome's encrypted local storage on your device and are sent only to the provider you chose, over HTTPS. They never sync to the cloud.",
     'privacy.c2.h': 'No middleman',
     'privacy.c2.p': 'No analytics, no telemetry, no proxy server. Requests go straight from your browser to the model provider.',
     'privacy.c3.h': 'Only on your prompt',
@@ -80,7 +80,7 @@ const STRINGS = {
     'faq.q1.q': 'Is Aside really free?',
     'faq.q1.a': "Yes. Aside itself is open source under the MIT license, free to use. You pay only what your provider charges for API calls — Anthropic, Google, OpenAI, xAI, and Groq each set their own pricing. Pick Ollama and run it locally — the whole stack is free.",
     'faq.q2.q': 'Are my API keys safe?',
-    'faq.q2.a': "Keys live in Chrome's encrypted storage and are sent only to the provider that issued them, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry. Read the full <a href=\"PRIVACY.html\">Privacy Policy</a>.",
+    'faq.q2.a': "Keys live in Chrome's encrypted local storage on your device and are sent only to the provider that issued them, over HTTPS. They never sync to the cloud and never reach any Aside server — because there is none. No proxy, no analytics, no telemetry. Read the full <a href=\"PRIVACY.html\">Privacy Policy</a>.",
     'faq.q3.q': 'Do I need an account to use Aside?',
     'faq.q3.a': "No account, no sign-up, no email. Install the extension, paste at least one provider API key, and you're in. Aside has no login of its own.",
     'faq.q4.q': 'Which browsers are supported?',
@@ -166,7 +166,7 @@ const STRINGS = {
 
     'providers.kicker': 'ספקים',
     'providers.h2': 'השתמשו במודל שאתם כבר משלמים עבורו.',
-    'providers.intro': 'הוסיפו מפתח פעם אחת ב-<strong>הגדרות → ספק</strong>. המפתחות נשמרים במחשב שלכם בלבד ונשלחים רק לספק שהנפיק אותם. החליפו בכל רגע — ישירות מהסרגל.',
+    'providers.intro': 'הוסיפו מפתח פעם אחת ב-<strong>הגדרות → ספק</strong>. Aside מאמת אותו מול ה-API האמיתי לפני השמירה — מפתחות לא תקפים לא נשמרים. החליפו בכל רגע — ישירות מהסרגל.',
     'providers.ollamaVendor': 'מקומי · אופליין',
 
     'how.kicker': 'איך זה עובד',
@@ -181,7 +181,7 @@ const STRINGS = {
     'privacy.kicker': 'פרטיות',
     'privacy.h2': 'המפתחות שלכם. המחשב שלכם. המידע שלכם.',
     'privacy.c1.h': 'המפתחות נשארים אצלכם',
-    'privacy.c1.p': 'מפתחות ה-API נשמרים באחסון המוצפן של Chrome, ונשלחים רק לספק שבחרתם — ב-HTTPS בלבד.',
+    'privacy.c1.p': 'מפתחות ה-API נשמרים באחסון המקומי המוצפן של Chrome במחשב שלכם, ונשלחים רק לספק שבחרתם — ב-HTTPS. הם לא מסונכרנים לענן.',
     'privacy.c2.h': 'בלי מתווך',
     'privacy.c2.p': 'בלי אנליטיקס, בלי טלמטריה, בלי שרת מתווך. הבקשות עוברות ישירות מהדפדפן שלכם לספק המודל.',
     'privacy.c3.h': 'רק כשאתם מבקשים',
@@ -194,7 +194,7 @@ const STRINGS = {
     'faq.q1.q': 'באמת חינמי?',
     'faq.q1.a': 'כן. Aside עצמו הוא קוד פתוח ברישיון MIT, ללא עלות. אתם משלמים רק על שימוש ב-API של הספק שבחרתם — לכל אחד מהם — Anthropic, Google, OpenAI, xAI, Groq — מחירון משלו. אם אתם בוחרים ב-Ollama מקומי, כל המערכת חינמית.',
     'faq.q2.q': 'מפתחות ה-API שלי בטוחים?',
-    'faq.q2.a': 'המפתחות נשמרים באחסון המוצפן של Chrome ונשלחים רק לספק שהנפיק אותם — ב-HTTPS. אין שרת Aside. אין שרת מתווך. אין אנליטיקס. אין טלמטריה. קראו את <a href="PRIVACY.html">מדיניות הפרטיות המלאה</a>.',
+    'faq.q2.a': 'המפתחות נשמרים באחסון המקומי המוצפן של Chrome במחשב שלכם ונשלחים רק לספק שהנפיק אותם — ב-HTTPS. הם לא מסונכרנים לענן ולא מגיעים לשום שרת של Aside — כי אין כזה. אין שרת מתווך. אין אנליטיקס. אין טלמטריה. קראו את <a href="PRIVACY.html">מדיניות הפרטיות המלאה</a>.',
     'faq.q3.q': 'צריך חשבון כדי להשתמש ב-Aside?',
     'faq.q3.a': 'אין חשבון, אין הרשמה, אין אימייל. מתקינים את התוסף, מדביקים לפחות מפתח API אחד, ויוצאים לדרך. Aside לא דורש התחברות בכלל.',
     'faq.q4.q': 'אילו דפדפנים נתמכים?',

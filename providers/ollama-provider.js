@@ -4,6 +4,16 @@ class OllamaProvider extends BaseProvider {
     this.baseUrl = baseUrl;
   }
 
+  async validateKey() {
+    try {
+      const res = await fetch(`${this.baseUrl}/api/tags`, { method: 'GET' });
+      if (res.ok) return { ok: true };
+      return { ok: false, error: `Ollama responded ${res.status}` };
+    } catch (err) {
+      return { ok: false, error: 'Ollama not reachable on localhost:11434 — make sure the Ollama app is running.' };
+    }
+  }
+
   async complete(messages, systemPrompt) {
     const data = await this._fetchJson(`${this.baseUrl}/api/chat`, {
       method: 'POST',

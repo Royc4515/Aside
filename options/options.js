@@ -3,12 +3,12 @@
  */
 
 const PROVIDERS = [
-  { id: 'claude',  name: 'Claude',  model: 'claude-sonnet-4-5',     letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
-  { id: 'openai',  name: 'GPT-4o',  model: 'gpt-4o-mini',           letter: 'G', tier: 'paid', hue: 'var(--p-gpt)',    placeholder: 'sk-…' },
-  { id: 'gemini',  name: 'Gemini',  model: 'gemini-2.0-flash',      letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
-  { id: 'grok',    name: 'Grok',    model: 'grok-3-mini',           letter: 'X', tier: 'paid', hue: 'var(--p-grok)',   placeholder: 'xai-…' },
-  { id: 'groq',    name: 'Groq',    model: 'llama-3.1-70b',         letter: 'G', tier: 'free', hue: 'var(--p-groq)',   placeholder: 'gsk_…' },
-  { id: 'ollama',  name: 'Ollama',  model: 'local',                 letter: 'O', tier: 'free', hue: 'var(--p-ollama)', placeholder: '' },
+  { id: 'claude',  name: 'Claude',  model: 'Claude 3.5 Sonnet',    letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
+  { id: 'openai',  name: 'GPT-4o',  model: 'GPT-4o mini',          letter: 'G', tier: 'paid', hue: 'var(--p-gpt)',    placeholder: 'sk-…' },
+  { id: 'gemini',  name: 'Gemini',  model: 'Gemini 2.0 Flash',     letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
+  { id: 'grok',    name: 'Grok',    model: 'Grok 2',               letter: 'X', tier: 'paid', hue: 'var(--p-grok)',   placeholder: 'xai-…' },
+  { id: 'groq',    name: 'Groq',    model: 'Llama 3.3 70B',        letter: 'G', tier: 'free', hue: 'var(--p-groq)',   placeholder: 'gsk_…' },
+  { id: 'ollama',  name: 'Ollama',  model: 'Llama 3.1 (local)',    letter: 'O', tier: 'free', hue: 'var(--p-ollama)', placeholder: '' },
 ];
 
 const NAV = [
@@ -67,7 +67,7 @@ function effectiveTheme(theme) {
 }
 
 async function init() {
-  const stored = await chrome.storage.sync.get([
+  const stored = await chrome.storage.local.get([
     'activeProvider','apiKeys','language','position','width','theme','pageContext'
   ]);
   state = {
@@ -95,13 +95,13 @@ async function init() {
 
 function bindGlobal() {
   document.getElementById('save-btn').onclick = async () => {
-    await chrome.storage.sync.set(state);
+    await chrome.storage.local.set(state);
     snapshotBaseline();
     flashSaved();
   };
   document.getElementById('reset-btn').onclick = async () => {
     if (!confirm('Reset all settings? Your API keys will also be cleared.')) return;
-    await chrome.storage.sync.clear();
+    await chrome.storage.local.clear();
     location.reload();
   };
 }
@@ -156,7 +156,7 @@ function renderProviders() {
   root.querySelectorAll('.set-provider').forEach(b => {
     b.onclick = async () => {
       state.activeProvider = b.dataset.id;
-      await chrome.storage.sync.set({ activeProvider: state.activeProvider });
+      await chrome.storage.local.set({ activeProvider: state.activeProvider });
       snapshotBaseline(); // active provider auto-saves, so re-baseline
       renderProviders();
     };
@@ -182,18 +182,67 @@ function renderKeys() {
         />
         <button class="set-key-validate" data-id="${p.id}">${state.apiKeys[p.id] ? 'Saved' : 'Save'}</button>
       </div>
+      <div class="set-key-error" data-id="${p.id}" style="display:none"></div>
     </div>
   `).join('');
   root.querySelectorAll('input[data-id]').forEach(inp => {
-    inp.oninput = () => { state.apiKeys[inp.dataset.id] = inp.value; updateDirtyState(); };
+    inp.oninput = () => {
+      state.apiKeys[inp.dataset.id] = inp.value;
+      const errEl = root.querySelector(`.set-key-error[data-id="${inp.dataset.id}"]`);
+      if (errEl) errEl.style.display = 'none';
+      updateDirtyState();
+    };
   });
   root.querySelectorAll('.set-key-validate').forEach(btn => {
     btn.onclick = async () => {
-      await chrome.storage.sync.set({ apiKeys: state.apiKeys, activeProvider: state.activeProvider });
-      snapshotBaseline();
-      btn.textContent = '✓ Saved';
-      btn.classList.add('is-valid');
-      setTimeout(() => { btn.classList.remove('is-valid'); btn.textContent = 'Save'; }, 1500);
+      const id = btn.dataset.id;
+      const key = state.apiKeys[id] || '';
+      const errEl = root.querySelector(`.set-key-error[data-id="${id}"]`);
+      const originalText = btn.textContent;
+
+      // Ollama doesn't take a key; for the others, an empty input is just "clear".
+      if (id !== 'ollama' && !key) {
+        // Treat as clear — remove the key and save.
+        delete state.apiKeys[id];
+        await chrome.storage.local.set({ apiKeys: state.apiKeys, activeProvider: state.activeProvider });
+        snapshotBaseline();
+        btn.textContent = 'Save';
+        if (errEl) errEl.style.display = 'none';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Checking…';
+      btn.classList.remove('is-valid', 'is-invalid');
+      if (errEl) errEl.style.display = 'none';
+
+      try {
+        const provider = ProviderFactory.get(id, state.apiKeys);
+        const result = await provider.validateKey();
+        if (result.ok) {
+          await chrome.storage.local.set({ apiKeys: state.apiKeys, activeProvider: state.activeProvider });
+          snapshotBaseline();
+          btn.textContent = '✓ Saved';
+          btn.classList.add('is-valid');
+          setTimeout(() => { btn.classList.remove('is-valid'); btn.textContent = 'Saved'; }, 1500);
+        } else {
+          btn.textContent = originalText || 'Save';
+          btn.classList.add('is-invalid');
+          if (errEl) {
+            errEl.textContent = `Key rejected: ${result.error || 'unknown error'}`;
+            errEl.style.display = 'block';
+          }
+        }
+      } catch (err) {
+        btn.textContent = originalText || 'Save';
+        btn.classList.add('is-invalid');
+        if (errEl) {
+          errEl.textContent = `Check failed: ${err.message || String(err)}`;
+          errEl.style.display = 'block';
+        }
+      } finally {
+        btn.disabled = false;
+      }
     };
   });
 }

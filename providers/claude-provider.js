@@ -1,4 +1,24 @@
 class ClaudeProvider extends BaseProvider {
+  async validateKey() {
+    if (!this.apiKey) return { ok: false, error: 'Missing API key' };
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'x-api-key': this.apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        }
+      });
+      if (res.ok) return { ok: true };
+      let msg = `${res.status} ${res.statusText}`;
+      try { const j = await res.json(); msg = j.error?.message || j.message || msg; } catch {}
+      return { ok: false, error: msg };
+    } catch (err) {
+      return { ok: false, error: err.message || String(err) };
+    }
+  }
+
   async complete(messages, systemPrompt) {
     const data = await this._fetchJson('https://api.anthropic.com/v1/messages', {
       method: 'POST',
