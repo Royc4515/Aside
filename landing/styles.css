@@ -401,9 +401,9 @@ kbd {
 .section-head h2 {
   font-family: 'Source Serif 4', 'Tiempos Headline', Georgia, serif;
   font-weight: 400;
-  font-size: clamp(2.4rem, 4.5vw, 3.4rem);
-  line-height: 1.1;
-  letter-spacing: -0.022em;
+  font-size: clamp(2.8rem, 6vw, 4.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
 }
 .kicker {
   display: inline-flex;
