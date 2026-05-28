@@ -233,16 +233,16 @@
         <header class="section-head">
           <span class="kicker" data-i18n="providers.kicker">Providers</span>
           <h2 data-i18n="providers.h2">Bring the model you already pay for.</h2>
-          <p data-i18n-html="providers.intro">Add a key once in <strong>Settings → Provider</strong>. Aside validates it live against the real API before saving. Switch any time from the sidebar header.</p>
+          <p data-i18n-html="providers.intro">Add a key once in <strong>Settings → Provider</strong>. Keys are stored locally on your device, never sent anywhere except the provider that issued them. Switch any time, right from the sidebar.</p>
         </header>
 
         <div class="providers-grid">
-          <div class="provider"><div class="p-name">Claude</div><div class="p-vendor">Anthropic</div><div class="p-model">claude-sonnet-4-6</div></div>
+          <div class="provider"><div class="p-name">Claude</div><div class="p-vendor">Anthropic</div><div class="p-model">claude-3-5-sonnet</div></div>
           <div class="provider"><div class="p-name">Gemini</div><div class="p-vendor">Google</div><div class="p-model">gemini-2.0-flash</div></div>
           <div class="provider"><div class="p-name">GPT-4o</div><div class="p-vendor">OpenAI</div><div class="p-model">gpt-4o-mini</div></div>
-          <div class="provider"><div class="p-name">Grok</div><div class="p-vendor">xAI</div><div class="p-model">grok-3-mini</div></div>
+          <div class="provider"><div class="p-name">Grok</div><div class="p-vendor">xAI</div><div class="p-model">grok-2-1212</div></div>
           <div class="provider"><div class="p-name">Groq</div><div class="p-vendor">Groq</div><div class="p-model">llama-3.3-70b</div></div>
-          <div class="provider provider-local"><div class="p-name">Ollama</div><div class="p-vendor" data-i18n="providers.ollamaVendor">Local · offline</div><div class="p-model">llama3.2</div></div>
+          <div class="provider provider-local"><div class="p-name">Ollama</div><div class="p-vendor" data-i18n="providers.ollamaVendor">Local · offline</div><div class="p-model">llama3.1</div></div>
         </div>
 
         <div class="showcase">
@@ -279,7 +279,7 @@
           <li>
             <div class="step-n">3</div>
             <h3 data-i18n="how.s3.h">Switch models any time</h3>
-            <p data-i18n="how.s3.p">The header dropdown swaps between Claude, Gemini, GPT-4o, Grok, Groq, and Ollama with one click. Each provider remembers your model choice.</p>
+            <p data-i18n="how.s3.p">The header dropdown swaps between Claude, Gemini, GPT-4o, Grok, Groq, and Ollama with one click. Your active provider persists between sessions.</p>
           </li>
         </ol>
 
@@ -302,7 +302,7 @@
         <div class="privacy-grid">
           <div class="priv-card">
             <h3 data-i18n="privacy.c1.h">Keys stay local</h3>
-            <p data-i18n="privacy.c1.p">API keys live in Chrome's encrypted local storage and are sent only to the provider you chose, over HTTPS.</p>
+            <p data-i18n="privacy.c1.p">API keys live in Chrome's encrypted storage and are sent only to the provider you chose, over HTTPS.</p>
           </div>
           <div class="priv-card">
             <h3 data-i18n="privacy.c2.h">No middleman</h3>
@@ -334,7 +334,7 @@
           </details>
           <details class="faq-item">
             <summary data-i18n-html="faq.q2.q">Are my API keys safe?</summary>
-            <div class="faq-a" data-i18n-html="faq.q2.a">Keys live in Chrome's encrypted local storage on your device and are sent only to the provider that issued them, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry. Read the full <a href="PRIVACY.html">Privacy Policy</a>.</div>
+            <div class="faq-a" data-i18n-html="faq.q2.a">Keys live in Chrome's encrypted storage and are sent only to the provider that issued them, over HTTPS. There is no Aside server, no proxy, no analytics, no telemetry. Read the full <a href="PRIVACY.html">Privacy Policy</a>.</div>
           </details>
           <details class="faq-item">
             <summary data-i18n-html="faq.q3.q">Do I need an account to use Aside?</summary>

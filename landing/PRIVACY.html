@@ -63,8 +63,10 @@
 
     <h2>2. API keys</h2>
     <p>When you paste a provider API key into <em>Settings</em>, it is stored
-    in Chrome's <code>chrome.storage.local</code> — the browser's encrypted
-    per-extension storage on your device. Keys are only ever sent to the
+    in Chrome's <code>chrome.storage.sync</code> — the browser's encrypted
+    per-extension storage. If you are signed into Chrome with sync enabled,
+    keys sync between your own devices through your Google account; otherwise
+    they remain on the current device only. Keys are only ever sent to the
     provider whose key it is (Anthropic, Google, OpenAI, xAI, Groq, or your
     local Ollama instance), over HTTPS, with the API request you initiated.
     Keys never reach any server operated by the author.</p>
@@ -103,11 +105,14 @@
     </ul>
 
     <h2>7. Permissions Aside requests</h2>
-    <p>Aside is a Manifest V3 extension and requests only the permissions it
-    needs to function: <code>activeTab</code> to read the current page when
-    you ask, <code>storage</code> to save your settings and history locally,
-    and host permissions for the six provider API endpoints listed in
-    <code>manifest.json</code>. No broader access is requested.</p>
+    <p>Aside is a Manifest V3 extension and requests: <code>activeTab</code>,
+    <code>scripting</code>, and <code>tabs</code> so the sidebar can read the
+    current page when you press the shortcut; <code>storage</code> for your
+    settings and per-site conversation history; <code>contextMenus</code> for
+    the right-click "Explain selection" entry; and the broad host permission
+    <code>&lt;all_urls&gt;</code> so the keyboard shortcut and content script
+    work on any site you open. The extension only actively reads a page when
+    you press a button — there is no background polling.</p>
 
     <h2>8. Children</h2>
     <p>Aside is not directed at children under 13 and does not knowingly
