@@ -90,7 +90,8 @@ real API before saving. Switch providers any time from the sidebar header.
 2. **Open Chrome extensions.** Paste `chrome://extensions` into the address bar and press <kbd>Enter</kbd>.
 3. **Turn on Developer mode.** Top-right toggle. Without it, Chrome won't load an unpacked extension.
 4. **Load unpacked.** Click *Load unpacked* and select the unzipped `Aside` folder.
-5. **Pin it & open the sidebar.** Click the puzzle icon in the toolbar, pin Aside, then press <kbd>Alt</kbd> + <kbd>A</kbd> on any page.
+5. **Pin it to the toolbar.** Click the puzzle icon in the toolbar and pin Aside so it's one click away.
+6. **Set the `Alt + A` shortcut.** Chrome only auto-assigns shortcuts for Web Store extensions, so set it once by hand: open `chrome://extensions/shortcuts`, find **Aside**, click the box next to *Toggle the AI sidebar*, and press <kbd>Alt</kbd> + <kbd>A</kbd>. (You can also just open it from the toolbar icon or the right-click menu.)
 
 ### Step 2 · Get a free Groq API key (recommended)
 
