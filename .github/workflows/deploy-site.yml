@@ -1,0 +1,68 @@
+name: Deploy landing site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "shared/tokens.css"
+      - "marketing/**"
+      - ".github/workflows/deploy-site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assemble publish tree
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          # Copy the site itself to the publish root.
+          cp -r site/. _site/
+          # Replace the dev shim with the canonical tokens.
+          # In dev, site/tokens.css @imports ../shared/tokens.css. The
+          # published site is flat, so we inline the real tokens here.
+          cp shared/tokens.css _site/tokens.css
+          # Marketing screenshots (referenced from index.html as ../marketing/).
+          mkdir -p _site/marketing
+          cp -r marketing/. _site/marketing/
+          # Rewrite ../marketing/ references to ./marketing/ for the flat tree.
+          find _site -maxdepth 2 -type f \( -name "*.html" -o -name "*.css" \) \
+            -exec sed -i 's|\.\./marketing/|./marketing/|g' {} +
+          # Sanity check.
+          test -f _site/index.html
+          test -f _site/privacy.html
+          test -f _site/tokens.css
+          test -f _site/marketing/hero-light.png
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

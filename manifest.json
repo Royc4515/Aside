@@ -54,6 +54,7 @@
         "sidebar/sidebar.js",
         "sidebar/translations.js",
         "sidebar/i18n.js",
+        "shared/tokens.css",
         "providers/*.js",
         "icons/*.png"
       ],

@@ -1,0 +1,8 @@
+/**
+ * Dev shim — proxies the canonical tokens from /shared/tokens.css.
+ * At deploy time, the GitHub Action overwrites this file with the
+ * full contents of shared/tokens.css so the published site has no
+ * cross-directory dependency. Do not edit tokens here — edit
+ * shared/tokens.css. See .github/workflows/deploy-site.yml.
+ */
+@import url("../shared/tokens.css");
