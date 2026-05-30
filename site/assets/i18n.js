@@ -201,8 +201,9 @@
     });
 
     document.querySelectorAll(".lang-toggle").forEach((btn) => {
-      btn.textContent = lang === "he" ? "EN" : "עב";
-      btn.setAttribute("aria-label", lang === "he" ? "Switch to English" : "החלף לעברית");
+      // Show the CURRENT language; aria-label describes the switch action.
+      btn.textContent = lang === "he" ? "עב" : "EN";
+      btn.setAttribute("aria-label", lang === "he" ? "החלף לאנגלית" : "Switch to Hebrew");
     });
   }
 
