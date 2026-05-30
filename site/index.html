@@ -79,8 +79,9 @@
       </a>
       <nav class="nav-links" aria-label="Primary">
         <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#install" data-i18n="nav.install">Install</a>
         <a href="privacy.html" data-i18n="nav.privacy">Privacy</a>
-        <a href="https://github.com/Royc4515/ai-sidebar" data-i18n="nav.github" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/Royc4515/Aside" data-i18n="nav.github" target="_blank" rel="noopener">GitHub</a>
         <div class="nav-cta">
           <button class="theme-toggle" type="button" aria-label="Toggle theme">
             <svg class="theme-icon theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -112,8 +113,7 @@
           <div class="hero-cta">
             <button class="btn btn-primary" type="button" aria-disabled="true" disabled
                     data-i18n="cta.store_soon">Coming to Chrome Web Store</button>
-            <a class="btn btn-secondary" href="https://github.com/Royc4515/ai-sidebar#install-from-source"
-               target="_blank" rel="noopener" data-i18n="cta.source">Install from source</a>
+            <a class="btn btn-secondary" href="#install" data-i18n="cta.source">Install from source</a>
           </div>
           <p class="hero-meta" data-i18n="hero.meta">Free · Open source · BYOK</p>
         </div>
@@ -240,6 +240,111 @@
               <img src="assets/img/dark-light.png" alt="Light and dark side by side" loading="lazy" decoding="async" width="1920" height="1200">
             </picture>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install / Quickstart -->
+    <section id="install" class="install">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-i18n="install.title">Up and running in two minutes</h2>
+          <p data-i18n="install.sub">Two short setups. The first installs the extension; the second gets you a free API key so you can actually use it.</p>
+        </div>
+        <div class="steps-grid">
+
+          <article class="steps-card" aria-labelledby="install-aside-h">
+            <header class="steps-card-head">
+              <span class="steps-card-eyebrow" data-i18n="install.aside.eyebrow">Step 1</span>
+              <h3 id="install-aside-h" data-i18n="install.aside.title">Install Aside on Chrome</h3>
+              <p data-i18n="install.aside.note">No build step, no npm. Just download and load the folder. About 30 seconds.</p>
+            </header>
+            <ol class="steps">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  <strong data-i18n="install.aside.s1.h">Download the code</strong>
+                  <p data-i18n="install.aside.s1.b">Grab the ZIP and unzip it anywhere on your machine.</p>
+                  <a class="step-link" href="https://github.com/Royc4515/Aside/archive/refs/heads/main.zip" data-i18n="install.aside.s1.cta">Download ZIP →</a>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  <strong data-i18n="install.aside.s2.h">Open Chrome extensions</strong>
+                  <p data-i18n="install.aside.s2.b">Paste <code>chrome://extensions</code> into the address bar and press Enter.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  <strong data-i18n="install.aside.s3.h">Turn on Developer mode</strong>
+                  <p data-i18n="install.aside.s3.b">Top-right toggle. Without it, Chrome won't load an unpacked extension.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>
+                  <strong data-i18n="install.aside.s4.h">Load unpacked</strong>
+                  <p data-i18n="install.aside.s4.b">Click <em>Load unpacked</em> and select the unzipped <code>Aside</code> folder.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">5</span>
+                <div>
+                  <strong data-i18n="install.aside.s5.h">Pin it & open the sidebar</strong>
+                  <p data-i18n="install.aside.s5.b">Click the puzzle icon in the toolbar, pin Aside, then press <kbd>Alt</kbd> + <kbd>A</kbd> on any page.</p>
+                </div>
+              </li>
+            </ol>
+          </article>
+
+          <article class="steps-card" aria-labelledby="install-groq-h">
+            <header class="steps-card-head">
+              <span class="steps-card-eyebrow" data-i18n="install.groq.eyebrow">Step 2 · Free</span>
+              <h3 id="install-groq-h" data-i18n="install.groq.title">Get a free Groq API key</h3>
+              <p data-i18n="install.groq.note">Groq runs Llama 3.3 70B at conversational speed and has a generous free tier — perfect for daily use. About 60 seconds.</p>
+            </header>
+            <ol class="steps">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  <strong data-i18n="install.groq.s1.h">Open the Groq console</strong>
+                  <p data-i18n="install.groq.s1.b">A clean sign-in page — Google, GitHub, or email all work.</p>
+                  <a class="step-link" href="https://console.groq.com/keys" target="_blank" rel="noopener" data-i18n="install.groq.s1.cta">Open console.groq.com/keys →</a>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  <strong data-i18n="install.groq.s2.h">Sign in</strong>
+                  <p data-i18n="install.groq.s2.b">No credit card required. The free tier covers tens of thousands of requests per day.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  <strong data-i18n="install.groq.s3.h">Create an API key</strong>
+                  <p data-i18n="install.groq.s3.b">Click <em>Create API Key</em>, name it something like <code>Aside</code>, and confirm.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>
+                  <strong data-i18n="install.groq.s4.h">Copy the key</strong>
+                  <p data-i18n="install.groq.s4.b">Groq shows the key once. Copy it now — you can always create another later.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">5</span>
+                <div>
+                  <strong data-i18n="install.groq.s5.h">Paste it into Aside</strong>
+                  <p data-i18n="install.groq.s5.b">Open Aside → <em>Settings</em> → <em>Groq</em>, paste the key, save. The sidebar validates it live before storing.</p>
+                </div>
+              </li>
+            </ol>
+          </article>
+
         </div>
       </div>
     </section>

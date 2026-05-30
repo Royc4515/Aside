@@ -81,16 +81,28 @@ real API before saving. Switch providers any time from the sidebar header.
 
 ## Install
 
-> Aside is open source and not yet on the Chrome Web Store. For now, install it as an unpacked extension — it takes about 30 seconds.
+> Aside is open source and not yet on the Chrome Web Store. Install it as an
+> unpacked extension — about **30 seconds**, no build, no npm, no account.
 
-1. **Download** this repository ([latest ZIP](https://github.com/Royc4515/ai-sidebar/archive/refs/heads/main.zip)) and unzip it, or `git clone https://github.com/Royc4515/ai-sidebar.git`
-2. Open Chrome and go to `chrome://extensions`
-3. Turn on **Developer mode** (top-right toggle)
-4. Click **Load unpacked** and pick the `ai-sidebar` folder
-5. Pin Aside to your toolbar, then open **Settings** and paste at least one API key
-6. Open any page and press **`Alt + A`** — or right-click the page and choose *Open AI Sidebar*
+### Step 1 · Install the extension
 
-No build step. No npm install. No accounts. Just unzip and load.
+1. **Download the code.** Grab the [latest ZIP](https://github.com/Royc4515/Aside/archive/refs/heads/main.zip) and unzip it anywhere, or `git clone https://github.com/Royc4515/Aside.git`.
+2. **Open Chrome extensions.** Paste `chrome://extensions` into the address bar and press <kbd>Enter</kbd>.
+3. **Turn on Developer mode.** Top-right toggle. Without it, Chrome won't load an unpacked extension.
+4. **Load unpacked.** Click *Load unpacked* and select the unzipped `Aside` folder.
+5. **Pin it & open the sidebar.** Click the puzzle icon in the toolbar, pin Aside, then press <kbd>Alt</kbd> + <kbd>A</kbd> on any page.
+
+### Step 2 · Get a free Groq API key (recommended)
+
+> Groq runs Llama 3.3 70B at conversational speed and has a generous free tier — perfect for daily use. About **60 seconds**.
+
+1. **Open the Groq console.** [console.groq.com/keys](https://console.groq.com/keys) — a clean sign-in page; Google, GitHub, or email all work.
+2. **Sign in.** No credit card required. The free tier covers tens of thousands of requests per day.
+3. **Create an API key.** Click *Create API Key*, name it something like `Aside`, and confirm.
+4. **Copy the key.** Groq shows it once. Copy it now — you can always create another later.
+5. **Paste it into Aside.** Open Aside → *Settings* → *Groq*, paste the key, save. The sidebar validates it live before storing.
+
+Prefer a different provider? Same flow with Anthropic Claude, OpenAI, Google Gemini, xAI Grok, or self-hosted Ollama. See [Providers](#providers) for what each one needs.
 
 **Want a slim install zip?** Run `pwsh ./scripts/build-zip.ps1` (or `bash ./scripts/build-zip.sh`) — it produces `dist/aside-<version>.zip` containing only the runtime files, ready to share.
 
