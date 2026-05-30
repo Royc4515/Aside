@@ -67,12 +67,12 @@ don't have to paste anything. You pick the model. You stay on the page.
 
 | Provider | What you need | Default model | Also selectable |
 |---|---|---|---|
-| **Claude** (Anthropic) | API key | `claude-sonnet-4-5` | Opus 4.1, Haiku 3.5 |
-| **Gemini** (Google) | API key | `gemini-2.0-flash` | 2.0 Flash-Lite, 1.5 Pro |
-| **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-4.1, 4.1 mini |
-| **Grok** (xAI) | API key | `grok-3-mini` | Grok 3, Grok 2 |
-| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, GPT-OSS 120B |
-| **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2, Mistral, Qwen 2.5 |
+| **Claude** (Anthropic) | API key | `claude-sonnet-4-6` | Opus 4.8, Haiku 4.5 |
+| **Gemini** (Google) | API key | `gemini-2.5-flash` | 3.5 Flash, 2.5 Pro, 2.5 Flash-Lite |
+| **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-5.4 mini, GPT-5.5 |
+| **Grok** (xAI) | API key | `grok-3-mini` | Grok 4.3, Grok 4, Grok 3 |
+| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, GPT-OSS 120B/20B |
+| **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2/3.3, Mistral, Qwen 2.5 |
 
 Add a key once in **Settings → Provider**, then pick a model from the **Model**
 dropdown — or choose **Custom…** to type any model id the provider supports

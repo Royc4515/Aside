@@ -1,5 +1,5 @@
 class GeminiProvider extends BaseProvider {
-  constructor(apiKey, model) { super(apiKey, model || 'gemini-2.0-flash'); }
+  constructor(apiKey, model) { super(apiKey, model || 'gemini-2.5-flash'); }
 
   // Gemini's API uses role:"model" for assistant turns and contents[].parts[].
   async complete(messages, systemPrompt) {

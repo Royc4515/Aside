@@ -5,9 +5,9 @@
 // `model` is a static fallback only; the live label comes from
 // providerModelLabel() (model catalog + the user's pick).
 const PROVIDERS = [
-  { id: 'claude',  name: 'Claude',  model: 'Claude Sonnet 4.5', letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
+  { id: 'claude',  name: 'Claude',  model: 'Claude Sonnet 4.6', letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
   { id: 'openai',  name: 'GPT-4o',  model: 'GPT-4o mini',       letter: 'G', tier: 'paid', hue: 'var(--p-gpt)',    placeholder: 'sk-…' },
-  { id: 'gemini',  name: 'Gemini',  model: 'Gemini 2.0 Flash',  letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
+  { id: 'gemini',  name: 'Gemini',  model: 'Gemini 2.5 Flash',  letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
   { id: 'grok',    name: 'Grok',    model: 'Grok 3 mini',       letter: 'X', tier: 'paid', hue: 'var(--p-grok)',   placeholder: 'xai-…' },
   { id: 'groq',    name: 'Groq',    model: 'Llama 3.3 70B',     letter: 'G', tier: 'free', hue: 'var(--p-groq)',   placeholder: 'gsk_…' },
   { id: 'ollama',  name: 'Ollama',  model: 'Llama 3.1',         letter: 'O', tier: 'free', hue: 'var(--p-ollama)', placeholder: '' },

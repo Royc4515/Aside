@@ -1,5 +1,5 @@
 class ClaudeProvider extends BaseProvider {
-  constructor(apiKey, model) { super(apiKey, model || 'claude-sonnet-4-5'); }
+  constructor(apiKey, model) { super(apiKey, model || 'claude-sonnet-4-6'); }
 
   async complete(messages, systemPrompt) {
     const data = await this._fetchJson('https://api.anthropic.com/v1/messages', {

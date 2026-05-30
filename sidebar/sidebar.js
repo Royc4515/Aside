@@ -21,8 +21,8 @@ let _renderPending = false;
 // `model` here is only a static fallback label; the live label comes from
 // providerModelLabel() which reads the user's pick + the model catalog.
 const PROVIDERS = [
-  { id: 'claude', name: 'Claude', model: 'Sonnet 4.5',   hue: 'var(--p-claude)' },
-  { id: 'gemini', name: 'Gemini', model: '2.0 Flash',    hue: 'var(--p-gemini)' },
+  { id: 'claude', name: 'Claude', model: 'Sonnet 4.6',   hue: 'var(--p-claude)' },
+  { id: 'gemini', name: 'Gemini', model: '2.5 Flash',    hue: 'var(--p-gemini)' },
   { id: 'openai', name: 'GPT-4o', model: '4o mini',      hue: 'var(--p-gpt)'    },
   { id: 'grok',   name: 'Grok',   model: 'Grok 3 mini',  hue: 'var(--p-grok)'   },
   { id: 'groq',   name: 'Groq',   model: 'Llama 3.3',    hue: 'var(--p-groq)'   },
@@ -125,6 +125,7 @@ function bindUI() {
   document.getElementById('theme-btn').onclick = cycleTheme;
   document.getElementById('lang-btn').onclick = () => toggleLangPicker();
   document.getElementById('model-btn').onclick = (e) => togglePicker('a', e.currentTarget);
+  document.getElementById('composer-model-btn').onclick = (e) => togglePicker('model', e.currentTarget);
   document.getElementById('compare-slot-a').onclick = (e) => togglePicker('a', e.currentTarget);
   document.getElementById('compare-slot-b').onclick = (e) => togglePicker('b', e.currentTarget);
   document.getElementById('compare-bar-close').onclick = () => { if (compareMode) toggleCompareMode(); };
@@ -703,7 +704,8 @@ function renderHeader() {
   const p = activeProviderInfo();
   document.getElementById('model-name').textContent = p.name;
   document.getElementById('model-dot').style.background = p.hue;
-  document.getElementById('composer-model-name').textContent = p.name;
+  // The composer chip shows the *model* (the header chip shows the provider).
+  document.getElementById('composer-model-name').textContent = providerModelLabel(p.id);
   document.getElementById('composer-dot').style.background = p.hue;
   renderCompareBar();
 }
@@ -729,9 +731,10 @@ function togglePicker(slot = 'a', anchor = null) {
   const triggers = {
     a: [document.getElementById('model-btn'), document.getElementById('compare-slot-a')],
     b: [document.getElementById('compare-slot-b')],
+    model: [document.getElementById('composer-model-btn')],
   };
   const setAria = (open, activeSlot) => {
-    for (const s of ['a', 'b']) {
+    for (const s of ['a', 'b', 'model']) {
       for (const el of triggers[s]) {
         if (el) el.setAttribute('aria-expanded', String(open && activeSlot === s));
       }
@@ -785,6 +788,7 @@ function positionPickerNearAnchor() {
 
 function renderPicker() {
   const host = document.getElementById('picker-host');
+  if (pickerSlot === 'model') { renderModelPicker(host); return; }
   const isB = pickerSlot === 'b';
   const currentId = isB ? compareProviderId : settings.activeProvider;
   const label = isB
@@ -837,6 +841,50 @@ function renderPicker() {
       }
       renderHeader();
       togglePicker('a');
+    };
+  });
+}
+
+// Model picker for the active provider (opened from the composer model chip).
+function renderModelPicker(host) {
+  const pid = settings.activeProvider;
+  const catalog = (typeof PROVIDER_MODELS !== 'undefined' && PROVIDER_MODELS[pid]) || { default: '', options: [] };
+  const currentModel = (typeof resolveModel === 'function')
+    ? resolveModel(pid, settings.selectedModels)
+    : (settings.selectedModels && settings.selectedModels[pid]) || catalog.default;
+  const provName = (PROVIDERS.find(p => p.id === pid) || {}).name || pid;
+  const check = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>';
+
+  host.innerHTML = `
+    <div class="sb-picker-veil" id="picker-veil"></div>
+    <div class="sb-picker" role="listbox">
+      <div class="sb-picker-label">${(t('picker_model_for') || 'Model')} · ${provName}</div>
+      ${catalog.options.map(o => {
+        const isActive = o.id === currentModel;
+        const isDefault = o.id === catalog.default;
+        return `
+        <button class="sb-picker-row${isActive ? ' is-active' : ''}" data-model="${o.id}">
+          <span class="sb-picker-name">${o.label}${isDefault ? ` <span class="sb-picker-model">${t('picker_default') || 'default'}</span>` : ''}</span>
+          ${isActive ? check : ''}
+        </button>`;
+      }).join('')}
+      <button class="sb-picker-row sb-picker-row--more" data-more="1">
+        <span class="sb-picker-name">${t('picker_custom_model') || 'Custom model…'}</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </button>
+    </div>
+  `;
+  positionPickerNearAnchor();
+  document.getElementById('picker-veil').onclick = () => togglePicker('model');
+  host.querySelectorAll('.sb-picker-row').forEach(b => {
+    b.onclick = async () => {
+      if (b.dataset.more) { togglePicker('model'); chrome.runtime.openOptionsPage(); return; }
+      const modelId = b.dataset.model;
+      settings.selectedModels = { ...(settings.selectedModels || {}), [pid]: modelId };
+      try { await chrome.storage.sync.set({ selectedModels: settings.selectedModels }); } catch (e) {}
+      try { provider = ProviderFactory.get(pid, settings.apiKeys, settings.selectedModels); } catch (e) {}
+      renderHeader();
+      togglePicker('model');
     };
   });
 }

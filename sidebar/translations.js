@@ -112,6 +112,9 @@ const TRANSLATIONS = {
 
     // ── pickers ───────────────────────────────────────────────────────────
     picker_switch_model:  'Switch model',
+    picker_model_for:     'Model',
+    picker_default:       'default',
+    picker_custom_model:  'Custom model…',
     picker_response_lang: 'Response language',
     picker_lang_auto:     'detect from page',
   },
@@ -226,6 +229,9 @@ const TRANSLATIONS = {
 
     // ── pickers ───────────────────────────────────────────────────────────
     picker_switch_model:  'החלפת מודל',
+    picker_model_for:     'מודל',
+    picker_default:       'ברירת מחדל',
+    picker_custom_model:  'מודל מותאם…',
     picker_response_lang: 'שפת תגובה',
     picker_lang_auto:     'זיהוי אוטומטי',
   },

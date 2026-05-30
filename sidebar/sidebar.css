@@ -609,8 +609,18 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 .sb-composer-tool:hover { background: var(--surface-2); color: var(--ink); }
 .sb-composer-model {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: 11px; color: var(--ink-3); padding: 0 4px;
+  font-size: 11px; color: var(--ink-3);
+  font-family: inherit;
+  background: transparent; border: 1px solid transparent;
+  border-radius: var(--r-pill); padding: 3px 7px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
 }
+.sb-composer-model:hover { background: var(--surface-2); border-color: var(--line); color: var(--ink); }
+.sb-composer-model svg { opacity: .7; }
+.sb-picker-row--more { color: var(--ink-3); }
+.sb-picker-row--more .sb-picker-name { color: var(--ink-2); }
+.sb-picker-row--more svg { opacity: .6; margin-inline-start: auto; }
 .sb-send {
   width: 30px; height: 30px;
   border-radius: 50%;
