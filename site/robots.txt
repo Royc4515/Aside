@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://royc4515.github.io/Aside/sitemap.xml

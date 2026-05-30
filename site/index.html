@@ -5,18 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title data-i18n-attr="textContent:meta.title">Aside — Every AI model, one sidebar</title>
   <meta name="description" content="A Chrome sidebar that puts Claude, ChatGPT, Gemini, Grok, Groq, and Ollama side-by-side. BYOK. Local. Open source.">
-  <meta name="theme-color" content="#c8643c">
+  <meta name="theme-color" content="#da7756">
+  <link rel="canonical" href="https://royc4515.github.io/Aside/">
 
   <meta property="og:title" content="Aside — Every AI model, one sidebar">
   <meta property="og:description" content="A Chrome sidebar that puts Claude, ChatGPT, Gemini, Grok, Groq, and Ollama side-by-side. BYOK. Local. Open source.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="../marketing/hero-light.png">
+  <meta property="og:url" content="https://royc4515.github.io/Aside/">
+  <meta property="og:site_name" content="Aside">
+  <meta property="og:image" content="assets/img/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="assets/img/og-card.png">
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/icon-32.png">
+  <link rel="icon" type="image/png" sizes="128x128" href="assets/img/icon-128.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Aside",
+    "applicationCategory": "BrowserApplication",
+    "operatingSystem": "Chrome",
+    "description": "A Chrome sidebar that puts Claude, ChatGPT, Gemini, Grok, Groq, and Ollama side-by-side. BYOK. Local. Open source.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "url": "https://royc4515.github.io/Aside/",
+    "license": "https://opensource.org/licenses/MIT"
+  }
+  </script>
 
   <link rel="stylesheet" href="tokens.css">
   <link rel="stylesheet" href="assets/styles.css">
@@ -87,8 +111,16 @@
           <p class="hero-meta" data-i18n="hero.meta">Free · Open source · BYOK</p>
         </div>
         <div class="hero-art">
-          <img class="img-light" src="../marketing/hero-light.png" alt="Aside sidebar — light theme" loading="eager">
-          <img class="img-dark"  src="../marketing/hero-dark.png"  alt="Aside sidebar — dark theme"  loading="eager">
+          <picture class="img-light">
+            <source type="image/webp" srcset="assets/img/hero-light-960.webp 960w, assets/img/hero-light-1920.webp 1920w" sizes="(max-width: 880px) 100vw, 560px">
+            <source type="image/png"  srcset="assets/img/hero-light-960.png 960w, assets/img/hero-light-1920.png 1920w"  sizes="(max-width: 880px) 100vw, 560px">
+            <img src="assets/img/hero-light.png" alt="Aside sidebar — light theme" loading="eager" decoding="async" width="1920" height="1200">
+          </picture>
+          <picture class="img-dark">
+            <source type="image/webp" srcset="assets/img/hero-dark-960.webp 960w, assets/img/hero-dark-1920.webp 1920w" sizes="(max-width: 880px) 100vw, 560px">
+            <source type="image/png"  srcset="assets/img/hero-dark-960.png 960w, assets/img/hero-dark-1920.png 1920w"  sizes="(max-width: 880px) 100vw, 560px">
+            <img src="assets/img/hero-dark.png" alt="Aside sidebar — dark theme" loading="eager" decoding="async" width="1920" height="1200">
+          </picture>
         </div>
       </div>
     </section>
@@ -171,15 +203,35 @@
         </div>
         <div class="gallery-grid">
           <div class="shot">
-            <img class="img-light" src="../marketing/features-light.png" alt="Features view, light theme" loading="lazy">
-            <img class="img-dark"  src="../marketing/features-dark.png"  alt="Features view, dark theme"  loading="lazy">
+            <picture class="img-light">
+              <source type="image/webp" srcset="assets/img/features-light-960.webp 960w, assets/img/features-light-1920.webp 1920w" sizes="(max-width: 720px) 100vw, 360px">
+              <source type="image/png"  srcset="assets/img/features-light-960.png 960w, assets/img/features-light-1920.png 1920w"  sizes="(max-width: 720px) 100vw, 360px">
+              <img src="assets/img/features-light.png" alt="Features view, light theme" loading="lazy" decoding="async" width="1920" height="1200">
+            </picture>
+            <picture class="img-dark">
+              <source type="image/webp" srcset="assets/img/features-dark-960.webp 960w, assets/img/features-dark-1920.webp 1920w" sizes="(max-width: 720px) 100vw, 360px">
+              <source type="image/png"  srcset="assets/img/features-dark-960.png 960w, assets/img/features-dark-1920.png 1920w"  sizes="(max-width: 720px) 100vw, 360px">
+              <img src="assets/img/features-dark.png" alt="Features view, dark theme" loading="lazy" decoding="async" width="1920" height="1200">
+            </picture>
           </div>
           <div class="shot">
-            <img class="img-light" src="../marketing/providers-light.png" alt="Provider picker, light theme" loading="lazy">
-            <img class="img-dark"  src="../marketing/providers-dark.png"  alt="Provider picker, dark theme"  loading="lazy">
+            <picture class="img-light">
+              <source type="image/webp" srcset="assets/img/providers-light-960.webp 960w, assets/img/providers-light-1920.webp 1920w" sizes="(max-width: 720px) 100vw, 360px">
+              <source type="image/png"  srcset="assets/img/providers-light-960.png 960w, assets/img/providers-light-1920.png 1920w"  sizes="(max-width: 720px) 100vw, 360px">
+              <img src="assets/img/providers-light.png" alt="Provider picker, light theme" loading="lazy" decoding="async" width="1920" height="1200">
+            </picture>
+            <picture class="img-dark">
+              <source type="image/webp" srcset="assets/img/providers-dark-960.webp 960w, assets/img/providers-dark-1920.webp 1920w" sizes="(max-width: 720px) 100vw, 360px">
+              <source type="image/png"  srcset="assets/img/providers-dark-960.png 960w, assets/img/providers-dark-1920.png 1920w"  sizes="(max-width: 720px) 100vw, 360px">
+              <img src="assets/img/providers-dark.png" alt="Provider picker, dark theme" loading="lazy" decoding="async" width="1920" height="1200">
+            </picture>
           </div>
           <div class="shot">
-            <img src="../marketing/dark-light.png" alt="Light and dark side by side" loading="lazy">
+            <picture>
+              <source type="image/webp" srcset="assets/img/dark-light-960.webp 960w, assets/img/dark-light-1920.webp 1920w" sizes="(max-width: 720px) 100vw, 360px">
+              <source type="image/png"  srcset="assets/img/dark-light-960.png 960w, assets/img/dark-light-1920.png 1920w"  sizes="(max-width: 720px) 100vw, 360px">
+              <img src="assets/img/dark-light.png" alt="Light and dark side by side" loading="lazy" decoding="async" width="1920" height="1200">
+            </picture>
           </div>
         </div>
       </div>
