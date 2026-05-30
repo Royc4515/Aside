@@ -570,7 +570,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   border: 1px solid var(--line-strong);
   border-radius: 18px;
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
   transition: border-color .15s, box-shadow .15s;
+}
+.sb-composer-inner:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
 }
 .sb-composer-input {
   width: 100%;
