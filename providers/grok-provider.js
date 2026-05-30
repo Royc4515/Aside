@@ -1,8 +1,7 @@
 class GrokProvider extends OpenAICompatProvider {
-  constructor(apiKey) {
-    super(apiKey);
+  constructor(apiKey, model) {
+    super(apiKey, model || 'grok-3-mini');
     this.url = 'https://api.x.ai/v1/chat/completions';
-    this.model = 'grok-2-1212';
   }
 }
 self.GrokProvider = GrokProvider;

@@ -1,7 +1,9 @@
 class GeminiProvider extends BaseProvider {
+  constructor(apiKey, model) { super(apiKey, model || 'gemini-2.0-flash'); }
+
   // Gemini's API uses role:"model" for assistant turns and contents[].parts[].
   async complete(messages, systemPrompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(this.apiKey)}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
     const contents = messages.map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }]

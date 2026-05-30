@@ -18,11 +18,13 @@ let detectedLang = '';
 let busy         = false;
 let _renderPending = false;
 
+// `model` here is only a static fallback label; the live label comes from
+// providerModelLabel() which reads the user's pick + the model catalog.
 const PROVIDERS = [
-  { id: 'claude', name: 'Claude', model: '3.5 Sonnet',   hue: 'var(--p-claude)' },
+  { id: 'claude', name: 'Claude', model: 'Sonnet 4.5',   hue: 'var(--p-claude)' },
   { id: 'gemini', name: 'Gemini', model: '2.0 Flash',    hue: 'var(--p-gemini)' },
   { id: 'openai', name: 'GPT-4o', model: '4o mini',      hue: 'var(--p-gpt)'    },
-  { id: 'grok',   name: 'Grok',   model: 'Grok-2',       hue: 'var(--p-grok)'   },
+  { id: 'grok',   name: 'Grok',   model: 'Grok 3 mini',  hue: 'var(--p-grok)'   },
   { id: 'groq',   name: 'Groq',   model: 'Llama 3.3',    hue: 'var(--p-groq)'   },
   { id: 'ollama', name: 'Ollama', model: 'Local',         hue: 'var(--p-ollama)' },
 ];
@@ -81,8 +83,9 @@ function applyUILanguage() {
 }
 
 async function loadSettings() {
-  settings = await chrome.storage.sync.get(['activeProvider','apiKeys','language','theme','pageContext']);
+  settings = await chrome.storage.sync.get(['activeProvider','apiKeys','selectedModels','language','theme','pageContext']);
   settings.apiKeys = settings.apiKeys || {};
+  settings.selectedModels = settings.selectedModels || {};
   settings.theme = settings.theme || 'auto';
   applyTheme(settings.theme);
   // When in auto mode, the "opposite" icon flips with the system theme.
@@ -94,7 +97,7 @@ async function loadSettings() {
     showOnboarding(); return;
   }
   try {
-    provider = ProviderFactory.get(settings.activeProvider, settings.apiKeys);
+    provider = ProviderFactory.get(settings.activeProvider, settings.apiKeys, settings.selectedModels);
     hideOnboarding();
   } catch (e) { showOnboarding(); }
 }
@@ -345,7 +348,7 @@ async function commitOnboardingStep2() {
   settings = { ...settings, apiKeys: newKeys, activeProvider: p.id };
   try {
     await chrome.storage.sync.set({ apiKeys: newKeys, activeProvider: p.id });
-    provider = ProviderFactory.get(p.id, newKeys);
+    provider = ProviderFactory.get(p.id, newKeys, settings.selectedModels);
     status.textContent = '';
     setOnbStep(3);
   } catch (e) {
@@ -498,7 +501,7 @@ async function useThisAnswer(turnIdx) {
   const chosenId = chosen.model?.id;
   if (chosenId && chosenId !== settings.activeProvider) {
     settings.activeProvider = chosenId;
-    try { provider = ProviderFactory.get(chosenId, settings.apiKeys); } catch (e) {}
+    try { provider = ProviderFactory.get(chosenId, settings.apiKeys, settings.selectedModels); } catch (e) {}
     await chrome.storage.sync.set({ activeProvider: chosenId });
   }
   // Strip compare metadata from the kept turn so it renders as a normal answer.
@@ -686,6 +689,16 @@ function activeProviderInfo() {
   return PROVIDERS.find(p => p.id === settings.activeProvider) || PROVIDERS[0];
 }
 
+// Human label for the model a provider will actually call (honors the user's
+// pick from Settings; falls back to the catalog default).
+function providerModelLabel(id) {
+  if (typeof resolveModel === 'function' && typeof modelLabel === 'function') {
+    return modelLabel(id, resolveModel(id, (settings && settings.selectedModels) || {}));
+  }
+  const p = PROVIDERS.find(x => x.id === id);
+  return p ? p.model : '';
+}
+
 function renderHeader() {
   const p = activeProviderInfo();
   document.getElementById('model-name').textContent = p.name;
@@ -794,7 +807,7 @@ function renderPicker() {
         <button class="sb-picker-row${isActive?' is-active':''}" data-id="${p.id}">
           ${window.providerChip ? window.providerChip(p.id, 22, p.hue) : `<span class="dot" style="background:${p.hue}"></span>`}
           <span class="sb-picker-name">${p.name}${isSelf ? ' <span class="sb-picker-model">(self)</span>' : ''}</span>
-          <span class="sb-picker-model">${p.model}</span>
+          <span class="sb-picker-model">${providerModelLabel(p.id)}</span>
           ${isActive?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>':''}
         </button>
       `;}).join('')}
@@ -817,7 +830,7 @@ function renderPicker() {
       }
       settings.activeProvider = id;
       await chrome.storage.sync.set({ activeProvider: id });
-      try { provider = ProviderFactory.get(id, settings.apiKeys); } catch(e){}
+      try { provider = ProviderFactory.get(id, settings.apiKeys, settings.selectedModels); } catch(e){}
       if (compareMode && !hasProviderKey(compareProviderId)) {
         const eligible = PROVIDERS.filter(p => p.id !== id && hasProviderKey(p.id));
         compareProviderId = eligible[0]?.id || id;
@@ -1166,7 +1179,7 @@ async function runComparePrompt(label) {
   const bInfo = providerInfoById(compareProviderId);
   // Build two providers
   let bProvider = null;
-  try { bProvider = ProviderFactory.get(compareProviderId, settings.apiKeys); }
+  try { bProvider = ProviderFactory.get(compareProviderId, settings.apiKeys, settings.selectedModels); }
   catch (e) { /* fall through; we'll mark error on B */ }
 
   const sameProvider = aInfo.id === bInfo.id;

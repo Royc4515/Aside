@@ -1,6 +1,6 @@
 class OllamaProvider extends BaseProvider {
-  constructor(_apiKey, baseUrl = 'http://localhost:11434') {
-    super('');
+  constructor(model, baseUrl = 'http://localhost:11434') {
+    super('', model || 'llama3.1');
     this.baseUrl = baseUrl;
   }
 
@@ -8,7 +8,7 @@ class OllamaProvider extends BaseProvider {
     const data = await this._fetchJson(`${this.baseUrl}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama3.1', stream: false, messages: this._msgs(messages, systemPrompt) })
+      body: JSON.stringify({ model: this.model, stream: false, messages: this._msgs(messages, systemPrompt) })
     });
     return data.message?.content || '';
   }
@@ -18,7 +18,7 @@ class OllamaProvider extends BaseProvider {
     const res = await fetch(`${this.baseUrl}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama3.1', stream: true, messages: this._msgs(messages, systemPrompt) })
+      body: JSON.stringify({ model: this.model, stream: true, messages: this._msgs(messages, systemPrompt) })
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 

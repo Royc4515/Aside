@@ -1,5 +1,5 @@
 class BaseProvider {
-  constructor(apiKey) { this.apiKey = apiKey; }
+  constructor(apiKey, model) { this.apiKey = apiKey; this.model = model; }
 
   buildSystemPrompt(pageContext, language) {
     let sys = 'You are a helpful AI assistant embedded in a browser sidebar.';

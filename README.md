@@ -65,17 +65,20 @@ don't have to paste anything. You pick the model. You stay on the page.
   </picture>
 </div>
 
-| Provider | What you need | Default model |
-|---|---|---|
-| **Claude** (Anthropic) | API key | `claude-sonnet-4-6` |
-| **Gemini** (Google) | API key | `gemini-2.0-flash` |
-| **OpenAI** | API key | `gpt-4o-mini` |
-| **Grok** (xAI) | API key | `grok-3-mini` |
-| **Groq** | API key | `llama-3.3-70b-versatile` |
-| **Ollama** | Nothing — runs on your machine | `llama3.2` |
+| Provider | What you need | Default model | Also selectable |
+|---|---|---|---|
+| **Claude** (Anthropic) | API key | `claude-sonnet-4-5` | Opus 4.1, Haiku 3.5 |
+| **Gemini** (Google) | API key | `gemini-2.0-flash` | 2.0 Flash-Lite, 1.5 Pro |
+| **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-4.1, 4.1 mini |
+| **Grok** (xAI) | API key | `grok-3-mini` | Grok 3, Grok 2 |
+| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, GPT-OSS 120B |
+| **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2, Mistral, Qwen 2.5 |
 
-Add a key once in **Settings → Provider**. Aside validates it live against the
-real API before saving. Switch providers any time from the sidebar header.
+Add a key once in **Settings → Provider**, then pick a model from the **Model**
+dropdown — or choose **Custom…** to type any model id the provider supports
+(handy when a provider ships a new model before this list catches up). Aside
+validates keys live before saving. Switch providers any time from the sidebar
+header; each remembers its own model.
 
 ---
 

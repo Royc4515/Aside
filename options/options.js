@@ -2,13 +2,15 @@
  * Aside — Settings page.
  */
 
+// `model` is a static fallback only; the live label comes from
+// providerModelLabel() (model catalog + the user's pick).
 const PROVIDERS = [
-  { id: 'claude',  name: 'Claude',  model: 'claude-sonnet-4-5',     letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
-  { id: 'openai',  name: 'GPT-4o',  model: 'gpt-4o-mini',           letter: 'G', tier: 'paid', hue: 'var(--p-gpt)',    placeholder: 'sk-…' },
-  { id: 'gemini',  name: 'Gemini',  model: 'gemini-2.0-flash',      letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
-  { id: 'grok',    name: 'Grok',    model: 'grok-3-mini',           letter: 'X', tier: 'paid', hue: 'var(--p-grok)',   placeholder: 'xai-…' },
-  { id: 'groq',    name: 'Groq',    model: 'llama-3.1-70b',         letter: 'G', tier: 'free', hue: 'var(--p-groq)',   placeholder: 'gsk_…' },
-  { id: 'ollama',  name: 'Ollama',  model: 'local',                 letter: 'O', tier: 'free', hue: 'var(--p-ollama)', placeholder: '' },
+  { id: 'claude',  name: 'Claude',  model: 'Claude Sonnet 4.5', letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
+  { id: 'openai',  name: 'GPT-4o',  model: 'GPT-4o mini',       letter: 'G', tier: 'paid', hue: 'var(--p-gpt)',    placeholder: 'sk-…' },
+  { id: 'gemini',  name: 'Gemini',  model: 'Gemini 2.0 Flash',  letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
+  { id: 'grok',    name: 'Grok',    model: 'Grok 3 mini',       letter: 'X', tier: 'paid', hue: 'var(--p-grok)',   placeholder: 'xai-…' },
+  { id: 'groq',    name: 'Groq',    model: 'Llama 3.3 70B',     letter: 'G', tier: 'free', hue: 'var(--p-groq)',   placeholder: 'gsk_…' },
+  { id: 'ollama',  name: 'Ollama',  model: 'Llama 3.1',         letter: 'O', tier: 'free', hue: 'var(--p-ollama)', placeholder: '' },
 ];
 
 const NAV = [
@@ -28,6 +30,7 @@ const PAGE_TITLES = {
 let state = {
   activeProvider: 'gemini',
   apiKeys: {},
+  selectedModels: {},
   language: 'auto',
   position: 'right',
   width: 420,
@@ -37,13 +40,16 @@ let state = {
 let baseline = null; // snapshot of state from last save / load
 let activePage = 'provider';
 
+function stateSnapshot() {
+  return JSON.stringify({ ...state, apiKeys: { ...state.apiKeys }, selectedModels: { ...state.selectedModels } });
+}
 function snapshotBaseline() {
-  baseline = JSON.stringify({ ...state, apiKeys: { ...state.apiKeys } });
+  baseline = stateSnapshot();
   updateDirtyState();
 }
 function isDirty() {
   if (!baseline) return false;
-  return JSON.stringify({ ...state, apiKeys: { ...state.apiKeys } }) !== baseline;
+  return stateSnapshot() !== baseline;
 }
 function updateDirtyState() {
   const btn = document.getElementById('save-btn');
@@ -61,16 +67,18 @@ function applyTheme(theme) {
 
 async function init() {
   const stored = await chrome.storage.sync.get([
-    'activeProvider','apiKeys','language','position','width','theme','pageContext'
+    'activeProvider','apiKeys','selectedModels','language','position','width','theme','pageContext'
   ]);
   state = {
     ...state,
     ...stored,
     apiKeys: stored.apiKeys || {},
+    selectedModels: stored.selectedModels || {},
   };
   applyTheme(state.theme);
   renderNav();
   renderProviders();
+  renderModel();
   renderKeys();
   renderAppearance();
   renderLanguage();
@@ -135,7 +143,7 @@ function renderProviders() {
       ${window.providerChip ? window.providerChip(p.id, 36, p.hue) : `<span class="set-provider-mark" style="background:${p.hue}">${p.letter}</span>`}
       <span class="set-provider-body">
         <span class="set-provider-name">${p.name}</span>
-        <span class="set-provider-model">${p.model}</span>
+        <span class="set-provider-model">${providerModelLabel(p.id)}</span>
       </span>
       <span class="set-tier set-tier--${p.tier}">${p.tier === 'paid' ? 'Paid' : 'Free'}</span>
     </button>
@@ -146,8 +154,63 @@ function renderProviders() {
       await chrome.storage.sync.set({ activeProvider: state.activeProvider });
       snapshotBaseline(); // active provider auto-saves, so re-baseline
       renderProviders();
+      renderModel();
     };
   });
+}
+
+// Live model label for a provider (catalog default unless the user picked one).
+function providerModelLabel(id) {
+  if (typeof resolveModel === 'function' && typeof modelLabel === 'function') {
+    return modelLabel(id, resolveModel(id, state.selectedModels));
+  }
+  const p = PROVIDERS.find(x => x.id === id);
+  return p ? p.model : '';
+}
+
+// ── Model picker (for the active provider) ─────────────────────────
+const CUSTOM_VALUE = '__custom__';
+
+function renderModel() {
+  const sel = document.getElementById('model-select');
+  const custom = document.getElementById('model-custom');
+  const label = document.getElementById('model-label');
+  if (!sel || !custom) return;
+
+  const id = state.activeProvider;
+  const provName = (PROVIDERS.find(p => p.id === id) || {}).name || id;
+  if (label) label.textContent = `Model for ${provName}`;
+
+  const catalog = (typeof PROVIDER_MODELS !== 'undefined' && PROVIDER_MODELS[id]) || { default: '', options: [] };
+  const current = (state.selectedModels[id] && String(state.selectedModels[id]).trim()) || catalog.default;
+  const known = catalog.options.some(o => o.id === current);
+
+  sel.innerHTML = catalog.options.map(o =>
+    `<option value="${o.id}"${o.id === current && known ? ' selected' : ''}>${o.label}${o.id === catalog.default ? ' · default' : ''}</option>`
+  ).join('') + `<option value="${CUSTOM_VALUE}"${!known ? ' selected' : ''}>Custom…</option>`;
+
+  const showCustom = !known;
+  custom.hidden = !showCustom;
+  custom.value = showCustom ? current : '';
+
+  sel.onchange = () => {
+    if (sel.value === CUSTOM_VALUE) {
+      custom.hidden = false;
+      custom.focus();
+      // Leave selectedModels as-is until the user types something.
+    } else {
+      custom.hidden = true;
+      state.selectedModels = { ...state.selectedModels, [id]: sel.value };
+      updateDirtyState();
+      renderProviders();
+    }
+  };
+  custom.oninput = () => {
+    const v = custom.value.trim();
+    state.selectedModels = { ...state.selectedModels, [id]: v };
+    updateDirtyState();
+    renderProviders();
+  };
 }
 
 function renderKeys() {

@@ -1,9 +1,8 @@
 class GroqProvider extends OpenAICompatProvider {
-  constructor(apiKey) {
-    super(apiKey);
+  constructor(apiKey, model) {
+    super(apiKey, model || 'llama-3.3-70b-versatile');
     this.url = 'https://api.groq.com/openai/v1/chat/completions';
-    this.model = 'llama-3.3-70b-versatile';
-    this.fallbackModel = 'llama-3.1-70b-versatile';
+    this.fallbackModel = 'llama-3.1-8b-instant';
   }
 
   async complete(messages, systemPrompt) {
