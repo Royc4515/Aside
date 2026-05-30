@@ -263,10 +263,12 @@ section { padding: 88px 0; }
 .feature p { font-size: 14.5px; color: var(--ink-3); }
 
 /* ---------- Screenshots gallery ---------- */
+/* Each shot is a full designed banner (its own heading + different aspect
+   ratio), so stack them full-width one under another — no ragged grid gaps. */
 .gallery { background: var(--bg-sunk); }
 .gallery-grid {
-  display: grid; gap: 22px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex; flex-direction: column; gap: 28px;
+  max-width: 1000px; margin: 0 auto;
 }
 .shot {
   border-radius: var(--r-lg);
@@ -275,7 +277,7 @@ section { padding: 88px 0; }
   border: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
 }
-.shot img { display: block; width: 100%; }
+.shot img { display: block; width: 100%; height: auto; }
 .shot .img-dark { display: none; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .shot .img-light { display: none; }
