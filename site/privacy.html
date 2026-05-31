@@ -63,7 +63,7 @@
 
   <main class="page-body">
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 27 May 2026</p>
+    <p class="updated">Last updated: 31 May 2026</p>
 
     <p>
       Aside is a Chrome extension that lets you chat with several AI providers
@@ -77,7 +77,7 @@
       <li>We do not operate any server. There is no “Aside backend” to send data to.</li>
       <li>You provide your own API keys. They are stored in Chrome’s storage on your device.</li>
       <li>Your prompts and the AI’s replies are sent <strong>directly</strong> from your browser to the provider you chose — never through us.</li>
-      <li>No analytics. No telemetry. No tracking pixels. No third-party scripts loaded by the extension.</li>
+      <li>No analytics. No telemetry. No tracking pixels. No third-party scripts. (Aside’s UI does load web fonts from Google Fonts — see “Web fonts” below.)</li>
     </ul>
 
     <h2>What Aside stores, and where</h2>
@@ -88,9 +88,10 @@
     </p>
     <ul>
       <li>
-        <strong>API keys</strong>, the active provider, the chosen theme
-        (light/dark), the interface language, the sidebar position/width, and
-        whether “send current page context” is enabled.
+        <strong>API keys</strong>, the active provider, the selected model for
+        each provider, the chosen theme (light/dark), the interface language,
+        the sidebar position/width, and whether “send current page context”
+        is enabled.
       </li>
       <li>
         Your <strong>conversation history</strong>.
@@ -119,17 +120,37 @@
     <p>
       Each request includes the API key for that provider (for authentication),
       the prompt you typed, and — if “page context” is enabled — the readable
-      text of the current tab (truncated to a reasonable length). Each
+      text of the current tab (truncated to about 30,000 characters). Each
       provider’s own privacy policy governs what they do with that data.
       Aside does not see, intercept, log, or store these requests.
+    </p>
+    <p>
+      <strong>About page context:</strong> when you open the sidebar, Aside reads
+      the current tab’s visible text into the sidebar so it is ready to use. Page
+      context is <strong>on by default</strong>, which means that captured text is
+      included with your prompt when you send a message. You can turn it off at any
+      time with the page-context toggle in the sidebar; while it is off, no page
+      text is sent to the provider. Selected text is only captured when you
+      highlight it and use a selection action (such as “Ask Aside about selection”).
+    </p>
+
+    <h2>Web fonts</h2>
+    <p>
+      Aside’s own interface (the sidebar, options, and popup pages) loads fonts
+      from <strong>Google Fonts</strong> (<code>fonts.googleapis.com</code> and
+      <code>fonts.gstatic.com</code>). When those pages render, your browser
+      requests the font files from Google, which means Google receives your IP
+      address and standard request headers, governed by Google’s own privacy
+      policy. This is the only third-party request Aside makes that you do not
+      initiate; it carries no API keys, prompts, page text, or identifiers.
     </p>
 
     <h2>Permissions, explained</h2>
     <ul>
       <li><strong>storage</strong> — to keep API keys and chat history on your device.</li>
-      <li><strong>activeTab</strong>, <strong>tabs</strong>, <strong>scripting</strong> — to inject the sidebar into the current tab when you press Alt+A, and to read the page text only when you opt in to “page context”.</li>
+      <li><strong>activeTab</strong>, <strong>tabs</strong>, <strong>scripting</strong> — to inject the sidebar into the current tab when you press Alt+A, and to read the page’s visible text for the “page context” feature (on by default; toggleable in the sidebar).</li>
       <li><strong>contextMenus</strong> — to add right-click entries (for example, “Ask Aside about selection”).</li>
-      <li><strong>host_permissions: &lt;all_urls&gt;</strong> — required so the sidebar can open on any website. Aside does not read page contents unless you explicitly use a feature that does so (such as page-context summarization).</li>
+      <li><strong>host_permissions: &lt;all_urls&gt;</strong> — required so the sidebar can open on any website. The page’s text is read only for the page-context feature (on by default, can be turned off) and for selection actions you trigger; it stays on your device until you send a message with page context enabled.</li>
     </ul>
 
     <h2>What we do NOT collect</h2>
