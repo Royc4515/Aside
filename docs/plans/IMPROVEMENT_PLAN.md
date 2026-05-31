@@ -45,7 +45,7 @@ Status legend: ☐ pending · ◐ in progress · ☑ shipped
 |---|---|---|
 | 3 ☑ | Code blocks — language badge (lowercased) on left, copy button on right · click → ✓ Copied feedback · proper mono spacing | `sidebar/sidebar.js` (markdown renderer + copy binding) `sidebar/sidebar.css` |
 | 8 ☑ | Streaming token meter — live `~127 tokens · 0.8s` next to cursor during streaming · persists in turn footer when done · respects accent color | `sidebar/sidebar.js` (runPrompt + turnHtml) `sidebar/sidebar.css` |
-| 9 ☑ | Page context pill — clickable pill above composer showing `Including page context · ~2.4k tokens` · click toggles on/off · auto-hides when no page content · persists to `chrome.storage.sync.pageContext` | `sidebar/sidebar.html` `sidebar/sidebar.js` (renderContextPill) `sidebar/sidebar.css` `sidebar/translations.js` |
+| 9 ☑ | Page context pill — clickable pill above composer showing `Including page context · ~2.4k tokens` · click toggles on/off · auto-hides when no page content · persists to `chrome.storage.local.pageContext` | `sidebar/sidebar.html` `sidebar/sidebar.js` (renderContextPill) `sidebar/sidebar.css` `sidebar/translations.js` |
 
 **Bonus:** preview chrome-shim now mocks `completeStream` so the chat works in standalone preview too.
 
@@ -120,7 +120,7 @@ Status legend: ☐ pending · ◐ in progress · ☑ shipped
 - **No new dependencies.** Vanilla JS + CSS only.
 - **Direction-safe.** Every change must work in RTL (Hebrew).
 - **Theme-safe.** Every change must work in light + dark + auto.
-- **Storage budget.** `chrome.storage.sync` is 100KB total — heavy chat history goes in `chrome.storage.local`.
+- **Storage.** Everything (keys, settings, chat history) lives in `chrome.storage.local` (5MB) — never `chrome.storage.sync`, so nothing leaves the device.
 - **Existing behavior preserved.** No regressions to provider routing, settings, popup toggle, etc.
 
 ---
