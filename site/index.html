@@ -362,7 +362,7 @@
         <div class="privacy-callout">
           <h2 data-i18n="privacy.title">Your keys stay in your browser</h2>
           <p data-i18n="privacy.body">
-            Aside is 100% client-side. API keys live in chrome.storage.sync (encrypted by Chrome, synced to your own Google account only). Requests go directly from your browser to the provider you chose. No telemetry, no analytics, no server in the middle.
+            Aside is 100% client-side. API keys live in chrome.storage.local — on your device only, never synced or uploaded anywhere. Requests go directly from your browser to the provider you chose. No telemetry, no analytics, no server in the middle.
           </p>
           <a class="btn btn-secondary" href="privacy.html" data-i18n="privacy.cta">Read the full Privacy Policy</a>
         </div>
@@ -382,7 +382,7 @@
           </details>
           <details class="faq-item">
             <summary data-i18n="faq.q2">Where are my API keys stored?</summary>
-            <p data-i18n="faq.a2">In chrome.storage.sync — Chrome encrypts them and syncs them across your own Chrome instances via your Google account. They never reach any server we control (there is no server we control). Conversation history is stored locally only.</p>
+            <p data-i18n="faq.a2">In chrome.storage.local — on your device only. They are never synced, uploaded, or sent to any server (there is no server we control). Conversation history is stored locally only, too.</p>
           </details>
           <details class="faq-item">
             <summary data-i18n="faq.q6">Can I choose which model each provider uses?</summary>

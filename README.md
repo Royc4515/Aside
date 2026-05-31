@@ -137,7 +137,7 @@ own model selection.
 
 ## Privacy
 
-- **Your API keys live on your machine.** Aside stores them in Chrome's encrypted local storage and sends them only to the provider you chose, over HTTPS. No analytics, no telemetry, no proxy server — your requests go straight from your browser to OpenAI / Anthropic / Google / xAI / Groq / your local Ollama.
+- **Your API keys live on your machine.** Aside stores them in Chrome's on-device `storage.local` — never synced to a Google account, never uploaded — and sends them only to the provider you chose, over HTTPS. No analytics, no telemetry, no proxy server — your requests go straight from your browser to OpenAI / Anthropic / Google / xAI / Groq / your local Ollama.
 - **Page content is sent only on your prompt.** When you press *Summarize* (or any action that needs the page), Aside grabs the readable body of the current tab, trims it to 12 000 characters, and includes it in **that one request**. Nothing is uploaded in the background.
 - **Conversation history stays local.** Threads are saved to Chrome's `storage.local` on your device. Nothing leaves your browser until you ask the model another question.
 - **Ollama mode is fully offline.** No key, no network call — your prompt and the page text go to the model running on your own computer.

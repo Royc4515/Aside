@@ -82,24 +82,25 @@
 
     <h2>What Aside stores, and where</h2>
     <p>
-      Aside uses two areas of Chrome’s extension storage. Nothing in either area
-      is transmitted to any server controlled by Aside (we do not have any).
+      Aside stores everything in <strong><code>chrome.storage.local</code></strong>,
+      which lives on your device only. Nothing is synced to your Google account,
+      uploaded, or transmitted to any server controlled by Aside (we do not have any).
     </p>
     <ul>
       <li>
-        <strong><code>chrome.storage.sync</code></strong> — used for: your API keys,
-        the active provider, the chosen theme (light/dark), the chosen interface
-        language, and whether the “send current page context” option is enabled.
-        Chrome encrypts this storage and synchronizes it across the Chrome
-        instances signed into your Google account. If you do not want this sync,
-        sign out of Chrome sync or disable extension sync in Chrome’s settings.
+        <strong>API keys</strong>, the active provider, the chosen theme
+        (light/dark), the interface language, the sidebar position/width, and
+        whether “send current page context” is enabled.
       </li>
       <li>
-        <strong><code>chrome.storage.local</code></strong> — used for your
-        conversation history. This area is local to the device and is not
-        synced anywhere.
+        Your <strong>conversation history</strong>.
       </li>
     </ul>
+    <p>
+      None of this leaves the device. (Earlier versions briefly used
+      <code>chrome.storage.sync</code> for settings; on update, Aside moves any
+      such data into local storage and clears the synced copy.)
+    </p>
 
     <h2>What Aside sends, and to whom</h2>
     <p>
@@ -145,7 +146,7 @@
       <li>To clear conversation history: open Aside → Settings → “Clear history”.</li>
       <li>To remove API keys: open the extension Options page and remove each key, or uninstall the extension.</li>
       <li>To wipe everything: uninstall Aside from <code>chrome://extensions</code>. Chrome removes all of the extension’s storage as part of uninstall.</li>
-      <li>To remove data already synced to your Google account: after uninstall, you can also clear extension data in <code>chrome://settings/syncSetup/advanced</code>.</li>
+      <li>Aside no longer uses synced storage. If an older version of Aside synced settings to your Google account, updating clears that synced copy automatically; you can also verify under <code>chrome://settings/syncSetup/advanced</code>.</li>
     </ul>
 
     <h2>Children</h2>

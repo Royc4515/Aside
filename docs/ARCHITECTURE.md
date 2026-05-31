@@ -22,7 +22,8 @@ see [README.md](README.md).
 ## Extension Platform
 
 - **MV3 service worker** — `background.js` handles the `Alt+A` keyboard command, context-menu registration, and live `VALIDATE_KEY` requests with a 10-second `Promise.race` timeout.
-- **Cross-origin `postMessage` security** — sidebar iframe validates `event.source === window.parent` before accepting any message; user-supplied text is always set via `textContent`, never `innerHTML`.
+- **Authenticated `postMessage` bridge** — because `content.js` shares the host page's origin, the sidebar iframe cannot trust messages by origin alone. `content.js` mints a random nonce, stores it in `chrome.storage.session` (unreadable by page scripts), passes the channel id through the iframe URL hash, and tags every message it posts *into* the iframe; the sidebar reads the same nonce and rejects anything without it. The reverse direction (iframe → content) is trusted by `event.source === iframe.contentWindow`, which page scripts cannot spoof. The nonce is never echoed back to the parent, so the page never observes it. AI responses are rendered through an HTML-escaping markdown pass; user/host text is escaped before it reaches `innerHTML`.
+- **Local-only storage** — API keys and settings live in `chrome.storage.local` via `shared/store.js`; nothing uses `chrome.storage.sync`, so no data is synced to a Google account or any server. A one-time migration moves data left in `sync` by older versions into `local` and clears it.
 - **Page content extraction** — `extractPageContent()` walks semantic selectors (`article`, `main`, `[role="main"]`, `.article-body`…), strips nav/chrome nodes, and truncates at 12 000 chars.
 - **Live API-key validation** — Settings sends `VALIDATE_KEY` to the service worker, which instantiates the provider and calls `validate()` against the real API.
 - **Custom Markdown renderer** — hand-rolled `renderMarkdown()` covers headings, bold/italic, code blocks, tables, and lists; output is sanitized by a DOM-based allowlist (`sanitizeHTML()`) before insertion.
@@ -76,7 +77,7 @@ systemPrompt, onChunk)` with no knowledge of which class is running.
 `OpenAIProvider`, `GrokProvider`, and `GroqProvider` reuse the entire
 `OpenAICompatProvider` implementation by only declaring their endpoint URL
 and default model. Switching providers requires a single
-`chrome.storage.sync` write.
+`chrome.storage.local` write.
 
 ## Project Layout
 
