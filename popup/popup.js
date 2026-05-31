@@ -2,7 +2,7 @@
  * Popup — provider status + open sidebar.
  */
 async function init() {
-  const stored = await chrome.storage.sync.get(['activeProvider', 'apiKeys', 'theme']);
+  const stored = await Store.get(['activeProvider', 'apiKeys', 'theme']);
   // Apply theme (auto / light / dark) to <html>
   const theme = stored.theme || 'auto';
   if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme);

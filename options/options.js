@@ -40,6 +40,15 @@ let state = {
 let baseline = null; // snapshot of state from last save / load
 let activePage = 'provider';
 
+// Escape user-controlled text before it goes into innerHTML (e.g. a custom
+// model id the user typed). Static catalog labels are safe, but the custom
+// field is free-form, so encode at the output boundary.
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function stateSnapshot() {
   return JSON.stringify({ ...state, apiKeys: { ...state.apiKeys }, selectedModels: { ...state.selectedModels } });
 }
@@ -66,9 +75,7 @@ function applyTheme(theme) {
 }
 
 async function init() {
-  const stored = await chrome.storage.sync.get([
-    'activeProvider','apiKeys','selectedModels','language','position','width','theme','pageContext'
-  ]);
+  const stored = await Store.get(Store.SETTINGS_KEYS);
   state = {
     ...state,
     ...stored,
@@ -90,13 +97,13 @@ async function init() {
 
 function bindGlobal() {
   document.getElementById('save-btn').onclick = async () => {
-    await chrome.storage.sync.set(state);
+    await Store.set(state);
     snapshotBaseline();
     flashSaved();
   };
   document.getElementById('reset-btn').onclick = async () => {
     if (!confirm('Reset all settings? Your API keys will also be cleared.')) return;
-    await chrome.storage.sync.clear();
+    await Store.clearSettings();
     location.reload();
   };
 }
@@ -143,7 +150,7 @@ function renderProviders() {
       ${window.providerChip ? window.providerChip(p.id, 36, p.hue) : `<span class="set-provider-mark" style="background:${p.hue}">${p.letter}</span>`}
       <span class="set-provider-body">
         <span class="set-provider-name">${p.name}</span>
-        <span class="set-provider-model">${providerModelLabel(p.id)}</span>
+        <span class="set-provider-model">${esc(providerModelLabel(p.id))}</span>
       </span>
       <span class="set-tier set-tier--${p.tier}">${p.tier === 'paid' ? 'Paid' : 'Free'}</span>
     </button>
@@ -151,7 +158,7 @@ function renderProviders() {
   root.querySelectorAll('.set-provider').forEach(b => {
     b.onclick = async () => {
       state.activeProvider = b.dataset.id;
-      await chrome.storage.sync.set({ activeProvider: state.activeProvider });
+      await Store.set({ activeProvider: state.activeProvider });
       snapshotBaseline(); // active provider auto-saves, so re-baseline
       renderProviders();
       renderModel();
@@ -226,7 +233,7 @@ function renderKeys() {
           type="password"
           data-id="${p.id}"
           placeholder="${p.placeholder}"
-          value="${state.apiKeys[p.id] || ''}"
+          value="${esc(state.apiKeys[p.id] || '')}"
           autocomplete="off"
           spellcheck="false"
         />
@@ -239,7 +246,7 @@ function renderKeys() {
   });
   root.querySelectorAll('.set-key-validate').forEach(btn => {
     btn.onclick = async () => {
-      await chrome.storage.sync.set({ apiKeys: state.apiKeys, activeProvider: state.activeProvider });
+      await Store.set({ apiKeys: state.apiKeys, activeProvider: state.activeProvider });
       snapshotBaseline();
       btn.textContent = '✓ Saved';
       btn.classList.add('is-valid');

@@ -83,7 +83,7 @@ function applyUILanguage() {
 }
 
 async function loadSettings() {
-  settings = await chrome.storage.sync.get(['activeProvider','apiKeys','selectedModels','language','theme','pageContext']);
+  settings = await Store.get(['activeProvider','apiKeys','selectedModels','language','theme','pageContext']);
   settings.apiKeys = settings.apiKeys || {};
   settings.selectedModels = settings.selectedModels || {};
   settings.theme = settings.theme || 'auto';
@@ -348,7 +348,7 @@ async function commitOnboardingStep2() {
   if (key) newKeys[p.id] = key;
   settings = { ...settings, apiKeys: newKeys, activeProvider: p.id };
   try {
-    await chrome.storage.sync.set({ apiKeys: newKeys, activeProvider: p.id });
+    await Store.set({ apiKeys: newKeys, activeProvider: p.id });
     provider = ProviderFactory.get(p.id, newKeys, settings.selectedModels);
     status.textContent = '';
     setOnbStep(3);
@@ -451,7 +451,7 @@ async function cycleTheme() {
   const next = eff === 'dark' ? 'light' : 'dark';
   settings.theme = next;
   applyTheme(next);
-  await chrome.storage.sync.set({ theme: next });
+  await Store.set({ theme: next });
 }
 
 // ── Compare mode ───────────────────────────────────────────────────────
@@ -503,7 +503,7 @@ async function useThisAnswer(turnIdx) {
   if (chosenId && chosenId !== settings.activeProvider) {
     settings.activeProvider = chosenId;
     try { provider = ProviderFactory.get(chosenId, settings.apiKeys, settings.selectedModels); } catch (e) {}
-    await chrome.storage.sync.set({ activeProvider: chosenId });
+    await Store.set({ activeProvider: chosenId });
   }
   // Strip compare metadata from the kept turn so it renders as a normal answer.
   delete chosen.compareSide;
@@ -811,7 +811,7 @@ function renderPicker() {
         <button class="sb-picker-row${isActive?' is-active':''}" data-id="${p.id}">
           ${window.providerChip ? window.providerChip(p.id, 22, p.hue) : `<span class="dot" style="background:${p.hue}"></span>`}
           <span class="sb-picker-name">${p.name}${isSelf ? ' <span class="sb-picker-model">(self)</span>' : ''}</span>
-          <span class="sb-picker-model">${providerModelLabel(p.id)}</span>
+          <span class="sb-picker-model">${escapeHtml(providerModelLabel(p.id))}</span>
           ${isActive?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>':''}
         </button>
       `;}).join('')}
@@ -833,7 +833,7 @@ function renderPicker() {
         togglePicker('a'); chrome.runtime.openOptionsPage(); return;
       }
       settings.activeProvider = id;
-      await chrome.storage.sync.set({ activeProvider: id });
+      await Store.set({ activeProvider: id });
       try { provider = ProviderFactory.get(id, settings.apiKeys, settings.selectedModels); } catch(e){}
       if (compareMode && !hasProviderKey(compareProviderId)) {
         const eligible = PROVIDERS.filter(p => p.id !== id && hasProviderKey(p.id));
@@ -881,7 +881,7 @@ function renderModelPicker(host) {
       if (b.dataset.more) { togglePicker('model'); chrome.runtime.openOptionsPage(); return; }
       const modelId = b.dataset.model;
       settings.selectedModels = { ...(settings.selectedModels || {}), [pid]: modelId };
-      try { await chrome.storage.sync.set({ selectedModels: settings.selectedModels }); } catch (e) {}
+      try { await Store.set({ selectedModels: settings.selectedModels }); } catch (e) {}
       try { provider = ProviderFactory.get(pid, settings.apiKeys, settings.selectedModels); } catch (e) {}
       renderHeader();
       togglePicker('model');
@@ -944,7 +944,7 @@ function toggleLangPicker() {
     b.onclick = async () => {
       const code = b.dataset.lang;
       settings.language = code;
-      await chrome.storage.sync.set({ language: code });
+      await Store.set({ language: code });
       renderLangBtn();
       applyUILanguage();
       toggleLangPicker();
@@ -1048,9 +1048,27 @@ function requestPageContent() {
   window.parent.postMessage({ type: 'REQUEST_PAGE_CONTENT' }, '*');
 }
 
-window.addEventListener('message', (e) => {
+// The content script and the host page share an origin, so we cannot trust
+// inbound messages by origin. content.js mints a per-channel nonce, stores it
+// in chrome.storage.session (unreadable by page scripts) and tags every message
+// with it; we read the same nonce via the channel id in our URL hash and reject
+// anything that does not carry it. This blocks a malicious page from driving the
+// sidebar (silent AI calls, context injection) by forging postMessages.
+const channelNoncePromise = (async () => {
+  try {
+    const id = new URLSearchParams(location.hash.slice(1)).get('c');
+    if (!id) return null;
+    const got = await chrome.storage.session.get(id);
+    return got[id] || null;
+  } catch { return null; }
+})();
+
+window.addEventListener('message', async (e) => {
   const msg = e.data;
   if (!msg || typeof msg !== 'object') return;
+  if (e.source !== window.parent) return;
+  const nonce = await channelNoncePromise;
+  if (!nonce || msg.k !== nonce) return;
   if (msg.type === 'PAGE_CONTENT')  { pageContent = msg.content || ''; renderContextPill(); }
   if (msg.type === 'PAGE_META')     {
     pageUrl   = msg.url   || pageUrl;
@@ -1075,7 +1093,9 @@ window.addEventListener('message', (e) => {
   }
 });
 
-chrome.storage.onChanged.addListener((changes) => {
+chrome.storage.onChanged.addListener((changes, area) => {
+  // Settings live in local now; ignore session (channel nonce) and other areas.
+  if (area !== 'local') return;
   // Skip our own activeProvider write — we updated `provider` and `settings` already.
   const keys = Object.keys(changes);
   if (keys.length === 1 && keys[0] === 'activeProvider'
@@ -1109,7 +1129,7 @@ function renderContextPill() {
   if (tog) tog.textContent = off ? (t('context_toggle_off') || 'Off') : (t('context_toggle_on') || 'On');
   pill.onclick = async () => {
     settings.pageContext = off; // off was true → flip to enabled
-    try { await chrome.storage.sync.set({ pageContext: settings.pageContext }); } catch {}
+    try { await Store.set({ pageContext: settings.pageContext }); } catch {}
     renderContextPill();
   };
 }
