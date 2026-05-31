@@ -4,7 +4,7 @@
 
 .DESCRIPTION
   Bundles only the files the extension needs at runtime, excluding repo
-  scaffolding (docs/, archive/, marketing/, screenshots/, .git/, etc.).
+  scaffolding (docs/, marketing/, .git/, etc.).
   Output: dist/aside-<version>.zip — drop into chrome://extensions
   (Developer mode → Load unpacked, after unzipping).
 

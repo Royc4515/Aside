@@ -10,6 +10,12 @@ package.json
 qa-screenshots/
 qa-debug.mjs
 
+# Dev-only scaffolding — kept locally, excluded from the public repo.
+# (Curated marketing assets in marketing/ stay tracked; these are raw/internal.)
+archive/
+docs/plans/
+screenshots/
+
 # Build output
 dist/
 *.zip
