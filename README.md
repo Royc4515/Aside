@@ -77,9 +77,11 @@ don't have to paste anything. You pick the model. You stay on the page.
 
 Add a key once in **Settings → Provider**, then pick a model from the **Model**
 dropdown — or choose **Custom…** to type any model id the provider supports
-(handy when a provider ships a new model before this list catches up). Aside
-validates keys live before saving. Switch providers any time from the sidebar
-header; each remembers its own model.
+(handy when a provider ships a new model before this list catches up). Custom
+ids are remembered per provider, so they reappear under **Saved custom** in
+both the Settings picker and the sidebar composer for one-click reuse — and you
+can remove them just as easily. Aside validates keys live before saving. Switch
+providers any time from the sidebar header; each remembers its own model.
 
 ---
 
