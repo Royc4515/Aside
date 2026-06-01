@@ -89,10 +89,10 @@ header; each remembers its own model.
 
 ### Step 1 · Install the extension
 
-1. **Download the code.** Grab the [latest ZIP](https://github.com/Royc4515/Aside/archive/refs/heads/main.zip) and unzip it anywhere, or `git clone https://github.com/Royc4515/Aside.git`.
+1. **Download the extension.** Grab [`aside.zip`](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) from the [latest release](https://github.com/Royc4515/Aside/releases/latest) and unzip it anywhere. It's a slim, runtime-only build (~83 KB). _(Developers: `git clone https://github.com/Royc4515/Aside.git` to get the full source instead.)_
 2. **Open Chrome extensions.** Paste `chrome://extensions` into the address bar and press <kbd>Enter</kbd>.
 3. **Turn on Developer mode.** Top-right toggle. Without it, Chrome won't load an unpacked extension.
-4. **Load unpacked.** Click *Load unpacked* and select the unzipped `Aside` folder.
+4. **Load unpacked.** Click *Load unpacked* and select the unzipped `aside` folder (the one containing `manifest.json`).
 5. **Pin it to the toolbar.** Click the puzzle icon in the toolbar and pin Aside so it's one click away.
 6. **Set the `Alt + A` shortcut.** Chrome only auto-assigns shortcuts for Web Store extensions, so set it once by hand: open `chrome://extensions/shortcuts`, find **Aside**, click the box next to *Toggle the AI sidebar*, and press <kbd>Alt</kbd> + <kbd>A</kbd>. (You can also just open it from the toolbar icon or the right-click menu.)
 
@@ -108,7 +108,7 @@ header; each remembers its own model.
 
 Prefer a different provider? Same flow with Anthropic Claude, OpenAI, Google Gemini, xAI Grok, or self-hosted Ollama. See [Providers](#providers) for what each one needs.
 
-**Want a slim install zip?** Run `pwsh ./scripts/build-zip.ps1` (or `bash ./scripts/build-zip.sh`) — it produces `dist/aside-<version>.zip` containing only the runtime files, ready to share.
+**Maintainers — cutting a release:** Run `pwsh ./scripts/build-zip.ps1` (or `bash ./scripts/build-zip.sh`) to produce `dist/aside-<version>.zip` (runtime files only), then attach it to a GitHub release as `aside.zip` so the [latest-download link](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) always serves the newest build.
 
 ---
 
