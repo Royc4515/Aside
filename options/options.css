@@ -269,19 +269,44 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 }
 .set-select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
-/* Model picker */
+/* Default-model per provider list */
+.set-model-list { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+.set-model-row { display: flex; flex-direction: column; gap: 8px; }
+.set-model-head { display: flex; align-items: center; gap: 8px; }
+.set-model-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.set-model-reset {
+  margin-inline-start: auto; padding: 2px 9px;
+  background: transparent; border: 1px solid var(--line); border-radius: var(--r-pill);
+  color: var(--ink-3); font-family: inherit; font-size: 11.5px; cursor: pointer;
+}
+.set-model-reset:hover { border-color: var(--line-strong); color: var(--ink); }
 .set-model-control { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-#model-select, #model-custom {
+.set-model-control select, .set-model-control input {
   padding: 8px 11px;
   background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
   font-family: inherit; font-size: 13px; color: var(--ink);
-  min-width: 260px;
+  min-width: 280px; max-width: 100%;
 }
-#model-select { cursor: pointer; }
-#model-custom { font-family: var(--font-mono); font-size: 12.5px; }
-#model-select:focus, #model-custom:focus {
+.set-model-control select { cursor: pointer; }
+.set-model-control input { font-family: var(--font-mono); font-size: 12.5px; }
+.set-model-control select:focus, .set-model-control input:focus {
   outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
 }
+
+/* Saved custom model chips */
+.set-saved-models { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.set-saved-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 4px 3px 9px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-pill);
+}
+.set-saved-id { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-2); }
+.set-saved-forget {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px; padding: 0; border: none; border-radius: var(--r-pill);
+  background: transparent; color: var(--ink-4); font-size: 14px; line-height: 1; cursor: pointer;
+}
+.set-saved-forget:hover { background: var(--surface-3); color: var(--danger); }
 
 /* Switch */
 .set-switch { position: relative; display: inline-block; width: 38px; height: 22px; }

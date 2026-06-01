@@ -15,7 +15,7 @@
 (function () {
   // Top-level settings keys (everything that is NOT conversation history).
   const SETTINGS_KEYS = [
-    'activeProvider', 'apiKeys', 'selectedModels',
+    'activeProvider', 'apiKeys', 'selectedModels', 'customModels',
     'language', 'position', 'width', 'theme', 'pageContext',
   ];
   const MIGRATION_FLAG = 'aside._migratedToLocal';

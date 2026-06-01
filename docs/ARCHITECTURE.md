@@ -100,13 +100,17 @@ shared/provider-marks.js   ← shared SVG provider monograms
 
 ## Provider matrix
 
-| Provider | Default model | Additional models |
+The built-in catalog lives in `providers/models.js` (the single source of truth).
+Users can override the default per provider in Settings, or type any custom model
+id — custom ids are remembered for reuse. The table below mirrors the catalog.
+
+| Provider | Built-in default | Additional catalog models |
 |---|---|---|
-| **Claude** (Anthropic) | `claude-sonnet-4-6` | `claude-haiku-4-5-20251001` · `claude-opus-4-7` |
-| **Gemini** (Google) | `gemini-2.0-flash` | `gemini-1.5-flash` · `gemini-1.5-pro` · `gemini-2.5-pro` |
-| **OpenAI** | `gpt-4o-mini` | `gpt-4o` · `o4-mini` |
-| **Grok** (xAI) † | `grok-3-mini` | `grok-3` |
-| **Groq** † | `llama-3.3-70b-versatile` | `llama-3.1-8b-instant` · `gemma2-9b-it` |
-| **Ollama** (local) | `llama3.2` | any locally pulled model |
+| **Claude** (Anthropic) | `claude-sonnet-4-6` | `claude-opus-4-8` · `claude-haiku-4-5` |
+| **OpenAI** | `gpt-4o-mini` | `gpt-4o` · `gpt-5.4-mini` · `gpt-5.5` |
+| **Gemini** (Google) | `gemini-2.5-flash` | `gemini-3.5-flash` · `gemini-2.5-pro` · `gemini-2.5-flash-lite` |
+| **Grok** (xAI) † | `grok-3-mini` | `grok-4.3` · `grok-4` · `grok-3` |
+| **Groq** † | `llama-3.3-70b-versatile` | `llama-3.1-8b-instant` · `meta-llama/llama-4-scout-17b-16e-instruct` · `openai/gpt-oss-120b` · `openai/gpt-oss-20b` · `qwen/qwen3-32b` · `groq/compound` · `groq/compound-mini` |
+| **Ollama** (local) | `llama3.1` | `llama3.2` · `llama3.3` · `gemma3` · `gemma3:4b` · `qwen3` · `qwen3:4b` · `qwen2.5` · `phi4` · `deepseek-r1` · `mistral` · any locally pulled model |
 
 <sup>† Grok, Groq, and OpenAI all extend `OpenAICompatProvider` — the chat-completions wire format is shared in one place.</sup>

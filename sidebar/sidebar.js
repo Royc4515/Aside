@@ -83,9 +83,10 @@ function applyUILanguage() {
 }
 
 async function loadSettings() {
-  settings = await Store.get(['activeProvider','apiKeys','selectedModels','language','theme','pageContext']);
+  settings = await Store.get(['activeProvider','apiKeys','selectedModels','customModels','language','theme','pageContext']);
   settings.apiKeys = settings.apiKeys || {};
   settings.selectedModels = settings.selectedModels || {};
+  settings.customModels = settings.customModels || {};
   settings.theme = settings.theme || 'auto';
   applyTheme(settings.theme);
   // When in auto mode, the "opposite" icon flips with the system theme.
@@ -853,6 +854,7 @@ function renderModelPicker(host) {
     ? resolveModel(pid, settings.selectedModels)
     : (settings.selectedModels && settings.selectedModels[pid]) || catalog.default;
   const provName = (PROVIDERS.find(p => p.id === pid) || {}).name || pid;
+  const savedModels = (typeof customModelIds === 'function') ? customModelIds(pid, settings.customModels) : [];
   const check = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>';
 
   host.innerHTML = `
@@ -863,8 +865,16 @@ function renderModelPicker(host) {
         const isActive = o.id === currentModel;
         const isDefault = o.id === catalog.default;
         return `
-        <button class="sb-picker-row${isActive ? ' is-active' : ''}" data-model="${o.id}">
-          <span class="sb-picker-name">${o.label}${isDefault ? ` <span class="sb-picker-model">${t('picker_default') || 'default'}</span>` : ''}</span>
+        <button class="sb-picker-row${isActive ? ' is-active' : ''}" data-model="${escapeHtml(o.id)}">
+          <span class="sb-picker-name">${escapeHtml(o.label)}${isDefault ? ` <span class="sb-picker-model">${t('picker_default') || 'default'}</span>` : ''}</span>
+          ${isActive ? check : ''}
+        </button>`;
+      }).join('')}
+      ${savedModels.map(mid => {
+        const isActive = mid === currentModel;
+        return `
+        <button class="sb-picker-row${isActive ? ' is-active' : ''}" data-model="${escapeHtml(mid)}">
+          <span class="sb-picker-name">${escapeHtml(mid)} <span class="sb-picker-model">${t('picker_custom') || 'custom'}</span></span>
           ${isActive ? check : ''}
         </button>`;
       }).join('')}

@@ -55,20 +55,30 @@ const PROVIDER_MODELS = {
   groq: {
     default: 'llama-3.3-70b-versatile',
     options: [
-      { id: 'llama-3.3-70b-versatile', label: 'Llama 3.3 70B' },
-      { id: 'llama-3.1-8b-instant',    label: 'Llama 3.1 8B (fastest)' },
-      { id: 'openai/gpt-oss-120b',     label: 'GPT-OSS 120B' },
-      { id: 'openai/gpt-oss-20b',      label: 'GPT-OSS 20B' },
+      { id: 'llama-3.3-70b-versatile',                   label: 'Llama 3.3 70B' },
+      { id: 'llama-3.1-8b-instant',                      label: 'Llama 3.1 8B (fastest)' },
+      { id: 'meta-llama/llama-4-scout-17b-16e-instruct', label: 'Llama 4 Scout 17B' },
+      { id: 'openai/gpt-oss-120b',                       label: 'GPT-OSS 120B' },
+      { id: 'openai/gpt-oss-20b',                        label: 'GPT-OSS 20B' },
+      { id: 'qwen/qwen3-32b',                            label: 'Qwen 3 32B' },
+      { id: 'groq/compound',                             label: 'Compound' },
+      { id: 'groq/compound-mini',                        label: 'Compound Mini' },
     ],
   },
   ollama: {
     default: 'llama3.1',
     options: [
-      { id: 'llama3.1', label: 'Llama 3.1' },
-      { id: 'llama3.2', label: 'Llama 3.2' },
-      { id: 'llama3.3', label: 'Llama 3.3' },
-      { id: 'mistral',  label: 'Mistral' },
-      { id: 'qwen2.5',  label: 'Qwen 2.5' },
+      { id: 'llama3.1',    label: 'Llama 3.1' },
+      { id: 'llama3.2',    label: 'Llama 3.2' },
+      { id: 'llama3.3',    label: 'Llama 3.3' },
+      { id: 'gemma3',      label: 'Gemma 3' },
+      { id: 'gemma3:4b',   label: 'Gemma 3 4B' },
+      { id: 'qwen3',       label: 'Qwen 3' },
+      { id: 'qwen3:4b',    label: 'Qwen 3 4B' },
+      { id: 'qwen2.5',     label: 'Qwen 2.5' },
+      { id: 'phi4',        label: 'Phi-4' },
+      { id: 'deepseek-r1', label: 'DeepSeek R1' },
+      { id: 'mistral',     label: 'Mistral' },
     ],
   },
 };
@@ -89,6 +99,55 @@ function modelLabel(providerId, modelId) {
   return found ? found.label : (modelId || entry.default);
 }
 
+/** True when `modelId` is part of a provider's built-in catalog. */
+function isCatalogModel(providerId, modelId) {
+  const entry = PROVIDER_MODELS[providerId];
+  if (!entry || !modelId) return false;
+  return entry.options.some(o => o.id === modelId);
+}
+
+/**
+ * Custom (user-typed) model ids saved for a provider, in stored order, with
+ * blanks and any id that's since become part of the catalog filtered out.
+ * `customModels` is the persisted `{ providerId: string[] }` map.
+ */
+function customModelIds(providerId, customModels = {}) {
+  const list = (customModels && customModels[providerId]) || [];
+  if (!Array.isArray(list)) return [];
+  const seen = new Set();
+  return list
+    .map(id => String(id || '').trim())
+    .filter(id => id && !isCatalogModel(providerId, id) && !seen.has(id) && seen.add(id));
+}
+
+/**
+ * Remember a custom model id for a provider. Returns a NEW `customModels` map
+ * (never mutates) with the id appended unless it's blank, already in the
+ * catalog, or already remembered. Most-recently-used stays last.
+ */
+function rememberCustomModel(providerId, modelId, customModels = {}) {
+  const id = String(modelId || '').trim();
+  const base = { ...(customModels || {}) };
+  if (!id || isCatalogModel(providerId, id)) return base;
+  const existing = customModelIds(providerId, customModels);
+  if (existing.includes(id)) return base;
+  return { ...base, [providerId]: [...existing, id] };
+}
+
+/** Drop a remembered custom model id. Returns a NEW `customModels` map. */
+function forgetCustomModel(providerId, modelId, customModels = {}) {
+  const id = String(modelId || '').trim();
+  const base = { ...(customModels || {}) };
+  const next = customModelIds(providerId, customModels).filter(x => x !== id);
+  if (next.length) base[providerId] = next;
+  else delete base[providerId];
+  return base;
+}
+
 self.PROVIDER_MODELS = PROVIDER_MODELS;
 self.resolveModel = resolveModel;
 self.modelLabel = modelLabel;
+self.isCatalogModel = isCatalogModel;
+self.customModelIds = customModelIds;
+self.rememberCustomModel = rememberCustomModel;
+self.forgetCustomModel = forgetCustomModel;

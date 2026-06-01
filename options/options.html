@@ -46,15 +46,9 @@
         </section>
 
         <section class="set-section">
-          <h2 class="set-h2">Model</h2>
-          <div class="set-row">
-            <label for="model-select" id="model-label">Model for the active provider</label>
-            <div class="set-model-control">
-              <select id="model-select"></select>
-              <input type="text" id="model-custom" placeholder="model-id" autocomplete="off" spellcheck="false" hidden />
-            </div>
-          </div>
-          <p class="set-hint">Pick a model or choose <em>Custom…</em> to type any model id the provider supports. Ids change over time — custom always works.</p>
+          <h2 class="set-h2">Default model</h2>
+          <p class="set-hint">Set the default model each provider uses. Choose <em>Custom…</em> to type any model id the provider supports — custom ids you use are saved for next time.</p>
+          <div id="model-list" class="set-model-list"></div>
         </section>
 
         <section class="set-section">
