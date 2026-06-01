@@ -72,8 +72,8 @@ don't have to paste anything. You pick the model. You stay on the page.
 | **Gemini** (Google) | API key | `gemini-2.5-flash` | 3.5 Flash, 2.5 Pro, 2.5 Flash-Lite |
 | **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-5.4 mini, GPT-5.5 |
 | **Grok** (xAI) | API key | `grok-3-mini` | Grok 4.3, Grok 4, Grok 3 |
-| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, Llama 4 Scout, GPT-OSS 120B/20B, Qwen 3 |
-| **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2/3.3, Mistral, Qwen 2.5 |
+| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, Llama 4 Scout, GPT-OSS 120B/20B, Qwen 3 32B, Compound / Compound Mini |
+| **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2/3.3, Gemma 3, Qwen 3 / 2.5, Phi-4, DeepSeek R1, Mistral |
 
 Add a key once in **Settings → Provider**, then pick a model from the **Model**
 dropdown — or choose **Custom…** to type any model id the provider supports
