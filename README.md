@@ -17,7 +17,8 @@ or just chat. Six providers, one keystroke, zero context-switching.
 <img src="https://img.shields.io/badge/Chrome%20Extension-MV3-4285F4?logo=googlechrome&logoColor=white" alt="Chrome MV3">&nbsp;
 <img src="https://img.shields.io/badge/providers-6-d97757" alt="6 providers">&nbsp;
 <img src="https://img.shields.io/badge/themes-Light%20%C2%B7%20Dark%20%C2%B7%20Auto-8b5cf6" alt="3 themes">&nbsp;
-<img src="https://img.shields.io/badge/languages-EN%20%C2%B7%20HE-0ea5e9" alt="EN / HE">&nbsp;
+<img src="https://img.shields.io/badge/UI-EN%20%C2%B7%20HE-0ea5e9" alt="UI in English and Hebrew">&nbsp;
+<img src="https://img.shields.io/badge/replies-8%20languages-0ea5e9" alt="Replies in 8 languages">&nbsp;
 <img src="https://img.shields.io/badge/license-MIT-22c55e" alt="MIT">
 
 <br/><br/>
@@ -51,7 +52,7 @@ don't have to paste anything. You pick the model. You stay on the page.
 - **Six AI providers.** Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama — switch in a click, no separate logins.
 - **Reads the page for you.** Summarize, extract key points, translate, find on page, or run a custom prompt. No copy-paste.
 - **Streaming answers.** Tokens arrive as the model thinks — cancel any time.
-- **Your theme. Your language.** Light, dark, or auto. English or Hebrew, with full RTL.
+- **Your theme. Your language.** Light, dark, or auto. The interface is English or Hebrew (full RTL); ask the model to reply in any of eight languages.
 - **History that follows the page.** Conversations are saved per-site so you can pick up where you left off.
 
 ---
@@ -71,7 +72,7 @@ don't have to paste anything. You pick the model. You stay on the page.
 | **Gemini** (Google) | API key | `gemini-2.5-flash` | 3.5 Flash, 2.5 Pro, 2.5 Flash-Lite |
 | **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-5.4 mini, GPT-5.5 |
 | **Grok** (xAI) | API key | `grok-3-mini` | Grok 4.3, Grok 4, Grok 3 |
-| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, GPT-OSS 120B/20B |
+| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, Llama 4 Scout, GPT-OSS 120B/20B, Qwen 3 |
 | **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2/3.3, Mistral, Qwen 2.5 |
 
 Add a key once in **Settings → Provider**, then pick a model from the **Model**
