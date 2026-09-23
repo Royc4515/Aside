@@ -23,8 +23,8 @@ let _renderPending = false;
 const PROVIDERS = [
   { id: 'claude', name: 'Claude', model: 'Sonnet 5',     hue: 'var(--p-claude)' },
   { id: 'gemini', name: 'Gemini', model: '2.5 Flash',    hue: 'var(--p-gemini)' },
-  { id: 'openai', name: 'GPT-4o', model: '4o mini',      hue: 'var(--p-gpt)'    },
-  { id: 'grok',   name: 'Grok',   model: 'Grok 3 mini',  hue: 'var(--p-grok)'   },
+  { id: 'openai', name: 'OpenAI', model: 'GPT-6 Luna',   hue: 'var(--p-gpt)'    },
+  { id: 'grok',   name: 'Grok',   model: 'Grok 4.3',     hue: 'var(--p-grok)'   },
   { id: 'groq',   name: 'Groq',   model: 'Llama 3.3',    hue: 'var(--p-groq)'   },
   { id: 'ollama', name: 'Ollama', model: 'Local',         hue: 'var(--p-ollama)' },
 ];
@@ -231,7 +231,7 @@ const ONB_PROVIDERS = [
     keyUrl: 'https://console.groq.com/keys' },
   { id: 'claude', name: 'Claude',  desc: 'Thoughtful, top quality',  tier: 'paid', placeholder: 'sk-ant-…',
     keyUrl: 'https://console.anthropic.com/settings/keys' },
-  { id: 'openai', name: 'GPT-4o',  desc: 'Versatile mini model',     tier: 'paid', placeholder: 'sk-…',
+  { id: 'openai', name: 'OpenAI',  desc: 'GPT-6 · fast & versatile', tier: 'paid', placeholder: 'sk-…',
     keyUrl: 'https://platform.openai.com/api-keys' },
   { id: 'grok',   name: 'Grok',    desc: 'xAI · fast reasoning',     tier: 'paid', placeholder: 'xai-…',
     keyUrl: 'https://console.x.ai/' },

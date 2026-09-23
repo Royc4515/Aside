@@ -8,7 +8,7 @@ see [README.md](README.md).
 ## Provider System
 
 - **Six AI providers** — Claude, Gemini, OpenAI, Grok, Groq, and Ollama; selected at runtime via `ProviderFactory`.
-- **Shared OpenAI-compatible base** — `OpenAICompatProvider` implements the chat-completions wire format once; `OpenAIProvider`, `GrokProvider`, and `GroqProvider` are thin subclasses that set `url` and `model`.
+- **Shared OpenAI-compatible base** — `OpenAICompatProvider` implements the chat-completions wire format once; `OpenAIProvider`, `GrokProvider`, and `GroqProvider` are thin subclasses that set `url`, `model`, and the output-cap field their API expects.
 - **Uniform message-array API** — every provider takes `(messages[], systemPrompt)`; the sidebar never branches on which class is running.
 
 ## Conversation & UI
@@ -75,8 +75,10 @@ flowchart LR
 pattern** — the sidebar calls `provider.completeStream(messages,
 systemPrompt, onChunk)` with no knowledge of which class is running.
 `OpenAIProvider`, `GrokProvider`, and `GroqProvider` reuse the entire
-`OpenAICompatProvider` implementation by only declaring their endpoint URL
-and default model. Switching providers requires a single
+`OpenAICompatProvider` implementation by only declaring their endpoint URL,
+default model, and output-cap field (`max_tokens` vs `max_completion_tokens`).
+Per-model request hints (e.g. reasoning `effort`) and retired-model
+redirects live in the catalog, `providers/models.js`. Switching providers requires a single
 `chrome.storage.local` write.
 
 ## Project Layout
@@ -107,9 +109,9 @@ id — custom ids are remembered for reuse. The table below mirrors the catalog.
 | Provider | Built-in default | Additional catalog models |
 |---|---|---|
 | **Claude** (Anthropic) | `claude-sonnet-5` | `claude-opus-5-5` · `claude-fable-5-1` · `claude-haiku-4-5` |
-| **OpenAI** | `gpt-4o-mini` | `gpt-4o` · `gpt-5.4-mini` · `gpt-5.5` |
+| **OpenAI** | `gpt-6-luna` | `gpt-6-sol` · `gpt-6-astra` |
 | **Gemini** (Google) | `gemini-2.5-flash` | `gemini-3.5-flash` · `gemini-2.5-pro` · `gemini-2.5-flash-lite` |
-| **Grok** (xAI) † | `grok-3-mini` | `grok-4.3` · `grok-4` · `grok-3` |
+| **Grok** (xAI) † | `grok-4.3` | `grok-4.20-0309-non-reasoning` · `grok-4.7` |
 | **Groq** † | `llama-3.3-70b-versatile` | `llama-3.1-8b-instant` · `meta-llama/llama-4-scout-17b-16e-instruct` · `openai/gpt-oss-120b` · `openai/gpt-oss-20b` · `qwen/qwen3-32b` · `groq/compound` · `groq/compound-mini` |
 | **Ollama** (local) | `llama3.1` | `llama3.2` · `llama3.3` · `gemma3` · `gemma3:4b` · `qwen3` · `qwen3:4b` · `qwen2.5` · `phi4` · `deepseek-r1` · `mistral` · any locally pulled model |
 

@@ -29,12 +29,13 @@ const PROVIDER_MODELS = {
     ],
   },
   openai: {
-    default: 'gpt-4o-mini',
+    default: 'gpt-6-luna',
+    // GPT-6 models reason by default (`medium`); pin lighter effort for a
+    // snappy sidebar. Astra's minimum is `low`.
     options: [
-      { id: 'gpt-4o-mini',  label: 'GPT-4o mini' },
-      { id: 'gpt-4o',       label: 'GPT-4o' },
-      { id: 'gpt-5.4-mini', label: 'GPT-5.4 mini' },
-      { id: 'gpt-5.5',      label: 'GPT-5.5' },
+      { id: 'gpt-6-luna',  label: 'GPT-6 Luna',  effort: 'none' },
+      { id: 'gpt-6-sol',   label: 'GPT-6 Sol',   effort: 'low' },
+      { id: 'gpt-6-astra', label: 'GPT-6 Astra', effort: 'low' },
     ],
   },
   gemini: {
@@ -47,12 +48,12 @@ const PROVIDER_MODELS = {
     ],
   },
   grok: {
-    default: 'grok-3-mini',
+    default: 'grok-4.3',
     options: [
-      { id: 'grok-3-mini', label: 'Grok 3 mini' },
-      { id: 'grok-4.3',    label: 'Grok 4.3' },
-      { id: 'grok-4',      label: 'Grok 4' },
-      { id: 'grok-3',      label: 'Grok 3' },
+      { id: 'grok-4.3',                     label: 'Grok 4.3' },
+      { id: 'grok-4.20-0309-non-reasoning', label: 'Grok 4.20 (no reasoning, fastest)' },
+      // Grok 4.7 always reasons and defaults to `high` — too slow for a sidebar.
+      { id: 'grok-4.7',                     label: 'Grok 4.7', effort: 'low' },
     ],
   },
   groq: {
@@ -94,6 +95,12 @@ const PROVIDER_MODELS = {
  * working as a custom id.
  */
 const RETIRED_MODELS = {
+  // xAI retired these on 2026-05-15 and now serves them with Grok 4.3.
+  grok: {
+    'grok-3-mini': 'grok-4.3',
+    'grok-3':      'grok-4.3',
+    'grok-4':      'grok-4.3',
+  },
 };
 
 /** Resolve the model id to call for a provider, honoring a stored choice. */

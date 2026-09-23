@@ -49,7 +49,7 @@ don't have to paste anything. You pick the model. You stay on the page.
 <br/>
 
 - **One keystroke.** `Alt + A` on any page. The sidebar slides in, already aware of what you're looking at.
-- **Six AI providers.** Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama — switch in a click, no separate logins.
+- **Six AI providers.** Claude, Gemini, OpenAI, Grok, Groq, and local Ollama — switch in a click, no separate logins.
 - **Reads the page for you.** Summarize, extract key points, translate, find on page, or run a custom prompt. No copy-paste.
 - **Streaming answers.** Tokens arrive as the model thinks — cancel any time.
 - **Your theme. Your language.** Light, dark, or auto. The interface is English or Hebrew (full RTL); ask the model to reply in any of eight languages.
@@ -70,8 +70,8 @@ don't have to paste anything. You pick the model. You stay on the page.
 |---|---|---|---|
 | **Claude** (Anthropic) | API key | `claude-sonnet-5` | Opus 5.5, Fable 5.1, Haiku 4.5 |
 | **Gemini** (Google) | API key | `gemini-2.5-flash` | 3.5 Flash, 2.5 Pro, 2.5 Flash-Lite |
-| **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-5.4 mini, GPT-5.5 |
-| **Grok** (xAI) | API key | `grok-3-mini` | Grok 4.3, Grok 4, Grok 3 |
+| **OpenAI** | API key | `gpt-6-luna` | GPT-6 Sol, GPT-6 Astra |
+| **Grok** (xAI) | API key | `grok-4.3` | Grok 4.20 (no reasoning), Grok 4.7 |
 | **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, Llama 4 Scout, GPT-OSS 120B/20B, Qwen 3 32B, Compound / Compound Mini |
 | **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2/3.3, Gemma 3, Qwen 3 / 2.5, Phi-4, DeepSeek R1, Mistral |
 
@@ -135,7 +135,7 @@ time. Hit again on a different page and you're in a fresh conversation;
 the history panel keeps the old one safe.
 
 **Need a different provider?** The header dropdown switches between Claude,
-Gemini, GPT-4o, Grok, Groq, and Ollama with one click. Each remembers its
+Gemini, OpenAI, Grok, Groq, and Ollama with one click. Each remembers its
 own model selection.
 
 ---
