@@ -69,11 +69,16 @@ don't have to paste anything. You pick the model. You stay on the page.
 | Provider | What you need | Default model | Also selectable |
 |---|---|---|---|
 | **Claude** (Anthropic) | API key | `claude-sonnet-5` | Opus 5.5, Fable 5.1, Haiku 4.5 |
-| **Gemini** (Google) | API key | `gemini-2.5-flash` | 3.5 Flash, 2.5 Pro, 2.5 Flash-Lite |
+| **Gemini** (Google) | API key | `gemini-3.5-flash-lite` | 3.8 Flash, 3.1 Pro (preview) |
 | **OpenAI** | API key | `gpt-6-luna` | GPT-6 Sol, GPT-6 Astra |
 | **Grok** (xAI) | API key | `grok-4.3` | Grok 4.20 (no reasoning), Grok 4.7 |
-| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, Llama 4 Scout, GPT-OSS 120B/20B, Qwen 3 32B, Compound / Compound Mini |
-| **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2/3.3, Gemma 3, Qwen 3 / 2.5, Phi-4, DeepSeek R1, Mistral |
+| **Groq** | API key | `openai/gpt-oss-120b` | GPT-OSS 20B |
+| **Ollama** | Nothing — runs on your machine | `qwen3.5` | Qwen 3.5 4B, Gemma 4, GPT-OSS 20B, Llama 3.2 / 3.1 |
+
+**Ollama setup:** pull a model first (`ollama pull qwen3.5`, or `qwen3.5:4b` on
+smaller laptops). Ollama also rejects browser-extension requests unless you allow
+them: start it with `OLLAMA_ORIGINS=chrome-extension://*`. If the default model
+isn't downloaded, Aside uses one you already have.
 
 Add a key once in **Settings → Provider**, then pick a model from the **Model**
 dropdown — or choose **Custom…** to type any model id the provider supports
@@ -101,10 +106,10 @@ providers any time from the sidebar header; each remembers its own model.
 
 ### Step 2 · Get a free Groq API key (recommended)
 
-> Groq runs Llama 3.3 70B at conversational speed and has a generous free tier — perfect for daily use. About **60 seconds**.
+> Groq runs OpenAI's open-weight GPT-OSS 120B at conversational speed and has a free tier — perfect for daily use. About **60 seconds**.
 
 1. **Open the Groq console.** [console.groq.com/keys](https://console.groq.com/keys) — a clean sign-in page; Google, GitHub, or email all work.
-2. **Sign in.** No credit card required. The free tier covers tens of thousands of requests per day.
+2. **Sign in.** No credit card required. The free tier covers about a thousand requests a day.
 3. **Create an API key.** Click *Create API Key*, name it something like `Aside`, and confirm.
 4. **Copy the key.** Groq shows it once. Copy it now — you can always create another later.
 5. **Paste it into Aside.** Open Aside → *Settings* → *Groq*, paste the key, save. The sidebar validates it live before storing.

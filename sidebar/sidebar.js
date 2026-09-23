@@ -22,10 +22,10 @@ let _renderPending = false;
 // providerModelLabel() which reads the user's pick + the model catalog.
 const PROVIDERS = [
   { id: 'claude', name: 'Claude', model: 'Sonnet 5',     hue: 'var(--p-claude)' },
-  { id: 'gemini', name: 'Gemini', model: '2.5 Flash',    hue: 'var(--p-gemini)' },
+  { id: 'gemini', name: 'Gemini', model: '3.5 Flash-Lite', hue: 'var(--p-gemini)' },
   { id: 'openai', name: 'OpenAI', model: 'GPT-6 Luna',   hue: 'var(--p-gpt)'    },
   { id: 'grok',   name: 'Grok',   model: 'Grok 4.3',     hue: 'var(--p-grok)'   },
-  { id: 'groq',   name: 'Groq',   model: 'Llama 3.3',    hue: 'var(--p-groq)'   },
+  { id: 'groq',   name: 'Groq',   model: 'GPT-OSS 120B', hue: 'var(--p-groq)'   },
   { id: 'ollama', name: 'Ollama', model: 'Local',         hue: 'var(--p-ollama)' },
 ];
 
@@ -227,7 +227,7 @@ let onbStep = 1;
 const ONB_PROVIDERS = [
   { id: 'gemini', name: 'Gemini',  desc: 'Fast & free tier',         tier: 'free', placeholder: 'AIza…',
     keyUrl: 'https://aistudio.google.com/app/apikey' },
-  { id: 'groq',   name: 'Groq',    desc: 'Llama 3.3 · free & fast',  tier: 'free', placeholder: 'gsk_…',
+  { id: 'groq',   name: 'Groq',    desc: 'GPT-OSS · free & fast',   tier: 'free', placeholder: 'gsk_…',
     keyUrl: 'https://console.groq.com/keys' },
   { id: 'claude', name: 'Claude',  desc: 'Thoughtful, top quality',  tier: 'paid', placeholder: 'sk-ant-…',
     keyUrl: 'https://console.anthropic.com/settings/keys' },

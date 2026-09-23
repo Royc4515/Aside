@@ -7,10 +7,10 @@
 const PROVIDERS = [
   { id: 'claude',  name: 'Claude',  model: 'Claude Sonnet 5',   letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
   { id: 'openai',  name: 'OpenAI',  model: 'GPT-6 Luna',        letter: 'O', tier: 'paid', hue: 'var(--p-gpt)',    placeholder: 'sk-…' },
-  { id: 'gemini',  name: 'Gemini',  model: 'Gemini 2.5 Flash',  letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
+  { id: 'gemini',  name: 'Gemini',  model: 'Gemini 3.5 Flash-Lite', letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
   { id: 'grok',    name: 'Grok',    model: 'Grok 4.3',          letter: 'X', tier: 'paid', hue: 'var(--p-grok)',   placeholder: 'xai-…' },
-  { id: 'groq',    name: 'Groq',    model: 'Llama 3.3 70B',     letter: 'G', tier: 'free', hue: 'var(--p-groq)',   placeholder: 'gsk_…' },
-  { id: 'ollama',  name: 'Ollama',  model: 'Llama 3.1',         letter: 'O', tier: 'free', hue: 'var(--p-ollama)', placeholder: '' },
+  { id: 'groq',    name: 'Groq',    model: 'GPT-OSS 120B',      letter: 'G', tier: 'free', hue: 'var(--p-groq)',   placeholder: 'gsk_…' },
+  { id: 'ollama',  name: 'Ollama',  model: 'Qwen 3.5 9B',        letter: 'O', tier: 'free', hue: 'var(--p-ollama)', placeholder: '' },
 ];
 
 const NAV = [

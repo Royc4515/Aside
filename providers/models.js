@@ -7,21 +7,28 @@
  *   list — provider APIs ship new model ids constantly, and the custom field
  *   is the escape hatch. `resolveModel` trusts whatever id is stored.
  *
- * Model ids verified against each provider's official docs (May 2026):
+ * - An option may carry request hints; today only `effort` (how hard a
+ *   reasoning model thinks). Each provider maps it to its own wire field:
+ *   Claude output_config.effort, OpenAI/xAI/Groq reasoning_effort, Gemini
+ *   thinkingLevel, Ollama think. Custom ids get no hints (provider defaults).
+ *
+ * Model ids verified against each provider's official docs (September 2026):
  *   Anthropic  platform.claude.com/docs/en/about-claude/models/overview
- *   OpenAI     developers.openai.com/api/docs/models
- *   Gemini     ai.google.dev/gemini-api/docs/models
- *   xAI        docs.x.ai/developers/models
- *   Groq       console.groq.com/docs/models
+ *   OpenAI     developers.openai.com/api/docs/models (+ /deprecations)
+ *   Gemini     ai.google.dev/gemini-api/docs/models (+ /deprecations)
+ *   xAI        docs.x.ai/developers/models (+ /migration/may-15-retirement)
+ *   Groq       console.groq.com/docs/models (+ /deprecations)
+ *   Ollama     ollama.com/library
  * If a provider renames or retires a model, update the default/options here
  * (one place) — every provider, the factory, and both UIs read this catalog.
+ * Refreshed monthly: see docs/MONTHLY_UPDATE.md.
  */
 const PROVIDER_MODELS = {
   claude: {
     default: 'claude-sonnet-5',
     options: [
       // Sonnet 5 thinks adaptively by default; `low` effort keeps sidebar
-      // answers fast and cheap (roughly Sonnet 4.6 quality at its default).
+      // answers fast and cheap.
       { id: 'claude-sonnet-5',  label: 'Claude Sonnet 5', effort: 'low' },
       { id: 'claude-opus-5-5',  label: 'Claude Opus 5.5' },
       { id: 'claude-fable-5-1', label: 'Claude Fable 5.1' },
@@ -39,12 +46,13 @@ const PROVIDER_MODELS = {
     ],
   },
   gemini: {
-    default: 'gemini-2.5-flash',
+    // Since 2026-09-18 the 2.5 models only serve accounts that already used
+    // them; Google points new projects at 3.5 Flash-Lite / 3.8 Flash.
+    default: 'gemini-3.5-flash-lite',
     options: [
-      { id: 'gemini-2.5-flash',      label: 'Gemini 2.5 Flash' },
-      { id: 'gemini-3.5-flash',      label: 'Gemini 3.5 Flash' },
-      { id: 'gemini-2.5-pro',        label: 'Gemini 2.5 Pro' },
-      { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash-Lite' },
+      { id: 'gemini-3.5-flash-lite',  label: 'Gemini 3.5 Flash-Lite' },
+      { id: 'gemini-3.8-flash',       label: 'Gemini 3.8 Flash', effort: 'low' },
+      { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro (preview, paid key)' },
     ],
   },
   grok: {
@@ -57,32 +65,25 @@ const PROVIDER_MODELS = {
     ],
   },
   groq: {
-    default: 'llama-3.3-70b-versatile',
+    // Groq shut down its Llama / Qwen 3 / Compound models on the free and
+    // developer tiers (Jul–Sep 2026); GPT-OSS is what remains in production.
+    default: 'openai/gpt-oss-120b',
     options: [
-      { id: 'llama-3.3-70b-versatile',                   label: 'Llama 3.3 70B' },
-      { id: 'llama-3.1-8b-instant',                      label: 'Llama 3.1 8B (fastest)' },
-      { id: 'meta-llama/llama-4-scout-17b-16e-instruct', label: 'Llama 4 Scout 17B' },
-      { id: 'openai/gpt-oss-120b',                       label: 'GPT-OSS 120B' },
-      { id: 'openai/gpt-oss-20b',                        label: 'GPT-OSS 20B' },
-      { id: 'qwen/qwen3-32b',                            label: 'Qwen 3 32B' },
-      { id: 'groq/compound',                             label: 'Compound' },
-      { id: 'groq/compound-mini',                        label: 'Compound Mini' },
+      { id: 'openai/gpt-oss-120b', label: 'GPT-OSS 120B', effort: 'low' },
+      { id: 'openai/gpt-oss-20b',  label: 'GPT-OSS 20B (fastest)', effort: 'low' },
     ],
   },
   ollama: {
-    default: 'llama3.1',
+    // Local models must be pulled first (`ollama pull <id>`). If the default
+    // isn't installed, OllamaProvider falls back to one that is.
+    default: 'qwen3.5',
     options: [
-      { id: 'llama3.1',    label: 'Llama 3.1' },
-      { id: 'llama3.2',    label: 'Llama 3.2' },
-      { id: 'llama3.3',    label: 'Llama 3.3' },
-      { id: 'gemma3',      label: 'Gemma 3' },
-      { id: 'gemma3:4b',   label: 'Gemma 3 4B' },
-      { id: 'qwen3',       label: 'Qwen 3' },
-      { id: 'qwen3:4b',    label: 'Qwen 3 4B' },
-      { id: 'qwen2.5',     label: 'Qwen 2.5' },
-      { id: 'phi4',        label: 'Phi-4' },
-      { id: 'deepseek-r1', label: 'DeepSeek R1' },
-      { id: 'mistral',     label: 'Mistral' },
+      { id: 'qwen3.5',     label: 'Qwen 3.5 9B',           effort: 'none' },
+      { id: 'qwen3.5:4b',  label: 'Qwen 3.5 4B (laptops)', effort: 'none' },
+      { id: 'gemma4',      label: 'Gemma 4',               effort: 'none' },
+      { id: 'gpt-oss:20b', label: 'GPT-OSS 20B (16 GB+ RAM)', effort: 'low' },
+      { id: 'llama3.2',    label: 'Llama 3.2 3B (smallest)' },
+      { id: 'llama3.1',    label: 'Llama 3.1 8B' },
     ],
   },
 };
@@ -95,11 +96,26 @@ const PROVIDER_MODELS = {
  * working as a custom id.
  */
 const RETIRED_MODELS = {
+  // Google shut these down on 2026-06-01.
+  gemini: {
+    'gemini-2.0-flash':      'gemini-3.5-flash-lite',
+    'gemini-2.0-flash-lite': 'gemini-3.5-flash-lite',
+  },
   // xAI retired these on 2026-05-15 and now serves them with Grok 4.3.
   grok: {
     'grok-3-mini': 'grok-4.3',
     'grok-3':      'grok-4.3',
     'grok-4':      'grok-4.3',
+  },
+  // Shut down for Groq's free and developer tiers; mapped to Groq's own
+  // recommended replacements.
+  groq: {
+    'llama-3.3-70b-versatile':                   'openai/gpt-oss-120b', // 2026-08-16
+    'llama-3.1-8b-instant':                      'openai/gpt-oss-20b',  // 2026-08-16
+    'meta-llama/llama-4-scout-17b-16e-instruct': 'openai/gpt-oss-120b', // 2026-07-17
+    'qwen/qwen3-32b':                            'openai/gpt-oss-120b', // 2026-07-17
+    'groq/compound':                             'openai/gpt-oss-120b', // 2026-09-21
+    'groq/compound-mini':                        'openai/gpt-oss-20b',  // 2026-09-21
   },
 };
 
