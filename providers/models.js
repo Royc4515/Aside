@@ -18,11 +18,14 @@
  */
 const PROVIDER_MODELS = {
   claude: {
-    default: 'claude-sonnet-4-6',
+    default: 'claude-sonnet-5',
     options: [
-      { id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6' },
-      { id: 'claude-opus-4-8',   label: 'Claude Opus 4.8' },
-      { id: 'claude-haiku-4-5',  label: 'Claude Haiku 4.5' },
+      // Sonnet 5 thinks adaptively by default; `low` effort keeps sidebar
+      // answers fast and cheap (roughly Sonnet 4.6 quality at its default).
+      { id: 'claude-sonnet-5',  label: 'Claude Sonnet 5', effort: 'low' },
+      { id: 'claude-opus-5-5',  label: 'Claude Opus 5.5' },
+      { id: 'claude-fable-5-1', label: 'Claude Fable 5.1' },
+      { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5' },
     ],
   },
   openai: {
@@ -83,12 +86,30 @@ const PROVIDER_MODELS = {
   },
 };
 
+/**
+ * Model ids a provider has shut down (or is about to), mapped to the catalog
+ * model that replaces them. A user whose stored pick is listed here is moved
+ * to the successor instead of hitting a "model not found" error. Only add ids
+ * that are actually retired; a model that merely left the curated list keeps
+ * working as a custom id.
+ */
+const RETIRED_MODELS = {
+};
+
 /** Resolve the model id to call for a provider, honoring a stored choice. */
 function resolveModel(providerId, selectedModels = {}) {
   const entry = PROVIDER_MODELS[providerId];
   const fallback = entry ? entry.default : undefined;
   const chosen = selectedModels && selectedModels[providerId];
-  return (chosen && String(chosen).trim()) || fallback;
+  const id = (chosen && String(chosen).trim()) || fallback;
+  const retired = RETIRED_MODELS[providerId];
+  return (retired && retired[id]) || id;
+}
+
+/** The catalog entry for a model id (with any per-model request hints), or null. */
+function modelOption(providerId, modelId) {
+  const entry = PROVIDER_MODELS[providerId];
+  return (entry && entry.options.find(o => o.id === modelId)) || null;
 }
 
 /** Short, human label for a model id (falls back to the raw id). */
@@ -145,8 +166,10 @@ function forgetCustomModel(providerId, modelId, customModels = {}) {
 }
 
 self.PROVIDER_MODELS = PROVIDER_MODELS;
+self.RETIRED_MODELS = RETIRED_MODELS;
 self.resolveModel = resolveModel;
 self.modelLabel = modelLabel;
+self.modelOption = modelOption;
 self.isCatalogModel = isCatalogModel;
 self.customModelIds = customModelIds;
 self.rememberCustomModel = rememberCustomModel;

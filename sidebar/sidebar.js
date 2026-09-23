@@ -21,7 +21,7 @@ let _renderPending = false;
 // `model` here is only a static fallback label; the live label comes from
 // providerModelLabel() which reads the user's pick + the model catalog.
 const PROVIDERS = [
-  { id: 'claude', name: 'Claude', model: 'Sonnet 4.6',   hue: 'var(--p-claude)' },
+  { id: 'claude', name: 'Claude', model: 'Sonnet 5',     hue: 'var(--p-claude)' },
   { id: 'gemini', name: 'Gemini', model: '2.5 Flash',    hue: 'var(--p-gemini)' },
   { id: 'openai', name: 'GPT-4o', model: '4o mini',      hue: 'var(--p-gpt)'    },
   { id: 'grok',   name: 'Grok',   model: 'Grok 3 mini',  hue: 'var(--p-grok)'   },

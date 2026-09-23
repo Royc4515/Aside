@@ -106,7 +106,7 @@ id — custom ids are remembered for reuse. The table below mirrors the catalog.
 
 | Provider | Built-in default | Additional catalog models |
 |---|---|---|
-| **Claude** (Anthropic) | `claude-sonnet-4-6` | `claude-opus-4-8` · `claude-haiku-4-5` |
+| **Claude** (Anthropic) | `claude-sonnet-5` | `claude-opus-5-5` · `claude-fable-5-1` · `claude-haiku-4-5` |
 | **OpenAI** | `gpt-4o-mini` | `gpt-4o` · `gpt-5.4-mini` · `gpt-5.5` |
 | **Gemini** (Google) | `gemini-2.5-flash` | `gemini-3.5-flash` · `gemini-2.5-pro` · `gemini-2.5-flash-lite` |
 | **Grok** (xAI) † | `grok-3-mini` | `grok-4.3` · `grok-4` · `grok-3` |

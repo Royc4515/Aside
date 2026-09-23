@@ -68,7 +68,7 @@ don't have to paste anything. You pick the model. You stay on the page.
 
 | Provider | What you need | Default model | Also selectable |
 |---|---|---|---|
-| **Claude** (Anthropic) | API key | `claude-sonnet-4-6` | Opus 4.8, Haiku 4.5 |
+| **Claude** (Anthropic) | API key | `claude-sonnet-5` | Opus 5.5, Fable 5.1, Haiku 4.5 |
 | **Gemini** (Google) | API key | `gemini-2.5-flash` | 3.5 Flash, 2.5 Pro, 2.5 Flash-Lite |
 | **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-5.4 mini, GPT-5.5 |
 | **Grok** (xAI) | API key | `grok-3-mini` | Grok 4.3, Grok 4, Grok 3 |
@@ -112,6 +112,8 @@ providers any time from the sidebar header; each remembers its own model.
 Prefer a different provider? Same flow with Anthropic Claude, OpenAI, Google Gemini, xAI Grok, or self-hosted Ollama. See [Providers](#providers) for what each one needs.
 
 **Maintainers — cutting a release:** Run `pwsh ./scripts/build-zip.ps1` (or `bash ./scripts/build-zip.sh`) to produce `dist/aside-<version>.zip` (runtime files only), then attach it to a GitHub release as `aside.zip` so the [latest-download link](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) always serves the newest build.
+
+**Maintainers — keeping models current:** The model list is refreshed on the 1st of every month following [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md). Run `node scripts/check-models.mjs` after any model change. It fails if the catalog, provider code, and docs disagree.
 
 ---
 
