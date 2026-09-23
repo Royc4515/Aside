@@ -2,7 +2,7 @@
  * Popup — provider status + open sidebar.
  */
 async function init() {
-  const stored = await Store.get(['activeProvider', 'apiKeys', 'theme']);
+  const stored = await Store.get(['activeProvider', 'apiKeys', 'selectedModels', 'theme']);
   // Apply theme (auto / light / dark) to <html>
   const theme = stored.theme || 'auto';
   if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme);
@@ -15,20 +15,22 @@ async function init() {
   const sub  = document.getElementById('provider-model-text');
 
   const META = {
-    claude:  { label: 'Claude',  model: 'sonnet-4-5',  hue: '#c8643c' },
-    gemini:  { label: 'Gemini',  model: '2.0-flash',   hue: '#4577b3' },
-    openai:  { label: 'GPT-4o',  model: 'mini',        hue: '#10a37f' },
-    grok:    { label: 'Grok',    model: '3-mini',      hue: '#1f1d18' },
-    groq:    { label: 'Groq',    model: 'llama-3.3',   hue: '#f55036' },
-    ollama:  { label: 'Ollama',  model: 'local',       hue: '#7e57c2' },
+    claude:  { label: 'Claude',  hue: '#c8643c' },
+    gemini:  { label: 'Gemini',  hue: '#4577b3' },
+    openai:  { label: 'OpenAI',  hue: '#10a37f' },
+    grok:    { label: 'Grok',    hue: '#1f1d18' },
+    groq:    { label: 'Groq',    hue: '#f55036' },
+    ollama:  { label: 'Ollama',  hue: '#7e57c2' },
   };
+  // Live model label from the catalog + the user's pick (never hardcoded here).
+  const modelText = modelLabel(provider, resolveModel(provider, stored.selectedModels || {}));
 
   if (provider && hasKey && META[provider]) {
     if (window.providerChip) mark.outerHTML = window.providerChip(provider, 22, META[provider].hue).replace(/^\s+/, '');
     dot.classList.add('ok');
     dot.title = 'Active';
     name.textContent = META[provider].label;
-    sub.textContent  = META[provider].model;
+    sub.textContent  = modelText;
   } else if (provider) {
     if (window.providerChip && META[provider]) mark.outerHTML = window.providerChip(provider, 22, META[provider].hue).replace(/^\s+/, '');
     dot.classList.add('warn');

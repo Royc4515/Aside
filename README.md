@@ -49,7 +49,7 @@ don't have to paste anything. You pick the model. You stay on the page.
 <br/>
 
 - **One keystroke.** `Alt + A` on any page. The sidebar slides in, already aware of what you're looking at.
-- **Six AI providers.** Claude, Gemini, GPT-4o, Grok, Groq, and local Ollama — switch in a click, no separate logins.
+- **Six AI providers.** Claude, Gemini, OpenAI, Grok, Groq, and local Ollama — switch in a click, no separate logins.
 - **Reads the page for you.** Summarize, extract key points, translate, find on page, or run a custom prompt. No copy-paste.
 - **Streaming answers.** Tokens arrive as the model thinks — cancel any time.
 - **Your theme. Your language.** Light, dark, or auto. The interface is English or Hebrew (full RTL); ask the model to reply in any of eight languages.
@@ -68,12 +68,17 @@ don't have to paste anything. You pick the model. You stay on the page.
 
 | Provider | What you need | Default model | Also selectable |
 |---|---|---|---|
-| **Claude** (Anthropic) | API key | `claude-sonnet-4-6` | Opus 4.8, Haiku 4.5 |
-| **Gemini** (Google) | API key | `gemini-2.5-flash` | 3.5 Flash, 2.5 Pro, 2.5 Flash-Lite |
-| **OpenAI** | API key | `gpt-4o-mini` | GPT-4o, GPT-5.4 mini, GPT-5.5 |
-| **Grok** (xAI) | API key | `grok-3-mini` | Grok 4.3, Grok 4, Grok 3 |
-| **Groq** | API key | `llama-3.3-70b-versatile` | Llama 3.1 8B, Llama 4 Scout, GPT-OSS 120B/20B, Qwen 3 32B, Compound / Compound Mini |
-| **Ollama** | Nothing — runs on your machine | `llama3.1` | Llama 3.2/3.3, Gemma 3, Qwen 3 / 2.5, Phi-4, DeepSeek R1, Mistral |
+| **Claude** (Anthropic) | API key | `claude-sonnet-5` | Opus 5.5, Fable 5.1, Haiku 4.5 |
+| **Gemini** (Google) | API key | `gemini-3.5-flash-lite` | 3.8 Flash, 3.1 Pro (preview) |
+| **OpenAI** | API key | `gpt-6-luna` | GPT-6 Sol, GPT-6 Astra |
+| **Grok** (xAI) | API key | `grok-4.3` | Grok 4.20 (no reasoning), Grok 4.7 |
+| **Groq** | API key | `openai/gpt-oss-120b` | GPT-OSS 20B |
+| **Ollama** | Nothing — runs on your machine | `qwen3.5` | Qwen 3.5 4B, Gemma 4, GPT-OSS 20B, Llama 3.2 / 3.1 |
+
+**Ollama setup:** pull a model first (`ollama pull qwen3.5`, or `qwen3.5:4b` on
+smaller laptops). Ollama also rejects browser-extension requests unless you allow
+them: start it with `OLLAMA_ORIGINS=chrome-extension://*`. If the default model
+isn't downloaded, Aside uses one you already have.
 
 Add a key once in **Settings → Provider**, then pick a model from the **Model**
 dropdown — or choose **Custom…** to type any model id the provider supports
@@ -101,10 +106,10 @@ providers any time from the sidebar header; each remembers its own model.
 
 ### Step 2 · Get a free Groq API key (recommended)
 
-> Groq runs Llama 3.3 70B at conversational speed and has a generous free tier — perfect for daily use. About **60 seconds**.
+> Groq runs OpenAI's open-weight GPT-OSS 120B at conversational speed and has a free tier — perfect for daily use. About **60 seconds**.
 
 1. **Open the Groq console.** [console.groq.com/keys](https://console.groq.com/keys) — a clean sign-in page; Google, GitHub, or email all work.
-2. **Sign in.** No credit card required. The free tier covers tens of thousands of requests per day.
+2. **Sign in.** No credit card required. The free tier covers about a thousand requests a day.
 3. **Create an API key.** Click *Create API Key*, name it something like `Aside`, and confirm.
 4. **Copy the key.** Groq shows it once. Copy it now — you can always create another later.
 5. **Paste it into Aside.** Open Aside → *Settings* → *Groq*, paste the key, save. The sidebar validates it live before storing.
@@ -112,6 +117,8 @@ providers any time from the sidebar header; each remembers its own model.
 Prefer a different provider? Same flow with Anthropic Claude, OpenAI, Google Gemini, xAI Grok, or self-hosted Ollama. See [Providers](#providers) for what each one needs.
 
 **Maintainers — cutting a release:** Run `pwsh ./scripts/build-zip.ps1` (or `bash ./scripts/build-zip.sh`) to produce `dist/aside-<version>.zip` (runtime files only), then attach it to a GitHub release as `aside.zip` so the [latest-download link](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) always serves the newest build.
+
+**Maintainers — keeping models current:** The model list is refreshed on the 1st of every month following [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md). Run `node scripts/check-models.mjs` after any model change. It fails if the catalog, provider code, and docs disagree.
 
 ---
 
@@ -133,7 +140,7 @@ time. Hit again on a different page and you're in a fresh conversation;
 the history panel keeps the old one safe.
 
 **Need a different provider?** The header dropdown switches between Claude,
-Gemini, GPT-4o, Grok, Groq, and Ollama with one click. Each remembers its
+Gemini, OpenAI, Grok, Groq, and Ollama with one click. Each remembers its
 own model selection.
 
 ---

@@ -1,0 +1,70 @@
+name: Model catalog
+
+# Keeps the model catalog honest:
+#  - on every change that touches models or docs → static consistency check
+#  - on the 1st of each month (and on demand)     → also asks each provider
+#    whether every catalog model is still served. A red scheduled run means a
+#    model was retired: run the monthly tech update (docs/MONTHLY_UPDATE.md).
+#
+# The live check uses whichever of these repo secrets exist and skips the
+# rest: ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY, XAI_API_KEY,
+# GROQ_API_KEY. It only reads model metadata — no completions, no cost.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "providers/**"
+      - "README.md"
+      - "docs/**"
+      - "site/**"
+      - "sidebar/**"
+      - "options/**"
+      - "popup/**"
+      - "scripts/check-models*.mjs"
+      - ".github/workflows/model-catalog.yml"
+  pull_request:
+    paths:
+      - "providers/**"
+      - "README.md"
+      - "docs/**"
+      - "site/**"
+      - "sidebar/**"
+      - "options/**"
+      - "popup/**"
+      - "scripts/check-models*.mjs"
+      - ".github/workflows/model-catalog.yml"
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Catalog ↔ code ↔ docs consistency
+        run: node scripts/check-models.mjs
+
+  live:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Every catalog model still served
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: node scripts/check-models-live.mjs
