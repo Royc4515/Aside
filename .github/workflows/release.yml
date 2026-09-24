@@ -1,0 +1,53 @@
+name: Release
+
+# Builds the runtime-only ZIP and publishes a GitHub release with it attached
+# as `aside.zip`. That keeps releases/latest/download/aside.zip pointing at the
+# newest build. Two ways to start it:
+#  - push a tag like v1.2.3, or
+#  - run it by hand ("Run workflow") on main. That tags the current commit
+#    v<manifest.json version>.
+# Release notes come from the matching `## 1.2.3` section of CHANGELOG.md.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches manifest.json and has changelog notes
+        run: |
+          set -euo pipefail
+          manifest=$(grep -E '"version"\s*:' manifest.json | head -1 | sed -E 's/.*"([0-9.]+)".*/\1/')
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then tag="$GITHUB_REF_NAME"; else tag="v$manifest"; fi
+          ver="${tag#v}"
+          [ "$manifest" = "$ver" ] || { echo "::error::Tag $tag but manifest.json says $manifest"; exit 1; }
+          awk -v v="$ver" 'index($0, "## " v " ") == 1 || $0 == "## " v {f=1; next} f && /^## / {exit} f' CHANGELOG.md > notes.md
+          [ -s notes.md ] || { echo "::error::No '## $ver' section in CHANGELOG.md"; exit 1; }
+          cat >> notes.md <<'NOTES'
+
+          ### Install
+          1. Download `aside.zip` below and unzip it.
+          2. Open `chrome://extensions` and turn on **Developer mode**.
+          3. Click **Load unpacked** and select the unzipped folder.
+          NOTES
+          echo "VERSION=$ver" >> "$GITHUB_ENV"
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+
+      - name: Build aside.zip
+        run: |
+          bash scripts/build-zip.sh
+          cp "dist/aside-$VERSION.zip" aside.zip
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # --target only matters on a manual run, where it creates the tag here.
+        run: gh release create "$TAG" aside.zip --target "$GITHUB_SHA" --title "Aside $VERSION" --notes-file notes.md

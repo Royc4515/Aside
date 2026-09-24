@@ -19,7 +19,7 @@ async function init() {
     gemini:  { label: 'Gemini',  model: '2.0-flash',   hue: '#4577b3' },
     openai:  { label: 'GPT-4o',  model: 'mini',        hue: '#10a37f' },
     grok:    { label: 'Grok',    model: '3-mini',      hue: '#1f1d18' },
-    groq:    { label: 'Groq',    model: 'llama-3.3',   hue: '#f55036' },
+    groq:    { label: 'Groq',    model: 'gpt-oss-120b', hue: '#f55036' },
     ollama:  { label: 'Ollama',  model: 'local',       hue: '#7e57c2' },
   };
 

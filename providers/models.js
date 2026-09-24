@@ -53,16 +53,12 @@ const PROVIDER_MODELS = {
     ],
   },
   groq: {
-    default: 'llama-3.3-70b-versatile',
+    // Groq shut down its Llama / Qwen 3 / Compound models on the free and
+    // developer tiers (Jul–Sep 2026); GPT-OSS is what remains in production.
+    default: 'openai/gpt-oss-120b',
     options: [
-      { id: 'llama-3.3-70b-versatile',                   label: 'Llama 3.3 70B' },
-      { id: 'llama-3.1-8b-instant',                      label: 'Llama 3.1 8B (fastest)' },
-      { id: 'meta-llama/llama-4-scout-17b-16e-instruct', label: 'Llama 4 Scout 17B' },
-      { id: 'openai/gpt-oss-120b',                       label: 'GPT-OSS 120B' },
-      { id: 'openai/gpt-oss-20b',                        label: 'GPT-OSS 20B' },
-      { id: 'qwen/qwen3-32b',                            label: 'Qwen 3 32B' },
-      { id: 'groq/compound',                             label: 'Compound' },
-      { id: 'groq/compound-mini',                        label: 'Compound Mini' },
+      { id: 'openai/gpt-oss-120b', label: 'GPT-OSS 120B', effort: 'low' },
+      { id: 'openai/gpt-oss-20b',  label: 'GPT-OSS 20B (fastest)', effort: 'low' },
     ],
   },
   ollama: {
@@ -83,12 +79,38 @@ const PROVIDER_MODELS = {
   },
 };
 
+/**
+ * Model ids a provider has shut down, mapped to the catalog model that
+ * replaces them. A user whose stored pick is listed here is moved to the
+ * successor instead of hitting a "model not found" error.
+ */
+const RETIRED_MODELS = {
+  // Shut down for Groq's free and developer tiers; mapped to Groq's own
+  // recommended replacements.
+  groq: {
+    'llama-3.3-70b-versatile':                   'openai/gpt-oss-120b', // 2026-08-16
+    'llama-3.1-8b-instant':                      'openai/gpt-oss-20b',  // 2026-08-16
+    'meta-llama/llama-4-scout-17b-16e-instruct': 'openai/gpt-oss-120b', // 2026-07-17
+    'qwen/qwen3-32b':                            'openai/gpt-oss-120b', // 2026-07-17
+    'groq/compound':                             'openai/gpt-oss-120b', // 2026-09-21
+    'groq/compound-mini':                        'openai/gpt-oss-20b',  // 2026-09-21
+  },
+};
+
 /** Resolve the model id to call for a provider, honoring a stored choice. */
 function resolveModel(providerId, selectedModels = {}) {
   const entry = PROVIDER_MODELS[providerId];
   const fallback = entry ? entry.default : undefined;
   const chosen = selectedModels && selectedModels[providerId];
-  return (chosen && String(chosen).trim()) || fallback;
+  const id = (chosen && String(chosen).trim()) || fallback;
+  const retired = RETIRED_MODELS[providerId];
+  return (retired && retired[id]) || id;
+}
+
+/** The catalog entry for a model id (with any per-model request hints), or null. */
+function modelOption(providerId, modelId) {
+  const entry = PROVIDER_MODELS[providerId];
+  return (entry && entry.options.find(o => o.id === modelId)) || null;
 }
 
 /** Short, human label for a model id (falls back to the raw id). */
@@ -145,8 +167,10 @@ function forgetCustomModel(providerId, modelId, customModels = {}) {
 }
 
 self.PROVIDER_MODELS = PROVIDER_MODELS;
+self.RETIRED_MODELS = RETIRED_MODELS;
 self.resolveModel = resolveModel;
 self.modelLabel = modelLabel;
+self.modelOption = modelOption;
 self.isCatalogModel = isCatalogModel;
 self.customModelIds = customModelIds;
 self.rememberCustomModel = rememberCustomModel;
