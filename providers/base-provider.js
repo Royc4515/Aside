@@ -73,18 +73,29 @@ class BaseProvider {
 }
 self.BaseProvider = BaseProvider;
 
-// Shared implementation for OpenAI / Grok / Groq. Subclasses set this.url and this.model.
+// Shared implementation for OpenAI / Grok / Groq. Subclasses set this.url and
+// this.providerId (catalog key), and may change the output-cap field and size.
 class OpenAICompatProvider extends BaseProvider {
+  constructor(apiKey, model) {
+    super(apiKey, model);
+    this.providerId = '';
+    this.tokenField = 'max_tokens';
+    this.maxOutputTokens = 2048;
+  }
   _headers() {
     return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` };
   }
   _body(messages, systemPrompt, extra) {
-    return JSON.stringify({
+    const body = {
       model: this.model,
-      max_tokens: 2048,
+      [this.tokenField]: this.maxOutputTokens,
       messages: this._msgs(messages, systemPrompt),
       ...extra
-    });
+    };
+    // Reasoning models: a catalog entry may pin `effort` (see providers/models.js).
+    const opt = (typeof modelOption === 'function') ? modelOption(this.providerId, this.model) : null;
+    if (opt && opt.effort) body.reasoning_effort = opt.effort;
+    return JSON.stringify(body);
   }
   async complete(messages, systemPrompt) {
     const data = await this._fetchJson(this.url, {

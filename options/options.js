@@ -188,8 +188,10 @@ const CUSTOM_VALUE = '__custom__';
 function catalogFor(id) {
   return (typeof PROVIDER_MODELS !== 'undefined' && PROVIDER_MODELS[id]) || { default: '', options: [] };
 }
-// The id a provider currently resolves to (user override or built-in default).
+// The id a provider currently resolves to (user override, retired ids mapped
+// to their successor, or the built-in default).
 function currentModelId(id) {
+  if (typeof resolveModel === 'function') return resolveModel(id, state.selectedModels);
   const catalog = catalogFor(id);
   return (state.selectedModels[id] && String(state.selectedModels[id]).trim()) || catalog.default;
 }
