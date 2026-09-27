@@ -105,6 +105,7 @@ for this section.
 ## 5 · Ship
 
 1. Add a dated entry at the top of `CHANGELOG.md` (what changed, why, sources).
+   It becomes the release notes, so link with full `https://` URLs.
 2. Bump `version` in `manifest.json`: patch for a catalog-only refresh, minor
    if request behavior changed.
 3. Open a **draft PR** titled `chore: monthly tech update YYYY-MM` with a

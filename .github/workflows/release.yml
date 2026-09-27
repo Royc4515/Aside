@@ -31,6 +31,10 @@ jobs:
           [ "$manifest" = "$ver" ] || { echo "::error::Tag $tag but manifest.json says $manifest"; exit 1; }
           awk -v v="$ver" 'index($0, "## " v " ") == 1 || $0 == "## " v {f=1; next} f && /^## / {exit} f' CHANGELOG.md > notes.md
           [ -s notes.md ] || { echo "::error::No '## $ver' section in CHANGELOG.md"; exit 1; }
+          # Relative links resolve against the release page, not the repo.
+          if grep -Eo '\]\([^)]*\)' notes.md | grep -Evq '\]\((https?://|#)'; then
+            echo "::error::The '## $ver' notes contain a relative link. Use a full https:// URL."; exit 1
+          fi
           if grep -Eiq "^## $ver .*unreleased" CHANGELOG.md; then
             echo "::error::The '## $ver' heading in CHANGELOG.md still says unreleased. Put the release date there first."; exit 1
           fi
