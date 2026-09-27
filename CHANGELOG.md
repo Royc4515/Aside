@@ -1,7 +1,8 @@
 # Changelog
 
-Newest first. Each version's section here becomes its GitHub release notes.
-Model refreshes follow [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md).
+Newest first. Each version's section here becomes its GitHub release notes,
+so link with full URLs: relative links break on the release page.
+Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
 ## 1.1.0 — 2026-09-27 · Monthly tech update (September 2026)
 
@@ -73,7 +74,7 @@ Claude Opus 4.8 or GPT-4o mini), you keep it. It appears as a custom model.
   It skips any provider without an API key, and fails if a key is rejected.
 - The `Model catalog` workflow runs the static check on every change and the
   live check on the 1st of each month.
-- [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md) is the runbook for the
+- [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md) is the runbook for the
   monthly refresh.
 
 Sources: the official models and deprecations pages listed in the header of
