@@ -23,7 +23,10 @@ async function init() {
     ollama:  { label: 'Ollama',  hue: '#7e57c2' },
   };
   // Live model label from the catalog + the user's pick (never hardcoded here).
-  const modelText = modelLabel(provider, resolveModel(provider, stored.selectedModels || {}));
+  // If the catalog didn't load, show the raw pick rather than break the popup.
+  const modelText = (typeof modelLabel === 'function' && typeof resolveModel === 'function')
+    ? modelLabel(provider, resolveModel(provider, stored.selectedModels || {}))
+    : (stored.selectedModels?.[provider] || '');
 
   if (provider && hasKey && META[provider]) {
     if (window.providerChip) mark.outerHTML = window.providerChip(provider, 22, META[provider].hue).replace(/^\s+/, '');

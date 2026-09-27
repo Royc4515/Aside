@@ -1,14 +1,18 @@
 class OllamaProvider extends BaseProvider {
-  constructor(model, baseUrl = 'http://localhost:11434') {
+  // `pinned` is true when the user picked this model themselves (Settings or
+  // the sidebar picker), as opposed to running on the catalog default.
+  constructor(model, { baseUrl = 'http://localhost:11434', pinned = false } = {}) {
     super('', model || 'qwen3.5');
+    this.providerId = 'ollama';
     this.baseUrl = baseUrl;
+    this.pinned = pinned;
   }
 
   _body(messages, systemPrompt, stream) {
     const body = { model: this.model, stream, messages: this._msgs(messages, systemPrompt) };
     // Thinking models (Qwen 3.5, Gemma 4, GPT-OSS) otherwise think silently
     // before answering. The catalog pins how much (see providers/models.js).
-    const opt = (typeof modelOption === 'function') ? modelOption('ollama', this.model) : null;
+    const opt = this._modelOption();
     if (opt && opt.effort) body.think = opt.effort === 'none' ? false : opt.effort;
     return JSON.stringify(body);
   }
@@ -21,21 +25,18 @@ class OllamaProvider extends BaseProvider {
     });
     let res = await send();
     if (res.status === 404 && await this._useInstalledModel()) res = await send();
-    if (!res.ok) {
-      let msg = `${res.status} ${res.statusText}`;
-      try { const j = await res.json(); msg = (typeof j.error === 'string' ? j.error : j.error?.message) || msg; } catch {}
-      throw new Error(msg);
-    }
+    if (!res.ok) throw await this._errorFrom(res);
     return res;
   }
 
-  // 404 = the model isn't downloaded. The built-in default moves as better
-  // local models ship, so for the default fall back to a model the user has
-  // already pulled; for an explicit pick, say exactly how to fix it.
+  // 404 = the model isn't downloaded. A model the user picked stays theirs:
+  // say exactly how to get it. Only when they never picked one (so they're on
+  // the built-in default, which moves as better local models ship) switch to
+  // a model they already have.
   async _useInstalledModel() {
     const missing = this.model;
     const catalog = (typeof PROVIDER_MODELS !== 'undefined') ? PROVIDER_MODELS.ollama : null;
-    if (!catalog || missing !== catalog.default) {
+    if (this.pinned || !catalog || missing !== catalog.default) {
       throw new Error(`Ollama model "${missing}" isn't downloaded. Run "ollama pull ${missing}", or pick an installed model in Settings.`);
     }
     let installed = [];
@@ -47,7 +48,21 @@ class OllamaProvider extends BaseProvider {
     const pick = catalog.options.map(o => o.id).find(has) || installed[0];
     if (!pick) throw new Error(`No Ollama models are downloaded yet. Run "ollama pull ${missing}" in a terminal, then try again.`);
     this.model = pick;
+    this.pinned = true;
+    await this._saveAsPick(pick);
     return true;
+  }
+
+  // Save the fallback as the user's Ollama pick, so every label (popup,
+  // sidebar, Settings) names the model that actually answers, and later
+  // sessions call it directly instead of retrying the missing default.
+  async _saveAsPick(model) {
+    try {
+      if (typeof Store === 'undefined') return;
+      const { selectedModels = {} } = await Store.get(['selectedModels']);
+      if (selectedModels.ollama) return;   // the user picked one meanwhile; keep it
+      await Store.set({ selectedModels: { ...selectedModels, ollama: model } });
+    } catch {}
   }
 
   async complete(messages, systemPrompt) {

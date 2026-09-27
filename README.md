@@ -77,8 +77,9 @@ don't have to paste anything. You pick the model. You stay on the page.
 
 **Ollama setup:** pull a model first (`ollama pull qwen3.5`, or `qwen3.5:4b` on
 smaller laptops). Ollama also rejects browser-extension requests unless you allow
-them: start it with `OLLAMA_ORIGINS=chrome-extension://*`. If the default model
-isn't downloaded, Aside uses one you already have.
+them: start it with `OLLAMA_ORIGINS=chrome-extension://*`. If you haven't picked
+a model and the default isn't downloaded, Aside switches to one you already have
+and saves it as your pick.
 
 Add a key once in **Settings → Provider**, then pick a model from the **Model**
 dropdown — or choose **Custom…** to type any model id the provider supports
@@ -116,7 +117,7 @@ providers any time from the sidebar header; each remembers its own model.
 
 Prefer a different provider? Same flow with Anthropic Claude, OpenAI, Google Gemini, xAI Grok, or self-hosted Ollama. See [Providers](#providers) for what each one needs.
 
-**Maintainers — cutting a release:** Bump `version` in `manifest.json` and add a matching `## <version>` section to `CHANGELOG.md`, then run the **Release** workflow on `main` (Actions → Release → Run workflow) or push a `v<version>` tag. It builds `aside.zip` with `scripts/build-zip.sh` (runtime files only) and publishes a GitHub release with that section as the notes, so the [latest-download link](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) always serves the newest build. To build locally instead: `pwsh ./scripts/build-zip.ps1` or `bash ./scripts/build-zip.sh`.
+**Maintainers — cutting a release:** Bump `version` in `manifest.json` and add a matching `## <version> — <date>` section to `CHANGELOG.md` (the workflow refuses a heading that still says "unreleased"), then run the **Release** workflow on `main` (Actions → Release → Run workflow) or push a `v<version>` tag. It builds `aside.zip` with `scripts/build-zip.sh` (runtime files only) and publishes a GitHub release with that section as the notes, so the [latest-download link](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) always serves the newest build. To build locally instead: `pwsh ./scripts/build-zip.ps1` or `bash ./scripts/build-zip.sh`.
 
 **Maintainers — keeping models current:** The model list is refreshed on the 1st of every month following [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md). Run `node scripts/check-models.mjs` after any model change. It fails if the catalog, provider code, and docs disagree.
 

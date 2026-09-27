@@ -21,6 +21,9 @@ on:
       - "sidebar/**"
       - "options/**"
       - "popup/**"
+      - "_locales/**"
+      - "content/**"
+      - "background.js"
       - "scripts/check-models*.mjs"
       - ".github/workflows/model-catalog.yml"
   pull_request:
@@ -32,6 +35,9 @@ on:
       - "sidebar/**"
       - "options/**"
       - "popup/**"
+      - "_locales/**"
+      - "content/**"
+      - "background.js"
       - "scripts/check-models*.mjs"
       - ".github/workflows/model-catalog.yml"
   schedule:

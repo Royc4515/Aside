@@ -42,20 +42,24 @@ Claude Opus 4.8 or GPT-4o mini), you keep it. It appears as a custom model.
   answering, and that reasoning counts against the output cap. The cap is now
   16k tokens for Claude, OpenAI, xAI and Gemini. Groq stays at 4k (since
   1.0.1), because its free plan counts the cap toward its 8K tokens-per-minute
-  limit.
+  limit. Custom model ids get a 4k cap, which every still-served model accepts,
+  so older models you typed in yourself keep working.
 - **Reasoning effort per model.** A catalog entry can set `effort`, which
   keeps the sidebar fast. Each provider sends it in its own field:
   - Claude: `output_config.effort`
   - OpenAI, xAI and Groq: `reasoning_effort`
   - Gemini: `thinkingLevel`
   - Ollama: `think`
-- **No more blank answers.** Claude refusals, Claude stream errors and empty
-  Gemini replies now show an error that explains why. Claude and Gemini
-  responses that include thinking return only the answer text.
-- **Ollama.** If the default model isn't downloaded, Aside uses one you
-  already have. If a model you picked isn't downloaded, the error tells you
-  the exact `ollama pull` command. The README now explains
-  `OLLAMA_ORIGINS=chrome-extension://*`.
+- **No more blank or cut-off answers.** If a model refuses, runs out of
+  output budget before answering, or its stream fails partway, you get an
+  error that says so. Before, you got a blank answer, or a cut-off one saved
+  as if it were complete. Claude and Gemini responses that include thinking
+  return only the answer text.
+- **Ollama.** If you never picked a model and the default isn't downloaded,
+  Aside switches to one you already have and saves it as your pick, so the
+  popup, sidebar and Settings show the model that's answering. If a model you
+  picked isn't downloaded, the error tells you the exact `ollama pull`
+  command. The README now explains `OLLAMA_ORIGINS=chrome-extension://*`.
 - **UI.** The provider is now called "OpenAI" instead of "GPT-4o". The popup
   shows the real current model; it used to show a hardcoded, outdated label.
 
@@ -63,10 +67,10 @@ Claude Opus 4.8 or GPT-4o mini), you keep it. It appears as a custom model.
 
 - `scripts/check-models.mjs` checks, without network access, that the catalog,
   the provider code and the docs agree. It also flags old model ids or names
-  in any user-facing file.
+  in any user-facing file, for all six providers.
 - `scripts/check-models-live.mjs` asks each provider whether every catalog
-  model is still served. It only reads model metadata, so it costs nothing,
-  and it skips any provider without an API key.
+  model is still served. It only reads model metadata, so it costs nothing.
+  It skips any provider without an API key, and fails if a key is rejected.
 - The `Model catalog` workflow runs the static check on every change and the
   live check on the 1st of each month.
 - [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md) is the runbook for the

@@ -60,8 +60,19 @@ provider's entry alone and say so in the PR.
      (`{ provider: { oldId: successorId } }`). Users who picked it get moved
      to the successor instead of an error. A removed id that still works
      does **not** go there. Users keep it as a custom model.
-   - Per-model request hints live on the option. Today there's one: `effort`
-     for Claude.
+   - Per-model request hints live on the option, and every provider reads
+     them:
+     - `effort`: how hard a reasoning model thinks. Each provider sends it in
+       its own field (Claude `output_config.effort`, OpenAI/xAI/Groq
+       `reasoning_effort`, Gemini `thinkingLevel`, Ollama `think`). Set it on
+       every reasoning model you add, usually `low` (or `none` where the
+       model allows it), so the sidebar stays fast. Carry it over when you
+       replace a model.
+     - `maxOutput`: only if the model's output limit is below its provider's
+       cap (16k for Claude, OpenAI, xAI and Gemini; 4k for Groq). A request
+       over the limit is rejected.
+     - Custom ids get no hints and a 4k output cap
+       (`BaseProvider.CUSTOM_OUTPUT_CAP` in `providers/base-provider.js`).
 2. **Request shape** (`providers/*.js`). Check what the new models expect on
    the wire, for example `max_tokens` vs `max_completion_tokens`, thinking
    tokens eating the output budget, or new stop reasons. Fix the provider

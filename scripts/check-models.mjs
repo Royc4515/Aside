@@ -37,6 +37,10 @@ for (const pid of PROVIDERS) {
   if (new Set(ids).size !== ids.length) fail('providers/models.js', `${pid}: duplicate option ids`);
   for (const o of entry.options) {
     if (!o.id || !o.label) fail('providers/models.js', `${pid}: option without id/label`);
+    if (o.effort !== undefined && typeof o.effort !== 'string') fail('providers/models.js', `${pid}: "${o.id}" effort must be a string`);
+    if (o.maxOutput !== undefined && !(Number.isInteger(o.maxOutput) && o.maxOutput > 0)) {
+      fail('providers/models.js', `${pid}: "${o.id}" maxOutput must be a positive integer`);
+    }
   }
   for (const [oldId, newId] of Object.entries(RETIRED[pid] || {})) {
     if (ids.includes(oldId)) fail('providers/models.js', `${pid}: "${oldId}" is marked retired but still offered`);
@@ -84,23 +88,45 @@ const DOC_NAMES = { claude: 'Claude', openai: 'OpenAI', gemini: 'Gemini', grok: 
 // ── 4. No stale model names anywhere user-facing ─────────────────────────────
 // Any model id or human model name mentioned outside the catalog must be one
 // the catalog still offers. Historical files (changelog, runbook) are exempt.
-const allIds = new Set(PROVIDERS.flatMap(pid => CATALOG[pid].options.map(o => o.id)));
-const allLabels = PROVIDERS.flatMap(pid => CATALOG[pid].options.map(o => o.label)).join(' | ');
+// Ids count with and without a vendor prefix: Groq's `openai/gpt-oss-120b` is
+// often written `gpt-oss-120b`.
+const catalogIds = PROVIDERS.flatMap(pid => CATALOG[pid].options.map(o => o.id));
+const allIds = new Set([...catalogIds, ...catalogIds.filter(id => id.includes('/')).map(id => id.split('/').pop())]);
+// Human names, without the picker's hints: "Grok 4.20 (no reasoning, fastest)" → "Grok 4.20".
+const catalogNames = PROVIDERS.flatMap(pid => CATALOG[pid].options.map(o => o.label.replace(/\s*\(.*\)\s*$/, '')));
+const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// A mention is current if it appears in a catalog name as whole words, so a
+// family name passes ("GPT-6" in "GPT-6 Luna") but an older version doesn't
+// ("Grok 4" in "Grok 4.3", "Gemini 3.5 Flash" in "Gemini 3.5 Flash-Lite").
+const isCurrentName = name => {
+  const re = new RegExp(`(^|\\s)${escapeRe(name)}(\\s|$)`);
+  return catalogNames.some(n => re.test(n));
+};
+// Trailing punctuation belongs to the sentence, not the name: "…switch to GPT-6."
+const trimEnd = s => s.replace(/[.,;:!?)-]+$/, '');
 
 const ID_PATTERNS = [
   /\bclaude-(?:fable|mythos|opus|sonnet|haiku|\d)[a-z0-9-]*/g,
   /\bgpt-\d[a-z0-9.-]*/g,
+  /\bgpt-oss[:-]\d+b\b/g,
   /\bgemini-\d[a-z0-9.-]*/g,
   /\bgrok-\d[a-z0-9.-]*/g,
   /\b(?:meta-llama|openai|qwen|moonshotai|groq|deepseek-ai|mistralai|google)\/[a-z0-9.-]+/g,
+  /\bllama-\d[a-z0-9.-]*/g,                               // Groq: llama-3.3-70b-versatile
+  /\b(?:llama|qwen|gemma|phi|mistral|deepseek-r)\d[a-z0-9.:]*/g, // Ollama: llama3.1, qwen3.5:4b
 ];
 // Human names → the catalog must contain a label with the same text.
 const LABEL_PATTERNS = [
   /\b(?:Fable|Mythos|Opus|Sonnet|Haiku) \d+(?:\.\d+)?/g,
   /\bGPT-\d[\w.]*(?: mini| nano)?/g,
+  /\bGPT-OSS \d+B\b/g,
   /\bGemini \d+(?:\.\d+)? (?:Flash-Lite|Flash|Pro)/g,
   /\bGrok \d+(?:\.\d+)?(?: mini| Fast)?/g,
+  /\b(?:Llama|Qwen) \d+(?:\.\d+)?(?: \d+B\b)?/g,
+  /\b(?:Gemma|Phi-)\s?\d+(?:\.\d+)?/g,
 ];
+// Gemini short forms in tables and lists: "3.5 Flash-Lite", "2.5 Pro".
+const GEMINI_SHORT = /(?<!Gemini )(?<![\w.])\d+\.\d+ (?:Flash-Lite|Flash|Pro)\b/g;
 
 const SCAN_DIRS = ['README.md', 'docs', 'site', 'sidebar', 'options', 'popup', '_locales', 'background.js', 'content'];
 const EXEMPT = new Set(['CHANGELOG.md', 'docs/MONTHLY_UPDATE.md']);
@@ -121,16 +147,29 @@ for (const target of SCAN_DIRS) {
     lines.forEach((line, i) => {
       for (const re of ID_PATTERNS) {
         for (const [id] of line.matchAll(re)) {
-          const clean = id.replace(/[.-]+$/, '');
+          const clean = trimEnd(id);
           if (!allIds.has(clean)) fail(`${r}:${i + 1}`, `mentions model id "${clean}", which is not in the catalog`);
         }
       }
       for (const re of LABEL_PATTERNS) {
         for (const [name] of line.matchAll(re)) {
-          if (!allLabels.includes(name)) fail(`${r}:${i + 1}`, `mentions "${name}", which matches no catalog label`);
+          const clean = trimEnd(name);
+          if (!isCurrentName(clean)) fail(`${r}:${i + 1}`, `mentions "${clean}", which matches no catalog model`);
         }
       }
+      for (const [short] of line.matchAll(GEMINI_SHORT)) {
+        if (!isCurrentName(`Gemini ${short}`)) fail(`${r}:${i + 1}`, `mentions Gemini "${short}", which matches no catalog model`);
+      }
     });
+  }
+}
+
+// ── 5. CI runs this check whenever a scanned file changes ────────────────────
+{
+  const wf = read('.github/workflows/model-catalog.yml');
+  for (const target of SCAN_DIRS) {
+    const listed = wf.split('\n').filter(l => l.includes(`"${target}"`) || l.includes(`"${target}/**"`)).length;
+    if (listed < 2) fail('.github/workflows/model-catalog.yml', `"${target}" is scanned but not in both push and pull_request paths`);
   }
 }
 

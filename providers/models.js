@@ -7,10 +7,14 @@
  *   list — provider APIs ship new model ids constantly, and the custom field
  *   is the escape hatch. `resolveModel` trusts whatever id is stored.
  *
- * - An option may carry request hints; today only `effort` (how hard a
- *   reasoning model thinks). Each provider maps it to its own wire field:
- *   Claude output_config.effort, OpenAI/xAI/Groq reasoning_effort, Gemini
- *   thinkingLevel, Ollama think. Custom ids get no hints (provider defaults).
+ * - An option may carry request hints:
+ *   - `effort`: how hard a reasoning model thinks. Each provider maps it to
+ *     its own wire field: Claude output_config.effort, OpenAI/xAI/Groq
+ *     reasoning_effort, Gemini thinkingLevel, Ollama think.
+ *   - `maxOutput`: the model's output-token limit, when it is below its
+ *     provider's cap (16k for Claude/OpenAI/xAI/Gemini, 4k for Groq).
+ *   Custom ids get no hints and BaseProvider.CUSTOM_OUTPUT_CAP (4k), which
+ *   every still-served model accepts.
  *
  * Model ids verified against each provider's official docs (September 2026):
  *   Anthropic  platform.claude.com/docs/en/about-claude/models/overview

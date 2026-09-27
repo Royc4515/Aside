@@ -9,9 +9,11 @@
  * against the public registry). Read-only: it only calls the providers'
  * model-metadata endpoints, never a completion, so it costs nothing.
  *
- * Exits 1 if any catalog id is no longer served. Also lists models the
- * provider serves that the catalog doesn't offer yet — candidates for the
- * next monthly tech update (docs/MONTHLY_UPDATE.md).
+ * Exits 1 if any catalog id is no longer served, or if a provider rejects
+ * its API key (401/403): an expired key would otherwise hide a retired model
+ * behind a green run. Rate limits and network errors only warn. Also lists
+ * models the provider serves that the catalog doesn't offer yet — candidates
+ * for the next monthly tech update (docs/MONTHLY_UPDATE.md).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,12 +27,16 @@ const CATALOG = sandbox.PROVIDER_MODELS;
 
 const env = process.env;
 const missing = [];   // catalog ids a provider no longer serves
+const badKeys = new Set(); // providers whose API key was rejected
 const skipped = [];
 
 async function getJson(url, headers = {}) {
   const res = await fetch(url, { headers });
   const body = await res.json().catch(() => ({}));
-  return { status: res.status, body };
+  // Gemini (and sometimes xAI) answer a bad key with 400 "API key not valid";
+  // report it as the auth failure it is.
+  const badKey = res.status === 400 && /api[ _-]?key/i.test(JSON.stringify(body));
+  return { status: badKey ? 401 : res.status, body };
 }
 
 // A model "exists" if the provider's metadata endpoint returns 200 for it.
@@ -39,7 +45,8 @@ async function checkEach(pid, exists) {
   for (const [id, status] of results) {
     if (status === 200) console.log(`  ✓ ${id}`);
     else if (status === 404) { console.log(`  ✗ ${id} — not served (404)`); missing.push(`${pid}/${id}`); }
-    else console.log(`  ? ${id} — HTTP ${status} (auth/rate limit? not counted as missing)`);
+    else if (status === 401 || status === 403) { console.log(`  ✗ ${id} — API key rejected (HTTP ${status})`); badKeys.add(pid); }
+    else console.log(`  ? ${id} — HTTP ${status} (rate limit or outage? not counted as missing)`);
   }
 }
 
@@ -104,9 +111,16 @@ for (const [pid, run] of Object.entries(CHECKS)) {
 }
 
 if (skipped.length) console.log(`\nSkipped (no API key in env): ${skipped.join(', ')}`);
+let failed = false;
+if (badKeys.size) {
+  console.error(`\n✗ API key rejected for: ${[...badKeys].join(', ')}. These providers were not checked.`);
+  console.error('  Update the matching repository secret (see .github/workflows/model-catalog.yml).');
+  failed = true;
+}
 if (missing.length) {
   console.error(`\n✗ ${missing.length} catalog model(s) no longer served: ${missing.join(', ')}`);
   console.error('  Replace them in providers/models.js and add them to RETIRED_MODELS.');
-  process.exit(1);
+  failed = true;
 }
+if (failed) process.exit(1);
 console.log('\n✓ Every checked catalog model is still served.');

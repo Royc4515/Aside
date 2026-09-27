@@ -1110,7 +1110,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
   const keys = Object.keys(changes);
   if (keys.length === 1 && keys[0] === 'activeProvider'
       && changes.activeProvider.newValue === settings.activeProvider) return;
-  loadSettings();
+  // Re-render the header too: the model can change from Settings, or from
+  // Ollama switching an unpicked default to an installed model.
+  loadSettings().then(renderHeader).catch(() => {});
 });
 
 // ── Page context pill ──────────────────────────────────────────────────

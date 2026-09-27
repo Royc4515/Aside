@@ -1,5 +1,8 @@
 class GeminiProvider extends BaseProvider {
-  constructor(apiKey, model) { super(apiKey, model || 'gemini-3.5-flash-lite'); }
+  constructor(apiKey, model) {
+    super(apiKey, model || 'gemini-3.5-flash-lite');
+    this.providerId = 'gemini';
+  }
 
   // Gemini's API uses role:"model" for assistant turns and contents[].parts[].
   async complete(messages, systemPrompt) {
@@ -11,8 +14,8 @@ class GeminiProvider extends BaseProvider {
     // Thinking tokens count against maxOutputTokens, so leave headroom.
     // Gemini 3 models take a thinkingLevel but older ones reject it, so only
     // send one when the catalog pins it (see providers/models.js).
-    const generationConfig = { maxOutputTokens: 16000 };
-    const opt = (typeof modelOption === 'function') ? modelOption('gemini', this.model) : null;
+    const generationConfig = { maxOutputTokens: this._outputCap(16000) };
+    const opt = this._modelOption();
     if (opt && opt.effort) generationConfig.thinkingConfig = { thinkingLevel: opt.effort.toUpperCase() };
     const data = await this._fetchJson(url, {
       method: 'POST',
