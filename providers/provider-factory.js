@@ -15,7 +15,11 @@ class ProviderFactory {
       case 'openai': return new OpenAIProvider(key, model);
       case 'grok':   return new GrokProvider(key, model);
       case 'groq':   return new GroqProvider(key, model);
-      case 'ollama': return new OllamaProvider(model);
+      case 'ollama': {
+        // Only an unpicked (default) Ollama model may fall back to an installed one.
+        const pinned = !!(selectedModels && String(selectedModels.ollama || '').trim());
+        return new OllamaProvider(model, { pinned });
+      }
       default: throw new Error(`Unknown provider: ${id}`);
     }
   }

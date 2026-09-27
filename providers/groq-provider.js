@@ -3,6 +3,7 @@ class GroqProvider extends OpenAICompatProvider {
     super(apiKey, model || 'openai/gpt-oss-120b');
     this.url = 'https://api.groq.com/openai/v1/chat/completions';
     this.providerId = 'groq';
+    this.name = 'Groq';
     // `max_tokens` is deprecated. GPT-OSS reasons before answering, but the
     // free plan's 8K tokens-per-minute limit counts the cap, so keep it modest.
     this.tokenField = 'max_completion_tokens';
