@@ -22,6 +22,8 @@ node scripts/check-models-live.mjs       # live: every catalog id still served
 
 The live check reads whichever of `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
 `GEMINI_API_KEY`, `XAI_API_KEY`, `GROQ_API_KEY` are set and skips the rest.
+They come from the environment or from a local `.env` file (copy
+`.env.example`; it's git-ignored and never shipped).
 Ollama is checked against the public registry and needs no key. It only calls
 model-metadata endpoints, so it costs nothing. Anything it lists under
 `+ served but not in catalog` is a candidate to add.

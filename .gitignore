@@ -19,3 +19,8 @@ screenshots/
 # Build output
 dist/
 *.zip
+
+# Local secrets (API keys for scripts/check-models-live.mjs)
+.env
+.env.*
+!.env.example

@@ -2,8 +2,12 @@
 /**
  * Live check: is every catalog model still served by its provider?
  *
- *   ANTHROPIC_API_KEY=… OPENAI_API_KEY=… GEMINI_API_KEY=… XAI_API_KEY=… \
- *   GROQ_API_KEY=… node scripts/check-models-live.mjs
+ *   node scripts/check-models-live.mjs
+ *
+ * Keys come from the environment (ANTHROPIC_API_KEY, OPENAI_API_KEY,
+ * GEMINI_API_KEY, XAI_API_KEY, GROQ_API_KEY) or from a local `.env` file at
+ * the repo root (copy `.env.example`). `.env` is git-ignored and never
+ * shipped in aside.zip; a real environment variable wins over it.
  *
  * Providers without a key are skipped (Ollama needs none — it's checked
  * against the public registry). Read-only: it only calls the providers'
@@ -25,7 +29,25 @@ const sandbox = {};
 vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'providers/models.js'), 'utf8'), { self: sandbox });
 const CATALOG = sandbox.PROVIDER_MODELS;
 
-const env = process.env;
+// Minimal .env reader (no deps): KEY=value per line, `#` comments, optional
+// quotes and `export`. Missing file → {}.
+function readDotEnv(file) {
+  let text;
+  try { text = fs.readFileSync(file, 'utf8'); } catch { return {}; }
+  const out = {};
+  for (const raw of text.split(/\r?\n/)) {
+    const m = raw.trim().match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+    if (!m) continue;
+    let v = m[2].trim();
+    if (/^(["']).*\1$/.test(v)) v = v.slice(1, -1);
+    else v = v.replace(/\s+#.*$/, '');
+    out[m[1]] = v;
+  }
+  return out;
+}
+const dotEnv = readDotEnv(path.join(ROOT, '.env'));
+const setInProcess = Object.fromEntries(Object.entries(process.env).filter(([, v]) => v));
+const env = { ...dotEnv, ...setInProcess };
 const missing = [];   // catalog ids a provider no longer serves
 const badKeys = new Set(); // providers whose API key was rejected
 const skipped = [];
@@ -101,7 +123,11 @@ const CHECKS = {
   },
 };
 
-const KEYS = { claude: env.ANTHROPIC_API_KEY, openai: env.OPENAI_API_KEY, gemini: env.GEMINI_API_KEY, grok: env.XAI_API_KEY, groq: env.GROQ_API_KEY, ollama: 'n/a' };
+const KEY_NAMES = { claude: 'ANTHROPIC_API_KEY', openai: 'OPENAI_API_KEY', gemini: 'GEMINI_API_KEY', grok: 'XAI_API_KEY', groq: 'GROQ_API_KEY' };
+const KEYS = { ...Object.fromEntries(Object.entries(KEY_NAMES).map(([pid, name]) => [pid, env[name]])), ollama: 'n/a' };
+
+const fromFile = Object.entries(KEYS).filter(([pid, v]) => pid !== 'ollama' && v && !setInProcess[KEY_NAMES[pid]]).map(([pid]) => pid);
+if (fromFile.length) console.log(`Using keys from .env for: ${fromFile.join(', ')}`);
 
 for (const [pid, run] of Object.entries(CHECKS)) {
   if (!KEYS[pid]) { skipped.push(pid); continue; }
@@ -110,7 +136,7 @@ for (const [pid, run] of Object.entries(CHECKS)) {
   catch (e) { console.log(`  ? request failed: ${e.message} (not counted as missing)`); }
 }
 
-if (skipped.length) console.log(`\nSkipped (no API key in env): ${skipped.join(', ')}`);
+if (skipped.length) console.log(`\nSkipped (no API key in env or .env): ${skipped.join(', ')}`);
 let failed = false;
 if (badKeys.size) {
   console.error(`\n✗ API key rejected for: ${[...badKeys].join(', ')}. These providers were not checked.`);
