@@ -1,20 +1,17 @@
 # Changelog
 
-Newest first. Model refreshes follow [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md).
+Newest first. Each version's section here becomes its GitHub release notes.
+Model refreshes follow [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md).
 
-## 1.1.0 — 2026-09-23 · Monthly tech update (September 2026)
+## 1.1.0 — unreleased · Monthly tech update (September 2026)
 
 The first refresh since June. Two providers' defaults had already stopped
 working.
 
 ### Fixed (these were broken)
 
-- **Groq:** the default `llama-3.3-70b-versatile` and the built-in fallback
-  `llama-3.1-8b-instant` were shut down on the free and developer tiers on
-  2026-08-16. `meta-llama/llama-4-scout-17b-16e-instruct` and `qwen/qwen3-32b`
-  went on 2026-07-17, and `groq/compound` / `groq/compound-mini` on 2026-09-21.
-  Groq now defaults to `openai/gpt-oss-120b`, and saved picks of retired
-  models move to Groq's recommended replacement.
+- **Groq:** already fixed in 1.0.1 (default `openai/gpt-oss-120b`, retired
+  picks move to Groq's replacements). This release keeps that fix.
 - **Gemini:** since 2026-09-18, the 2.5 models only serve accounts that
   already used them, so new installs couldn't use the `gemini-2.5-flash`
   default. Gemini now defaults to `gemini-3.5-flash-lite`, one of the two
@@ -33,7 +30,7 @@ working.
 | OpenAI | `gpt-4o-mini` → `gpt-6-luna` | GPT-6 Luna, Sol, Astra |
 | Gemini | `gemini-2.5-flash` → `gemini-3.5-flash-lite` | 3.5 Flash-Lite, 3.8 Flash, 3.1 Pro (preview) |
 | Grok | `grok-3-mini` → `grok-4.3` | Grok 4.3, Grok 4.20 non-reasoning, Grok 4.7 |
-| Groq | `llama-3.3-70b-versatile` → `openai/gpt-oss-120b` | GPT-OSS 120B, GPT-OSS 20B |
+| Groq | `openai/gpt-oss-120b` (unchanged since 1.0.1) | GPT-OSS 120B, GPT-OSS 20B |
 | Ollama | `llama3.1` → `qwen3.5` | Qwen 3.5 9B / 4B, Gemma 4, GPT-OSS 20B, Llama 3.2, Llama 3.1 |
 
 If you picked a model that has left the list but still works (for example
@@ -43,8 +40,9 @@ Claude Opus 4.8 or GPT-4o mini), you keep it. It appears as a custom model.
 
 - **Output budget for reasoning models.** Most current models reason before
   answering, and that reasoning counts against the output cap. The cap is now
-  16k tokens for Claude, OpenAI, xAI and Gemini. Groq's cap is 4k, because its
-  free plan counts the cap toward its 8K tokens-per-minute limit.
+  16k tokens for Claude, OpenAI, xAI and Gemini. Groq stays at 4k (since
+  1.0.1), because its free plan counts the cap toward its 8K tokens-per-minute
+  limit.
 - **Reasoning effort per model.** A catalog entry can set `effort`, which
   keeps the sidebar fast. Each provider sends it in its own field:
   - Claude: `output_config.effort`
@@ -54,9 +52,6 @@ Claude Opus 4.8 or GPT-4o mini), you keep it. It appears as a custom model.
 - **No more blank answers.** Claude refusals, Claude stream errors and empty
   Gemini replies now show an error that explains why. Claude and Gemini
   responses that include thinking return only the answer text.
-- **Groq fallback while streaming.** If a model has been retired, the request
-  is retried once on `openai/gpt-oss-20b`. Before, this only happened for
-  non-streaming requests, which the sidebar never makes.
 - **Ollama.** If the default model isn't downloaded, Aside uses one you
   already have. If a model you picked isn't downloaded, the error tells you
   the exact `ollama pull` command. The README now explains
@@ -79,3 +74,39 @@ Claude Opus 4.8 or GPT-4o mini), you keep it. It appears as a custom model.
 
 Sources: the official models and deprecations pages listed in the header of
 `providers/models.js`, checked 2026-09-23.
+
+### Updating
+
+Unzip `aside.zip` **over your existing Aside folder**, in the same location.
+Then click **Reload** on Aside's card at `chrome://extensions`. Your keys and
+history stay. If you load it from a new folder, Chrome installs it as a
+separate extension without your settings.
+
+## 1.0.1 — 2026-09-24 · Groq hotfix
+
+Groq has been unusable on the free and developer tiers since 2026-08-16: Groq
+shut down both Aside's default (`llama-3.3-70b-versatile`) and its built-in
+fallback (`llama-3.1-8b-instant`).
+
+- **New default: GPT-OSS 120B** (`openai/gpt-oss-120b`). It's Groq's own
+  recommended replacement, it's on the free tier, and it's fast. GPT-OSS 20B
+  is the faster option in the model picker.
+- **Saved picks move automatically.** If you had picked a Groq model that has
+  been shut down (Llama 3.3 70B, Llama 3.1 8B, Llama 4 Scout, Qwen 3 32B,
+  Compound or Compound Mini), Aside now uses Groq's recommended replacement
+  instead of failing.
+- **Fallback while streaming.** If a Groq model has been retired, the request
+  is retried once on GPT-OSS 20B. Before, this only happened for
+  non-streaming requests, which the sidebar never makes.
+- **Answers aren't cut off by reasoning.** GPT-OSS reasons before it answers,
+  so requests now use `max_completion_tokens` (4096) with
+  `reasoning_effort: "low"`.
+
+No other providers changed in this release.
+
+### Updating
+
+Unzip `aside.zip` **over your existing Aside folder**, in the same location.
+Then click **Reload** on Aside's card at `chrome://extensions`. Your keys and
+history stay. If you load it from a new folder, Chrome installs it as a
+separate extension without your settings.

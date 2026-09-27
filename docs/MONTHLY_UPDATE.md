@@ -98,7 +98,9 @@ for this section.
    if request behavior changed.
 3. Open a **draft PR** titled `chore: monthly tech update YYYY-MM` with a
    per-provider before → after table and the sources. Don't cut a release.
-   The maintainer does that after review (`scripts/build-zip.sh`).
+   The maintainer does that after review by running the **Release** workflow
+   on `main`. It publishes `aside.zip` with this version's CHANGELOG section
+   as the notes.
 
 If nothing changed this month, don't open a PR. Report "catalog current as of
 YYYY-MM-DD" instead.

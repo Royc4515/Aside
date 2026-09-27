@@ -116,7 +116,7 @@ providers any time from the sidebar header; each remembers its own model.
 
 Prefer a different provider? Same flow with Anthropic Claude, OpenAI, Google Gemini, xAI Grok, or self-hosted Ollama. See [Providers](#providers) for what each one needs.
 
-**Maintainers — cutting a release:** Run `pwsh ./scripts/build-zip.ps1` (or `bash ./scripts/build-zip.sh`) to produce `dist/aside-<version>.zip` (runtime files only), then attach it to a GitHub release as `aside.zip` so the [latest-download link](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) always serves the newest build.
+**Maintainers — cutting a release:** Bump `version` in `manifest.json` and add a matching `## <version>` section to `CHANGELOG.md`, then run the **Release** workflow on `main` (Actions → Release → Run workflow) or push a `v<version>` tag. It builds `aside.zip` with `scripts/build-zip.sh` (runtime files only) and publishes a GitHub release with that section as the notes, so the [latest-download link](https://github.com/Royc4515/Aside/releases/latest/download/aside.zip) always serves the newest build. To build locally instead: `pwsh ./scripts/build-zip.ps1` or `bash ./scripts/build-zip.sh`.
 
 **Maintainers — keeping models current:** The model list is refreshed on the 1st of every month following [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md). Run `node scripts/check-models.mjs` after any model change. It fails if the catalog, provider code, and docs disagree.
 
