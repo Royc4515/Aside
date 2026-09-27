@@ -3,7 +3,7 @@
 Newest first. Each version's section here becomes its GitHub release notes.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](docs/MONTHLY_UPDATE.md).
 
-## 1.1.0 — unreleased · Monthly tech update (September 2026)
+## 1.1.0 — 2026-09-27 · Monthly tech update (September 2026)
 
 The first refresh since June. Two providers' defaults had already stopped
 working.
