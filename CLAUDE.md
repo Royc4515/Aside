@@ -1,0 +1,53 @@
+# CLAUDE.md - Aside
+
+## What this is
+A Chrome MV3 extension that opens an AI sidebar on any webpage so a reader can summarize, extract, translate or chat about the page with one of 6 providers (Claude, Gemini, OpenAI, Grok, Groq, local Ollama) using their own API key, without copy-pasting or leaving the tab.
+
+## Stack & layout
+Vanilla JS, no build step, no bundler, no npm deps. Node is only used by maintenance scripts.
+- `manifest.json` - MV3 manifest; version, permissions, CSP `connect-src` allowlist, `Alt+A` command.
+- `background.js` - service worker: command/context-menu routing, content-script reinjection, session-storage access level.
+- `content/` - injected into every page; hosts the sidebar iframe, extracts page text, owns the nonce-authenticated `postMessage` bridge.
+- `sidebar/` - chat UI (`sidebar.js` is the big one), `history.js` (threads, max 100), `translations.js` + `i18n.js` (EN/HE UI).
+- `options/`, `popup/` - settings page (keys, model picker, response language) and toolbar popup.
+- `providers/` - `BaseProvider` -> `OpenAICompatProvider` (OpenAI, Grok, Groq) plus Claude, Gemini, Ollama; `provider-factory.js`; `models.js` is the single source of truth for model ids.
+- `shared/store.js` - the only settings storage layer (`chrome.storage.local`).
+- `site/` - landing page, deployed to GitHub Pages (royc4515.github.io/Aside/) by `.github/workflows/deploy-site.yml`.
+- `scripts/` - model catalog checks and ZIP builders. `docs/` - ARCHITECTURE.md, MONTHLY_UPDATE.md runbook. `marketing/` - images only.
+
+## Commands
+- Run: `chrome://extensions` -> Developer mode -> Load unpacked -> repo root. Reload the extension after edits.
+- Static catalog check (catalog vs provider code vs README/ARCHITECTURE/site/UI): `node scripts/check-models.mjs` - verified, passes. CI runs it on push/PR.
+- Syntax check: `for f in $(git ls-files '*.js' '*.mjs'); do node --check "$f"; done` - verified, clean.
+- Build release ZIP: `bash scripts/build-zip.sh` -> `dist/aside-<version>.zip` - verified (needs `zip`). `pwsh ./scripts/build-zip.ps1` - unverified.
+- Live model check: `node scripts/check-models-live.mjs` - unverified; needs provider keys in env or a local `.env` (copy `.env.example`).
+- Release: bump `version` in `manifest.json`, add a dated `## <version> - <date>` section to `CHANGELOG.md`, run the Release workflow or push `v<version>`.
+- There are no unit or UI tests. Test UI changes by hand in Chrome, in both EN and HE.
+
+## Conventions (Roy's standing rules)
+- Comments explain WHY, not what.
+- Flag counterintuitive, load-bearing or past-bug-hiding lines with `// don't touch / <reason>` (`/* ... */` in CSS, `#` in shell).
+- Edge cases and input validation are priorities; prefer clean OOP, good naming, reuse. New OpenAI-style providers subclass `OpenAICompatProvider`, not `BaseProvider`.
+- No em dashes in any user-facing text or docs; use a plain hyphen.
+- Secrets only via environment variables, never committed.
+
+## API keys (BYOK) - hard rules
+- Keys are user-supplied. They live only in `chrome.storage.local` under `apiKeys`, written via `shared/store.js`. Never use `chrome.storage.sync` (store.js migrates old sync data to local and clears sync on purpose).
+- Never log a key, put it in an error message, send it anywhere except the chosen provider's own endpoint, or commit one. Keys for `check-models-live.mjs` go in the git-ignored `.env` or CI secrets only.
+- Gemini sends the key as a `?key=` query param (`providers/gemini-provider.js`, `scripts/check-models-live.mjs`), so never log or surface Gemini request URLs.
+
+## RTL / Hebrew
+- Check RTL/Hebrew rendering on ANY UI change: switch UI to Hebrew and test on both an LTR and an RTL page.
+- `dir` on the sidebar has two writers in `sidebar/sidebar.js`: `applyUILanguage()` (from UI language) and the `SIDEBAR_OPENED` handler (copies the host page's `dir`). Last writer wins; verify both orders.
+- RTL overrides live as `[dir="rtl"]` rules in `sidebar/sidebar.css`; the landing site flips `dir` in `site/assets/i18n.js`. `options/` and `popup/` are English-only and hardcoded.
+
+## Gotchas
+- Adding a provider or host: update the CSP `connect-src` in `manifest.json` or every fetch is blocked. Ollama is only allowed at `http://localhost:11434`, and Ollama itself must run with `OLLAMA_ORIGINS=chrome-extension://*`.
+- Any model id change must go through `providers/models.js` and keep the `model || '<default>'` fallback in each `providers/*-provider.js` equal to the catalog default; `check-models.mjs` enforces this and also scans README, docs, site, sidebar, options, popup, _locales. Retired ids go in `RETIRED_MODELS`.
+- Reasoning tokens count against the output cap. Caps: 16k Claude/OpenAI/xAI/Gemini, 4k Groq (free-tier TPM), 4k for custom ids (`BaseProvider.CUSTOM_OUTPUT_CAP`). Past bugs: blank or cut-off answers saved as complete (CHANGELOG 1.1.0).
+- OpenAI current models reject `max_tokens`; `openai-provider.js` must send `max_completion_tokens` (past bug, CHANGELOG 1.1.0).
+- `GroqProvider` retries once on `fallbackModel` when the model is gone; the regex match on the error text is load-bearing.
+- Ollama falls back to an installed model only when the user never pinned one (`pinned` in `provider-factory.js`); a pinned missing model must error, not switch.
+- Messages into the sidebar iframe are trusted only with the session nonce (`content/content.js`); never echo the nonce back to the page. Model output reaches `innerHTML` only via `renderMarkdown()`, which escapes first. docs/ARCHITECTURE.md mentions a `sanitizeHTML()` allowlist that does not exist in the code.
+- Page text is truncated at 12 000 chars (`sidebar/sidebar.js`); the README privacy section states that number.
+- CHANGELOG release sections must use full `https://` links and a real date, or the Release workflow fails.
