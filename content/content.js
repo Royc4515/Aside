@@ -25,11 +25,20 @@
   let channelNonce = null;
   let channelReady = null;
 
+  // don't touch / crypto.randomUUID() exists only in secure contexts, and this
+  // script shares the page's context, so on plain http:// pages it is undefined
+  // and the sidebar silently never opened (past bug, CHANGELOG 1.1.1).
+  // getRandomValues works in every context: 128 random bits (a UUID has 122).
+  function randomToken() {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  }
+
   function setupChannel() {
     if (channelReady) return channelReady;
     channelReady = (async () => {
-      const channelId = 'aside.ch.' + crypto.randomUUID();
-      const nonce = crypto.randomUUID();
+      const channelId = 'aside.ch.' + randomToken();
+      const nonce = randomToken();
       try {
         await chrome.runtime.sendMessage({ type: 'ENSURE_SESSION' });
         await chrome.storage.session.set({ [channelId]: nonce });

@@ -4,6 +4,18 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## 1.1.1 - 2026-09-30 · Sidebar on http:// sites
+
+### Fixed
+
+- **The sidebar never opened on plain `http://` sites.** `Alt+A`, the
+  popup's "Open sidebar" button, the right-click menu and the selection
+  button all did nothing, with no error. The content script created its
+  channel id with `crypto.randomUUID()`, which browsers only provide on
+  secure (`https://`) pages. It now uses `crypto.getRandomValues()`, which
+  works everywhere and is just as strong. Every release since 1.0.0 had
+  this bug. `https://` sites were never affected.
+
 ## 1.1.0 — 2026-09-27 · Monthly tech update (September 2026)
 
 The first refresh since June. Two providers' defaults had already stopped

@@ -48,6 +48,7 @@ Vanilla JS, no build step, no bundler, no npm deps. Node is only used by mainten
 - OpenAI current models reject `max_tokens`; `openai-provider.js` must send `max_completion_tokens` (past bug, CHANGELOG 1.1.0).
 - `GroqProvider` retries once on `fallbackModel` when the model is gone; the regex match on the error text is load-bearing.
 - Ollama falls back to an installed model only when the user never pinned one (`pinned` in `provider-factory.js`); a pinned missing model must error, not switch.
+- `content/content.js` runs in the host page's context, so secure-context-only APIs (`crypto.randomUUID`, `navigator.clipboard`, ...) are missing on `http://` pages. Past bug: the sidebar never opened on http sites (CHANGELOG 1.1.1). Use `crypto.getRandomValues`.
 - Messages into the sidebar iframe are trusted only with the session nonce (`content/content.js`); never echo the nonce back to the page. Model output reaches `innerHTML` only via `renderMarkdown()`, which escapes first. docs/ARCHITECTURE.md mentions a `sanitizeHTML()` allowlist that does not exist in the code.
 - Page text is truncated at 12 000 chars (`sidebar/sidebar.js`); the README privacy section states that number.
 - CHANGELOG release sections must use full `https://` links and a real date, or the Release workflow fails.
