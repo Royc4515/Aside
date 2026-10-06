@@ -4,6 +4,28 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## 1.1.2 - 2026-10-06 · Monthly tech update (October 2026)
+
+Small refresh. Nothing was broken; two catalog entries moved to newer models.
+
+### Changed
+
+- **Claude:** default is now `claude-sonnet-5-5` (Claude Sonnet 5.5, the current
+  Sonnet). Sonnet 5 still works and stays usable as a custom id.
+  Source: https://platform.claude.com/docs/en/about-claude/models/overview
+- **OpenAI:** `gpt-6-sol` in the picker is now `gpt-6.1-sol` (GPT-6.1 Sol, low
+  reasoning effort). `gpt-6-sol` is still served and remains usable as a custom
+  id. Source: https://developers.openai.com/api/docs/models
+- Gemini, xAI, Groq and Ollama checked and unchanged.
+
+### Heads up
+
+- `claude-haiku-4-5` has a tentative retirement of "not sooner than 2026-10-15"
+  and no deprecation notice yet. Check next month.
+  Source: https://platform.claude.com/docs/en/about-claude/model-deprecations
+- `claude-sonnet-4-5` is deprecated (retires 2026-11-30); it is not in the
+  catalog, so only custom-id users are affected.
+
 ## 1.1.1 - 2026-09-30 · Sidebar on http:// sites
 
 ### Fixed

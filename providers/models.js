@@ -16,7 +16,7 @@
  *   Custom ids get no hints and BaseProvider.CUSTOM_OUTPUT_CAP (4k), which
  *   every still-served model accepts.
  *
- * Model ids verified against each provider's official docs (September 2026):
+ * Model ids verified against each provider's official docs (October 2026):
  *   Anthropic  platform.claude.com/docs/en/about-claude/models/overview
  *   OpenAI     developers.openai.com/api/docs/models (+ /deprecations)
  *   Gemini     ai.google.dev/gemini-api/docs/models (+ /deprecations)
@@ -29,11 +29,11 @@
  */
 const PROVIDER_MODELS = {
   claude: {
-    default: 'claude-sonnet-5',
+    default: 'claude-sonnet-5-5',
     options: [
-      // Sonnet 5 thinks adaptively by default; `low` effort keeps sidebar
+      // Sonnet 5.5 thinks adaptively by default; `low` effort keeps sidebar
       // answers fast and cheap.
-      { id: 'claude-sonnet-5',  label: 'Claude Sonnet 5', effort: 'low' },
+      { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5', effort: 'low' },
       { id: 'claude-opus-5-5',  label: 'Claude Opus 5.5' },
       { id: 'claude-fable-5-1', label: 'Claude Fable 5.1' },
       { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5' },
@@ -45,7 +45,7 @@ const PROVIDER_MODELS = {
     // snappy sidebar. Astra's minimum is `low`.
     options: [
       { id: 'gpt-6-luna',  label: 'GPT-6 Luna',  effort: 'none' },
-      { id: 'gpt-6-sol',   label: 'GPT-6 Sol',   effort: 'low' },
+      { id: 'gpt-6.1-sol', label: 'GPT-6.1 Sol', effort: 'low' },
       { id: 'gpt-6-astra', label: 'GPT-6 Astra', effort: 'low' },
     ],
   },
