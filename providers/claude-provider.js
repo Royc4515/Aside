@@ -4,7 +4,7 @@ const CLAUDE_OUT_OF_TOKENS = 'Claude used its whole output budget thinking befor
 
 class ClaudeProvider extends BaseProvider {
   constructor(apiKey, model) {
-    super(apiKey, model || 'claude-sonnet-5');
+    super(apiKey, model || 'claude-sonnet-5-5');
     this.providerId = 'claude';
   }
 

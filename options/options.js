@@ -5,7 +5,7 @@
 // `model` is a static fallback only; the live label comes from
 // providerModelLabel() (model catalog + the user's pick).
 const PROVIDERS = [
-  { id: 'claude',  name: 'Claude',  model: 'Claude Sonnet 5',   letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
+  { id: 'claude',  name: 'Claude',  model: 'Claude Sonnet 5.5',   letter: 'C', tier: 'paid', hue: 'var(--p-claude)', placeholder: 'sk-ant-…' },
   { id: 'openai',  name: 'OpenAI',  model: 'GPT-6 Luna',        letter: 'O', tier: 'paid', hue: 'var(--p-gpt)',    placeholder: 'sk-…' },
   { id: 'gemini',  name: 'Gemini',  model: 'Gemini 3.5 Flash-Lite', letter: 'G', tier: 'free', hue: 'var(--p-gemini)', placeholder: 'AIza…' },
   { id: 'grok',    name: 'Grok',    model: 'Grok 4.3',          letter: 'X', tier: 'paid', hue: 'var(--p-grok)',   placeholder: 'xai-…' },

@@ -68,9 +68,9 @@ don't have to paste anything. You pick the model. You stay on the page.
 
 | Provider | What you need | Default model | Also selectable |
 |---|---|---|---|
-| **Claude** (Anthropic) | API key | `claude-sonnet-5` | Opus 5.5, Fable 5.1, Haiku 4.5 |
+| **Claude** (Anthropic) | API key | `claude-sonnet-5-5` | Opus 5.5, Fable 5.1, Haiku 4.5 |
 | **Gemini** (Google) | API key | `gemini-3.5-flash-lite` | 3.8 Flash, 3.1 Pro (preview) |
-| **OpenAI** | API key | `gpt-6-luna` | GPT-6 Sol, GPT-6 Astra |
+| **OpenAI** | API key | `gpt-6-luna` | GPT-6.1 Sol, GPT-6 Astra |
 | **Grok** (xAI) | API key | `grok-4.3` | Grok 4.20 (no reasoning), Grok 4.7 |
 | **Groq** | API key | `openai/gpt-oss-120b` | GPT-OSS 20B |
 | **Ollama** | Nothing — runs on your machine | `qwen3.5` | Qwen 3.5 4B, Gemma 4, GPT-OSS 20B, Llama 3.2 / 3.1 |
