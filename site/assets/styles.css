@@ -47,7 +47,7 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-2); text-decoration: underline; }
 
-img { max-width: 100%; height: auto; display: block; }
+img, video { max-width: 100%; height: auto; display: block; }
 
 button, .btn {
   font-family: inherit; cursor: pointer; border: 0;
@@ -173,22 +173,34 @@ button, .btn {
   margin-top: 16px;
   font-size: 13px; color: var(--ink-4);
 }
+/* The hero shows the real sidebar at a readable size instead of a whole
+   banner in miniature: a full banner scaled into half the hero left its
+   text a few pixels tall. */
 .hero-art {
   position: relative;
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  background: var(--surface);
-  border: 1px solid var(--line);
+  justify-self: center;
+  width: min(380px, 100%);
 }
-.hero-art img { display: block; width: 100%; }
-.hero-art .img-dark { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .hero-art .img-light { display: none; }
-  :root:not([data-theme="light"]) .hero-art .img-dark { display: block; }
+.hero-art::before {
+  content: "";
+  position: absolute;
+  inset: 6% -18% 0;
+  background: radial-gradient(55% 50% at 50% 40%, color-mix(in oklab, var(--accent) 34%, transparent), transparent 70%);
+  filter: blur(40px);
+  z-index: 0;
+  pointer-events: none;
 }
-:root[data-theme="dark"] .hero-art .img-light { display: none; }
-:root[data-theme="dark"] .hero-art .img-dark { display: block; }
+/* Product shots: tight sidebar crops; corners and depth come from CSS. */
+.shot-pic { position: relative; z-index: 1; display: block; }
+.shot-pic img {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .06), 0 30px 70px -20px rgba(20, 18, 14, .5), 0 10px 24px rgba(20, 18, 14, .14);
+}
+@media (max-width: 880px) {
+  .hero-art { width: min(300px, 100%); }
+}
 
 /* ---------- Providers strip ---------- */
 .providers {
@@ -331,13 +343,16 @@ section { padding: 88px 0; }
 @media (max-width: 720px) {
   .demo-frame { padding: 6px; border-radius: 16px; }
   .demo-video { border-radius: 11px; }
-  .demo-toggle, .demo-sound { bottom: 14px; width: 40px; height: 40px; }
-  .demo-toggle { inset-inline-end: 14px; }
-  .demo-sound { inset-inline-end: 62px; }
+  /* On a phone the video is ~180px tall; 40px buttons covered a quarter of it. */
+  .demo-toggle, .demo-sound { bottom: 10px; width: 32px; height: 32px; }
+  .demo-toggle svg, .demo-sound svg { width: 14px; height: 14px; }
+  .demo-toggle { inset-inline-end: 10px; }
+  .demo-sound { inset-inline-end: 48px; }
 }
 
 /* ---------- Latest models ---------- */
 .models .section-head .eyebrow { margin-bottom: 16px; }
+.models .section-head { max-width: 760px; }   /* keeps the heading on one line on desktop */
 .models-grid {
   display: grid; gap: 20px;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -431,28 +446,41 @@ section { padding: 88px 0; }
 }
 
 /* ---------- Screenshots gallery ---------- */
-/* Each shot is a full designed banner (its own heading + different aspect
-   ratio), so stack them full-width one under another — no ragged grid gaps. */
+/* Three sidebar shots in a row; on phones a swipeable strip instead of a
+   three-screens-tall stack. Captions are HTML so they stay crisp and translate. */
 .gallery { background: var(--bg-sunk); }
 .gallery-grid {
-  display: flex; flex-direction: column; gap: 28px;
-  max-width: 1000px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 320px));
+  justify-content: center;
+  gap: 32px;
 }
-.shot {
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-sm);
+.gallery-item { margin: 0; }
+.gallery-item figcaption {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 15px; font-weight: 600;
+  color: var(--ink-2);
 }
-.shot img { display: block; width: 100%; height: auto; }
-.shot .img-dark { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .shot .img-light { display: none; }
-  :root:not([data-theme="light"]) .shot .img-dark { display: block; }
+@media (max-width: 1040px) {
+  .gallery-grid { gap: 20px; grid-template-columns: repeat(3, minmax(0, 280px)); }
 }
-:root[data-theme="dark"] .shot .img-light { display: none; }
-:root[data-theme="dark"] .shot .img-dark { display: block; }
+@media (max-width: 720px) {
+  .gallery-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 72vw;
+    justify-content: start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 24px;
+    padding: 8px 24px 28px;
+    margin-inline: -24px;     /* bleed to the screen edge, inside the container */
+    scrollbar-width: none;
+  }
+  .gallery-grid::-webkit-scrollbar { display: none; }
+  .gallery-item { scroll-snap-align: start; }
+}
 
 /* ---------- Install / Quickstart steps ---------- */
 .install { background: var(--bg-sunk); }

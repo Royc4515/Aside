@@ -49,8 +49,8 @@
   }
   </script>
 
-  <link rel="stylesheet" href="tokens.css">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="tokens.css?v=1.1.3">
+  <link rel="stylesheet" href="assets/styles.css?v=1.1.3">
   <script>
     // Apply stored theme before paint to avoid flash.
     try {
@@ -119,16 +119,7 @@
           <p class="hero-meta" data-i18n="hero.meta">Free · Open source · BYOK</p>
         </div>
         <div class="hero-art">
-          <picture class="img-light">
-            <source type="image/webp" srcset="assets/img/hero-light-960.webp 960w, assets/img/hero-light-1920.webp 1920w" sizes="(max-width: 880px) 100vw, 560px">
-            <source type="image/png"  srcset="assets/img/hero-light-960.png 960w, assets/img/hero-light-1920.png 1920w"  sizes="(max-width: 880px) 100vw, 560px">
-            <img src="assets/img/hero-light.png" alt="Aside sidebar — light theme" loading="eager" decoding="async" width="1920" height="1200">
-          </picture>
-          <picture class="img-dark">
-            <source type="image/webp" srcset="assets/img/hero-dark-960.webp 960w, assets/img/hero-dark-1920.webp 1920w" sizes="(max-width: 880px) 100vw, 560px">
-            <source type="image/png"  srcset="assets/img/hero-dark-960.png 960w, assets/img/hero-dark-1920.png 1920w"  sizes="(max-width: 880px) 100vw, 560px">
-            <img src="assets/img/hero-dark.png" alt="Aside sidebar — dark theme" loading="eager" decoding="async" width="1920" height="1200">
-          </picture>
+          <picture class="shot-pic"><source type="image/webp" srcset="assets/img/shot-answer-1x.webp 452w, assets/img/shot-answer-2x.webp 904w" sizes="(max-width: 880px) 300px, 380px"><img src="assets/img/shot-answer-1x.png" alt="Aside sidebar summarizing an article with Claude Sonnet 5.5" data-i18n-attr="alt:hero.shot_alt" width="452" height="802" loading="eager" decoding="async"></picture>
         </div>
       </div>
     </section>
@@ -277,37 +268,18 @@
           <p data-i18n="gallery.sub">Familiar look, no glaring chrome — built to live next to whatever you're reading.</p>
         </div>
         <div class="gallery-grid">
-          <div class="shot">
-            <picture class="img-light">
-              <source type="image/webp" srcset="assets/img/features-light-960.webp 960w, assets/img/features-light-1920.webp 1920w" sizes="(max-width: 1040px) 100vw, 1000px">
-              <source type="image/png"  srcset="assets/img/features-light-960.png 960w, assets/img/features-light-1920.png 1920w"  sizes="(max-width: 1040px) 100vw, 1000px">
-              <img src="assets/img/features-light.png" alt="Features view, light theme" loading="lazy" decoding="async" width="1920" height="1200">
-            </picture>
-            <picture class="img-dark">
-              <source type="image/webp" srcset="assets/img/features-dark-960.webp 960w, assets/img/features-dark-1920.webp 1920w" sizes="(max-width: 1040px) 100vw, 1000px">
-              <source type="image/png"  srcset="assets/img/features-dark-960.png 960w, assets/img/features-dark-1920.png 1920w"  sizes="(max-width: 1040px) 100vw, 1000px">
-              <img src="assets/img/features-dark.png" alt="Features view, dark theme" loading="lazy" decoding="async" width="1920" height="1200">
-            </picture>
-          </div>
-          <div class="shot">
-            <picture class="img-light">
-              <source type="image/webp" srcset="assets/img/providers-light-960.webp 960w, assets/img/providers-light-1920.webp 1920w" sizes="(max-width: 1040px) 100vw, 1000px">
-              <source type="image/png"  srcset="assets/img/providers-light-960.png 960w, assets/img/providers-light-1920.png 1920w"  sizes="(max-width: 1040px) 100vw, 1000px">
-              <img src="assets/img/providers-light.png" alt="Provider picker, light theme" loading="lazy" decoding="async" width="1920" height="960">
-            </picture>
-            <picture class="img-dark">
-              <source type="image/webp" srcset="assets/img/providers-dark-960.webp 960w, assets/img/providers-dark-1920.webp 1920w" sizes="(max-width: 1040px) 100vw, 1000px">
-              <source type="image/png"  srcset="assets/img/providers-dark-960.png 960w, assets/img/providers-dark-1920.png 1920w"  sizes="(max-width: 1040px) 100vw, 1000px">
-              <img src="assets/img/providers-dark.png" alt="Provider picker, dark theme" loading="lazy" decoding="async" width="1920" height="960">
-            </picture>
-          </div>
-          <div class="shot">
-            <picture>
-              <source type="image/webp" srcset="assets/img/dark-light-960.webp 960w, assets/img/dark-light-1920.webp 1920w" sizes="(max-width: 1040px) 100vw, 1000px">
-              <source type="image/png"  srcset="assets/img/dark-light-960.png 960w, assets/img/dark-light-1920.png 1920w"  sizes="(max-width: 1040px) 100vw, 1000px">
-              <img src="assets/img/dark-light.png" alt="Light and dark side by side" loading="lazy" decoding="async" width="1920" height="1080">
-            </picture>
-          </div>
+          <figure class="gallery-item">
+            <picture class="shot-pic"><source type="image/webp" srcset="assets/img/shot-ask-1x.webp 452w, assets/img/shot-ask-2x.webp 904w" sizes="(max-width: 720px) 72vw, 320px"><img src="assets/img/shot-ask-1x.png" alt="Ask anything about the page" data-i18n-attr="alt:gallery.cap1_alt" width="452" height="802" loading="lazy" decoding="async"></picture>
+            <figcaption data-i18n="gallery.cap1">Ask anything about the page</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <picture class="shot-pic"><source type="image/webp" srcset="assets/img/shot-switch-1x.webp 452w, assets/img/shot-switch-2x.webp 904w" sizes="(max-width: 720px) 72vw, 320px"><img src="assets/img/shot-switch-1x.png" alt="Switch provider in one click" data-i18n-attr="alt:gallery.cap2_alt" width="452" height="802" loading="lazy" decoding="async"></picture>
+            <figcaption data-i18n="gallery.cap2">Switch provider in one click</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <picture class="shot-pic"><source type="image/webp" srcset="assets/img/shot-followup-1x.webp 452w, assets/img/shot-followup-2x.webp 904w" sizes="(max-width: 720px) 72vw, 320px"><img src="assets/img/shot-followup-1x.png" alt="Follow up with any model" data-i18n-attr="alt:gallery.cap3_alt" width="452" height="802" loading="lazy" decoding="async"></picture>
+            <figcaption data-i18n="gallery.cap3">Follow up with any model</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -485,8 +457,8 @@
     </div>
   </footer>
 
-  <script src="assets/i18n.js" defer></script>
-  <script src="assets/theme.js" defer></script>
-  <script src="assets/demo.js" defer></script>
+  <script src="assets/i18n.js?v=1.1.3" defer></script>
+  <script src="assets/theme.js?v=1.1.3" defer></script>
+  <script src="assets/demo.js?v=1.1.3" defer></script>
 </body>
 </html>

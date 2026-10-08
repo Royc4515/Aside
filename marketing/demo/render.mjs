@@ -96,7 +96,33 @@ try {
     return Buffer.from(data, 'base64');
   };
 
-  if (stills) {
+  if (args.includes('--shots')) {
+    // Site product shots: the sidebar alone, on transparency, at 2x, taken from
+    // the same timeline as the video so the images always match it.
+    await page.setViewport({ width: WIDTH, height: HEIGHT, deviceScaleFactor: 2 });
+    await page.evaluate(() => window.__ready);
+    const SHOTS = { ask: 7.9, answer: 15.0, switch: 16.2, followup: 23.15 };
+    const isolate = `
+      html, body, #stage, #page, #browser { background: transparent !important; }
+      #browser { box-shadow: none !important; transform: none !important; }
+      #camera { transform: none !important; filter: none !important; opacity: 1 !important; }
+      .glow, #vignette, #grain, #fade, #intro, #wall, #outro, #keysWrap, #cursor, #ripple,
+      #chrome, #article, #pageDim, #sweep { display: none !important; }`;
+    for (const [name, t] of Object.entries(SHOTS)) {
+      await page.evaluate(tt => window.renderAt(tt), t);
+      const style = await page.addStyleTag({ content: isolate });
+      const box = await page.$eval('#sidebar', el => {
+        const r = el.getBoundingClientRect();
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+      });
+      // Tight crop: the site adds the rounded corners and shadow in CSS, which
+      // stays crisp at every size (a baked-in shadow picked up the page color).
+      const file = join(outDir, `shot-${name}.png`);
+      await page.screenshot({ path: file, omitBackground: true, clip: box });
+      await style.evaluate(el => el.remove());
+      console.log('wrote', file);
+    }
+  } else if (stills) {
     for (const t of stills) {
       const file = join(outDir, `still-${String(t).replace('.', '_')}.png`);
       writeFileSync(file, await grab(t, 'png'));

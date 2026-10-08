@@ -21,6 +21,11 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
 - **Landing page:** a 30-second product demo video with music (muted
   autoplay, one-click sound toggle) and a
   "Latest models" section that lists each provider's current lineup.
+- **Landing page sizing:** the hero and gallery now show crisp 2x product shots
+  of the sidebar (rendered from the demo, current models) instead of full
+  marketing banners that shrank to unreadable text on phones; the gallery is a
+  swipeable strip on mobile. CSS/JS URLs are versioned (`?v=1.1.3`) so returning
+  visitors never mix a cached old stylesheet with new markup.
 - **README:** demo video near the top.
 - `marketing/demo/`: the demo's source (`demo.html`, a deterministic HTML
   animation), `music_edit.py` (cuts the music to the animation on the track's
