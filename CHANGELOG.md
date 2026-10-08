@@ -18,8 +18,8 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
 
 ### Added
 
-- **Landing page:** a 30-second product demo video with music (muted
-  autoplay, one-click sound toggle) and a
+- **Landing page:** a 30-second product demo video with music (it plays from
+  the start when scrolled into view, sound on where the browser allows) and a
   "Latest models" section that lists each provider's current lineup.
 - **Landing page sizing:** the hero and gallery now show crisp 2x product shots
   of the sidebar (rendered from the demo, current models) instead of full
