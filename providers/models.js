@@ -36,7 +36,8 @@ const PROVIDER_MODELS = {
       { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5', effort: 'low' },
       { id: 'claude-opus-5-5',  label: 'Claude Opus 5.5' },
       { id: 'claude-fable-5-1', label: 'Claude Fable 5.1' },
-      { id: 'claude-haiku-4-5', label: 'Claude Haiku 4.5' },
+      // Haiku 5.5 defaults to `medium` effort; `low` keeps it the fastest pick.
+      { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5', effort: 'low' },
     ],
   },
   openai: {

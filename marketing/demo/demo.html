@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Aside demo</title>
+<meta name="viewport" content="width=1920, height=1080">
+<!--
+  Aside product demo - a deterministic motion composition.
+  Open directly to preview (plays in real time, loops).
+  marketing/demo/render.mjs drives window.renderAt(t) frame by frame and
+  pipes the frames to ffmpeg. Every animated value is a pure function of t.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1b1916; --bg-2: #22201c;
+    --surface: #2a2824; --surface-2: #33302b; --surface-3: #3d3a34;
+    --line: rgba(238,236,226,.09); --line-2: rgba(238,236,226,.16);
+    --ink: #eeece2; --ink-2: #d4ccb8; --ink-3: #a9a293; --ink-4: #7d776b;
+    --accent: #e08866; --accent-2: #c96846; --accent-soft: rgba(218,119,86,.16);
+    --p-claude: #da7756; --p-openai: #10a37f; --p-gemini: #4f86c6;
+    --p-grok: #5b574e; --p-groq: #f55036; --p-ollama: #7e57c2;
+    --sans: "Inter", system-ui, sans-serif;
+    --serif: "Source Serif 4", Georgia, serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .abs { position: absolute; }
+  [data-a] { will-change: transform, opacity, filter; }
+
+  /* ---------- Stage & atmosphere ---------- */
+  #stage { position: absolute; inset: 0; overflow: hidden;
+    background: radial-gradient(120% 90% at 50% 40%, #24211d 0%, #1b1916 55%, #141210 100%); }
+  .glow { position: absolute; border-radius: 50%; filter: blur(90px); pointer-events: none; }
+  #glowA { width: 900px; height: 700px; left: 980px; top: -260px;
+    background: radial-gradient(closest-side, rgba(224,136,102,.34), rgba(224,136,102,0)); }
+  #glowB { width: 800px; height: 700px; left: -220px; top: 520px;
+    background: radial-gradient(closest-side, rgba(126,87,194,.22), rgba(126,87,194,0)); }
+  #glowC { width: 700px; height: 520px; left: 610px; top: 280px;
+    background: radial-gradient(closest-side, rgba(224,136,102,.20), rgba(224,136,102,0)); }
+  #vignette { position: absolute; inset: 0; pointer-events: none; z-index: 40;
+    background: radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(0,0,0,.55) 100%); }
+  #grain { position: absolute; inset: -64px; pointer-events: none; z-index: 41; opacity: .055;
+    mix-blend-mode: overlay; background-size: 256px 256px; }
+  #fade { position: absolute; inset: 0; background: var(--bg); z-index: 50; pointer-events: none; }
+
+  /* ---------- Intro ---------- */
+  #intro { position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 20; }
+  #introMark { width: 132px; height: 132px; position: relative; }
+  #introMark svg { width: 100%; height: 100%; overflow: visible; }
+  #introRing { position: absolute; left: 50%; top: 46%; width: 300px; height: 300px;
+    margin: -150px 0 0 -150px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(224,136,102,.38), rgba(224,136,102,0) 70%); }
+  #wordmark { display: flex; gap: 2px; margin-top: 30px; font-size: 92px; font-weight: 600;
+    letter-spacing: -0.035em; line-height: 1; }
+  #wordmark span { display: inline-block; }
+  #tagline { margin-top: 22px; font-family: var(--serif); font-size: 40px; color: var(--ink-2);
+    letter-spacing: -0.01em; }
+  #tagline em { font-style: normal; color: var(--accent); }
+
+  /* ---------- Camera & browser ---------- */
+  #camera { position: absolute; inset: 0; transform-origin: 960px 540px; z-index: 10; }
+  #browser { position: absolute; left: 210px; top: 100px; width: 1500px; height: 880px;
+    border-radius: 18px; background: #f4f2ea; overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 50px 120px rgba(0,0,0,.55), 0 18px 40px rgba(0,0,0,.35);
+    transform-origin: 50% 100%; }
+  #chrome { height: 54px; background: #e7e4d9; display: flex; align-items: center; gap: 16px;
+    padding: 0 18px; border-bottom: 1px solid rgba(61,57,41,.10); }
+  .dots { display: flex; gap: 8px; }
+  .dots i { width: 12px; height: 12px; border-radius: 50%; background: #d3cfc2; display: block; }
+  .dots i:nth-child(1) { background: #e9897a; } .dots i:nth-child(2) { background: #e9c36a; } .dots i:nth-child(3) { background: #8fc27a; }
+  #tab { height: 36px; margin-top: 18px; align-self: flex-start; background: #f4f2ea; border-radius: 10px 10px 0 0;
+    padding: 0 16px; display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: #544f3f; width: 290px; }
+  #tab b { width: 14px; height: 14px; border-radius: 4px; background: #3d3929; display: inline-block; }
+  #url { flex: 1; height: 34px; border-radius: 999px; background: #f4f2ea; display: flex; align-items: center;
+    padding: 0 16px; gap: 10px; font-size: 14px; color: #6b6555; max-width: 640px; }
+  #url svg { width: 13px; height: 13px; }
+  #extIcon { margin-left: auto; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; }
+  #extIcon svg { width: 18px; height: 18px; }
+
+  #page { position: absolute; left: 0; top: 54px; right: 0; bottom: 0; background: #f4f2ea; }
+  #article { position: absolute; left: 120px; top: 64px; width: 760px; color: #3d3929; }
+  #kicker { font-size: 12.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #bd5d3a; }
+  #headline { font-family: var(--serif); font-size: 50px; line-height: 1.08; font-weight: 600; letter-spacing: -0.02em;
+    margin: 14px 0 16px; color: #2f2c22; }
+  #byline { font-size: 14px; color: #91897a; display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
+  #byline i { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg,#d9b59c,#a7826a); display: inline-block; }
+  .para { font-family: var(--serif); font-size: 20px; line-height: 1.65; color: #4a4536; margin-bottom: 20px; }
+  .hl { --hl: 0; background-image: linear-gradient(transparent 58%, rgba(224,136,102,.42) 58%, rgba(224,136,102,.42) 92%, transparent 92%);
+    background-repeat: no-repeat; background-size: calc(var(--hl) * 100%) 100%; }
+  #pageDim { position: absolute; inset: 0; background: #1b1916; opacity: 0; }
+
+  /* ---------- Sidebar ---------- */
+  #sidebar { position: absolute; top: 12px; right: 12px; bottom: 12px; width: 452px; border-radius: 18px;
+    background: #262421; color: var(--ink); overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 30px 80px rgba(20,18,14,.45), inset 0 1px 0 rgba(255,255,255,.05); }
+  #sbHead { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 16px 0 18px;
+    border-bottom: 1px solid var(--line); }
+  #sbHead .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 17px; }
+  #sbHead .brand svg { width: 20px; height: 20px; }
+  #pill { margin-left: auto; position: relative; height: 32px; width: 132px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--line-2); }
+  .pillFace { position: absolute; inset: 0; display: flex; align-items: center; gap: 8px; padding: 0 12px;
+    font-size: 14px; font-weight: 600; }
+  .pillFace i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .pillFace svg { width: 12px; height: 12px; margin-left: auto; color: var(--ink-3); }
+  .hIcon { width: 30px; height: 30px; display: grid; place-items: center; color: var(--ink-3); }
+  .hIcon svg { width: 17px; height: 17px; }
+  #tabs { margin: 14px 16px 0; height: 44px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
+    display: flex; padding: 4px; }
+  #tabs div { flex: 1; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 7px;
+    font-size: 14px; color: var(--ink-3); font-weight: 500; }
+  #tabs div.on { background: var(--surface-3); color: var(--ink); font-weight: 600; }
+  #tabs svg { width: 14px; height: 14px; }
+
+  #sbBody { position: absolute; left: 0; right: 0; top: 132px; bottom: 150px; overflow: hidden; }
+  #empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 0 34px; text-align: center; }
+  #emptyMark { width: 64px; height: 64px; border-radius: 18px; background: var(--accent-soft); display: grid; place-items: center;
+    box-shadow: 0 0 60px rgba(224,136,102,.25); }
+  #emptyMark svg { width: 30px; height: 30px; }
+  #empty h3 { font-family: var(--serif); font-weight: 600; font-size: 30px; margin: 22px 0 8px; letter-spacing: -0.01em; }
+  #empty p { color: var(--ink-3); font-size: 15px; line-height: 1.5; margin-bottom: 22px; }
+  .chip { width: 100%; height: 48px; border-radius: 13px; border: 1px solid var(--line-2); background: var(--surface);
+    display: flex; align-items: center; gap: 12px; padding: 0 16px; font-size: 15px; color: var(--ink-2); margin-bottom: 10px;
+    position: relative; overflow: hidden; }
+  .chip svg { width: 16px; height: 16px; color: var(--ink-3); flex-shrink: 0; }
+  .chip .arr { margin-left: auto; }
+  .chipPress { position: absolute; inset: 0; background: rgba(224,136,102,.14); border-radius: 13px; opacity: 0; }
+
+  #msgs { position: absolute; left: 0; right: 0; top: 0; padding: 22px 20px; }
+  .user { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+  .user span { background: var(--surface-3); padding: 11px 16px; border-radius: 18px 18px 6px 18px; font-size: 15px; color: var(--ink); }
+  .ai { margin-bottom: 22px; }
+  .aiHead { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--ink-3); margin-bottom: 10px; font-weight: 500; }
+  .aiHead .mk { width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; }
+  .aiHead .mk svg { width: 13px; height: 13px; }
+  .aiHead b { color: var(--ink-2); font-weight: 600; }
+  .think { display: flex; gap: 5px; margin: 4px 0 0 2px; height: 0; }
+  .think i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); display: block; }
+  .aiText { font-size: 15.5px; line-height: 1.6; color: var(--ink-2); }
+  .aiText p { margin-bottom: 8px; }
+  .aiText ul { list-style: none; }
+  .aiText li { position: relative; padding-left: 18px; margin-bottom: 9px; }
+  .aiText li::before { content: ""; position: absolute; left: 3px; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .aiText strong { color: var(--ink); font-weight: 600; }
+  .typing::after { content: ""; display: inline-block; width: 2px; height: 1.05em; background: var(--accent);
+    vertical-align: -0.15em; margin-left: 2px; border-radius: 1px; }
+
+  #sbFoot { position: absolute; left: 0; right: 0; bottom: 0; height: 150px; padding: 0 16px; border-top: 1px solid var(--line);
+    background: #262421; }
+  #ctxChip { margin: 12px 0 10px; height: 26px; display: inline-flex; align-items: center; gap: 7px; padding: 0 11px;
+    border-radius: 999px; border: 1px solid var(--line-2); font-size: 12.5px; color: var(--ink-3); }
+  #ctxChip svg { width: 12px; height: 12px; }
+  #composer { height: 80px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line-2); position: relative; }
+  #composerFocus { position: absolute; inset: -1px; border-radius: 16px; border: 1px solid rgba(224,136,102,.7);
+    box-shadow: 0 0 0 4px rgba(224,136,102,.14); opacity: 0; }
+  #ph, #typed { position: absolute; left: 16px; top: 13px; font-size: 15px; }
+  #ph { color: var(--ink-4); }
+  #typed { color: var(--ink); }
+  #modelChip { position: absolute; left: 12px; bottom: 10px; height: 26px; width: 140px; }
+  .mcFace { position: absolute; inset: 0; display: flex; align-items: center; gap: 7px; padding: 0 10px; border-radius: 999px;
+    border: 1px solid var(--line-2); font-family: var(--mono); font-size: 12px; color: var(--ink-3); width: max-content; }
+  .mcFace i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  #send { position: absolute; right: 10px; bottom: 9px; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--accent); display: grid; place-items: center; box-shadow: 0 4px 14px rgba(224,136,102,.35); }
+  #send svg { width: 16px; height: 16px; color: #fff; }
+  #disclaimer { text-align: center; font-size: 11.5px; color: var(--ink-4); margin-top: 9px; }
+
+  /* Provider dropdown */
+  #menu { position: absolute; top: 54px; right: 88px; width: 316px; border-radius: 16px; padding: 8px;
+    background: rgba(48,45,40,.96); border: 1px solid var(--line-2); z-index: 5; transform-origin: 85% 0;
+    box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 4px 14px rgba(0,0,0,.3); backdrop-filter: blur(20px); }
+  #menu .lab { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-4); padding: 8px 10px 8px; font-weight: 600; }
+  .row { height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 10px; border-radius: 11px; position: relative; z-index: 1; }
+  .row .mk { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex-shrink: 0; }
+  .row .mk svg { width: 17px; height: 17px; }
+  .row .nm { font-size: 14.5px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+  .row .md { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+  .row .ck { margin-left: auto; width: 16px; height: 16px; color: var(--accent); }
+  #menuHi { position: absolute; left: 8px; right: 8px; top: 37px; height: 52px; border-radius: 11px; background: rgba(238,236,226,.07); }
+
+  /* Cursor */
+  #cursor { position: absolute; left: 0; top: 0; width: 30px; height: 30px; z-index: 30; transform-origin: 4px 3px; }
+  #cursor svg { width: 30px; height: 30px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.35)); }
+  #ripple { position: absolute; left: 0; top: 0; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%;
+    border: 2px solid rgba(224,136,102,.9); z-index: 29; }
+
+  /* Keycaps */
+  /* Centered by the flex wrapper, not translateX(-50%): the tween engine owns `transform`. */
+  #keys { position: relative; z-index: 25; display: flex; align-items: center; gap: 16px;
+    padding: 18px 26px; border-radius: 22px; background: rgba(32,30,27,.78); border: 1px solid var(--line-2);
+    box-shadow: 0 30px 70px rgba(0,0,0,.5); backdrop-filter: blur(16px); white-space: nowrap; }
+  #keysWrap { position: absolute; left: 0; right: 0; top: 860px; z-index: 25; display: flex; justify-content: center; pointer-events: none; }
+  .key { min-width: 70px; height: 64px; padding: 0 18px; border-radius: 14px; display: grid; place-items: center;
+    font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--ink);
+    background: linear-gradient(#3b3833, #2e2b27); border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 5px 0 #191714, 0 8px 18px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08); }
+  #keys .plus { font-size: 22px; color: var(--ink-4); }
+  #keys .cap { font-size: 18px; color: var(--ink-3); margin-left: 10px; }
+
+  /* Model wall */
+  #wall { position: absolute; inset: 0; z-index: 15; }
+  #wallTitle { position: absolute; left: 0; right: 0; top: 150px; text-align: center; }
+  #wallTitle .eb { font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  #wallTitle h2 { font-family: var(--serif); font-size: 64px; font-weight: 600; letter-spacing: -0.02em; margin-top: 14px; }
+  #wallTitle h2 em { font-style: normal; color: var(--accent); }
+  #grid { position: absolute; left: 212px; top: 360px; width: 1496px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+    perspective: 1600px; }
+  .card { height: 232px; border-radius: 22px; padding: 26px 28px; position: relative; overflow: hidden;
+    background: linear-gradient(160deg, rgba(52,49,44,.92), rgba(34,32,28,.92));
+    border: 1px solid rgba(238,236,226,.10);
+    box-shadow: 0 30px 70px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05); }
+  .card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 90% at 0% 0%, var(--c), transparent 60%); opacity: .16; }
+  .card .top { display: flex; align-items: center; gap: 14px; position: relative; }
+  .card .mk { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; }
+  .card .mk svg { width: 24px; height: 24px; }
+  .card .pn { font-size: 24px; font-weight: 600; letter-spacing: -0.01em; }
+  .card .pv { font-size: 13px; color: var(--ink-4); margin-top: 2px; }
+  .card .models { position: relative; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .card .m { height: 32px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 7px;
+    font-family: var(--mono); font-size: 13.5px; color: var(--ink-2); background: rgba(238,236,226,.06); border: 1px solid rgba(238,236,226,.08); }
+  .card .m.def { color: var(--ink); border-color: color-mix(in oklab, var(--c) 55%, transparent); background: color-mix(in oklab, var(--c) 16%, transparent); }
+  .card .m.def::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+  #sweep { position: absolute; top: -200px; left: 0; width: 360px; height: 1400px; z-index: 16; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255,240,225,.10), transparent); mix-blend-mode: screen; }
+  #wallFoot { position: absolute; left: 0; right: 0; top: 900px; text-align: center; color: var(--ink-3); font-size: 19px; }
+  #wallFoot code { font-family: var(--mono); color: var(--ink-2); font-size: 17px; background: rgba(238,236,226,.06);
+    border: 1px solid var(--line); padding: 3px 10px; border-radius: 8px; }
+
+  /* Outro */
+  #outro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 22; }
+  #outroMark { width: 96px; height: 96px; }
+  #outroMark svg { width: 100%; height: 100%; overflow: visible; }
+  #outroName { font-size: 84px; font-weight: 600; letter-spacing: -0.035em; margin-top: 22px; line-height: 1; }
+  #outroLine { font-family: var(--serif); font-size: 34px; color: var(--ink-2); margin-top: 18px; }
+  #outroLine em { font-style: normal; color: var(--accent); }
+  #outroMeta { display: flex; gap: 14px; margin-top: 40px; }
+  #outroMeta span { height: 46px; padding: 0 20px; border-radius: 999px; display: inline-flex; align-items: center; gap: 9px;
+    font-size: 17px; color: var(--ink-2); border: 1px solid var(--line-2); background: rgba(238,236,226,.04); }
+  #outroMeta span.cta { background: var(--accent); color: #fff; border-color: transparent; font-weight: 600;
+    box-shadow: 0 10px 30px rgba(224,136,102,.35); }
+  #outroMeta svg { width: 17px; height: 17px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="glow" id="glowA"></div>
+  <div class="glow" id="glowB"></div>
+  <div class="glow" id="glowC"></div>
+
+  <!-- ===== Intro ===== -->
+  <div id="intro">
+    <div id="introMark">
+      <div id="introRing"></div>
+      <svg viewBox="0 0 32 32" fill="none"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0a07f"/><stop offset="1" stop-color="#c96846"/></linearGradient></defs>
+        <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="url(#g1)"/>
+        <circle id="introDot" cx="16" cy="27.6" r="1.7" fill="#e08866"/></svg>
+    </div>
+    <div id="wordmark"><span>A</span><span>s</span><span>i</span><span>d</span><span>e</span></div>
+    <div id="tagline">AI, <em>on your side.</em></div>
+  </div>
+
+  <!-- ===== Browser (inside camera) ===== -->
+  <div id="camera">
+    <div id="browser">
+      <div id="chrome">
+        <div class="dots"><i></i><i></i><i></i></div>
+        <div id="tab"><b></b>The quiet shift · Field Notes</div>
+        <div id="url"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>fieldnotes.blog/the-quiet-shift</div>
+        <div id="extIcon"><svg viewBox="0 0 32 32"><path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="#da7756"/><circle cx="16" cy="27.6" r="1.7" fill="#da7756"/></svg></div>
+      </div>
+      <div id="page">
+        <article id="article">
+          <div id="kicker" class="ln">Essay · 9 min read</div>
+          <h1 id="headline" class="ln">The quiet shift to ambient AI</h1>
+          <div id="byline" class="ln"><i></i>Mara Ellison · October 2026</div>
+          <p class="para ln">For years, using AI meant leaving what you were doing. <span class="hl" id="hl1">Now small models run right on the device</span>, and the answer arrives before you'd have finished switching tabs.</p>
+          <p class="para ln">That proximity changes the trust equation. <span class="hl" id="hl2">When page data never leaves the browser</span>, privacy stops being a setting and becomes the default.</p>
+          <p class="para ln">The bigger change is where the assistant lives. <span class="hl" id="hl3">It is no longer a destination. It's a layer</span> that sits beside every page you read, ready the moment you are.</p>
+          <p class="para ln" style="color:#91897a">The tools that win this era won't ask for your attention. They'll simply be there, quietly, when you need them.</p>
+        </article>
+        <div id="pageDim"></div>
+
+        <aside id="sidebar">
+          <div id="sbHead">
+            <div class="brand"><svg viewBox="0 0 32 32"><path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="#e08866"/><circle cx="16" cy="27.6" r="1.9" fill="#e08866"/></svg>Aside</div>
+            <div id="pill">
+              <div class="pillFace" id="pillA"><i style="background:var(--p-claude)"></i>Claude<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></div>
+              <div class="pillFace" id="pillB"><i style="background:var(--p-gemini)"></i>Gemini<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+            <div class="hIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></div>
+            <div class="hIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.7l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.7-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3.5 14H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 3.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.6 1.6 0 0 0 20.5 10H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg></div>
+            <div class="hIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></div>
+          </div>
+          <div id="tabs">
+            <div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="#e08866" stroke-width="2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></svg>Chat</div>
+            <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg>Tools</div>
+          </div>
+
+          <div id="sbBody">
+            <div id="msgs">
+              <div class="user" id="u1"><span>Summarize this page</span></div>
+              <div class="ai" id="a1">
+                <div class="aiHead" id="a1h"><span class="mk" style="background:var(--p-claude)" data-mark="claude"></span><b>Claude</b> · Sonnet 5.5</div>
+                <div class="think" id="think1"><i></i><i></i><i></i></div>
+                <div class="aiText">
+                  <p><span class="st" data-s="10.95">Here's the gist of this essay:</span></p>
+                  <ul>
+                    <li id="b1"><strong class="st" data-s="11.35">Models went local.</strong> <span class="st" data-s="11.6">Small models now run on-device, so answers arrive without a round-trip.</span></li>
+                    <li id="b2"><strong class="st" data-s="12.45">Privacy by default.</strong> <span class="st" data-s="12.7">Page data stays in your browser unless you choose to send it.</span></li>
+                    <li id="b3"><strong class="st" data-s="13.5">AI becomes ambient.</strong> <span class="st" data-s="13.75">The assistant moves from a destination tab to a layer over every page.</span></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="user" id="u2"><span>Turn it into three action items</span></div>
+              <div class="ai" id="a2">
+                <div class="aiHead" id="a2h"><span class="mk" style="background:var(--p-gemini)" data-mark="gemini"></span><b>Gemini</b> · 3.5 Flash-Lite</div>
+                <div class="think" id="think2"><i></i><i></i><i></i></div>
+                <div class="aiText">
+                  <ul>
+                    <li><strong class="st" data-s="20.45">Try a local model.</strong> <span class="st" data-s="20.85">Instant and private.</span></li>
+                    <li><strong class="st" data-s="21.4">Keep data in-browser.</strong> <span class="st" data-s="21.8">Share only on purpose.</span></li>
+                    <li><strong class="st" data-s="22.3">Stay one keystroke away.</strong> <span class="st" data-s="22.7">No more tab-hopping.</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div id="empty">
+              <div id="emptyMark" class="es"><svg viewBox="0 0 32 32"><path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="#e08866"/><circle cx="16" cy="27.6" r="1.9" fill="#e08866"/></svg></div>
+              <h3 class="es">What's on your mind?</h3>
+              <p class="es">Ask anything about this page: summarize, extract, translate, or just chat.</p>
+              <div class="chip es" id="chip1"><div class="chipPress" id="chip1p"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Summarize this page<svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+              <div class="chip es"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Extract the key points<svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+              <div class="chip es"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h7M7.5 4v2M5 9c.7 2.5 2 4.5 4 6M11 9c-1.5 4-4 6.5-7 8M14 21l4-9 4 9M15.5 18h5"/></svg>Translate the selection<svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+            </div>
+          </div>
+
+          <div id="sbFoot">
+            <div id="ctxChip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8"/></svg>Page context · fieldnotes.blog</div>
+            <div id="composer">
+              <div id="composerFocus"></div>
+              <div id="ph">Ask anything about this page…</div>
+              <div id="typed"><span class="st" id="typedText" data-s="18.55" data-cps="32">Turn it into three action items</span></div>
+              <div id="modelChip">
+                <div class="mcFace" id="mcA"><i style="background:var(--p-claude)"></i>Sonnet 5.5</div>
+                <div class="mcFace" id="mcB"><i style="background:var(--p-gemini)"></i>3.5 Flash-Lite</div>
+              </div>
+              <div id="send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+            </div>
+            <div id="disclaimer">Aside can make mistakes. Check important info.</div>
+          </div>
+
+          <div id="menu">
+            <div class="lab">Provider</div>
+            <div id="menuHi"></div>
+            <div class="row" id="r-claude"><span class="mk" style="background:var(--p-claude)" data-mark="claude"></span><div><div class="nm">Claude</div><div class="md">claude-sonnet-5-5</div></div><svg class="ck" id="ckA" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg></div>
+            <div class="row" id="r-openai"><span class="mk" style="background:var(--p-openai)" data-mark="openai"></span><div><div class="nm">OpenAI</div><div class="md">gpt-6-luna</div></div></div>
+            <div class="row" id="r-gemini"><span class="mk" style="background:var(--p-gemini)" data-mark="gemini"></span><div><div class="nm">Gemini</div><div class="md">gemini-3.5-flash-lite</div></div><svg class="ck" id="ckB" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m5 12 5 5 9-10"/></svg></div>
+            <div class="row" id="r-grok"><span class="mk" style="background:var(--p-grok)" data-mark="grok"></span><div><div class="nm">Grok</div><div class="md">grok-4.3</div></div></div>
+            <div class="row" id="r-groq"><span class="mk" style="background:var(--p-groq)" data-mark="groq"></span><div><div class="nm">Groq</div><div class="md">openai/gpt-oss-120b</div></div></div>
+            <div class="row" id="r-ollama"><span class="mk" style="background:var(--p-ollama)" data-mark="ollama"></span><div><div class="nm">Ollama <span style="font-weight:500;color:var(--ink-4);font-size:12.5px">· local</span></div><div class="md">qwen3.5</div></div></div>
+          </div>
+        </aside>
+      </div>
+
+      <div id="ripple"></div>
+      <div id="cursor"><svg viewBox="0 0 30 30"><path d="M4 3 L4 24 L9.6 18.8 L13.4 27 L17 25.4 L13.3 17.4 L21 17.2 Z" fill="#fff" stroke="#1b1916" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+    </div>
+  </div>
+
+  <!-- ===== Keycaps ===== -->
+  <div id="keysWrap">
+    <div id="keys"><div class="key" id="kAlt">Alt</div><span class="plus">+</span><div class="key" id="kA">A</div><span class="cap">opens Aside on any page</span></div>
+  </div>
+
+  <!-- ===== Model wall ===== -->
+  <div id="wall">
+    <div id="wallTitle"><div class="eb" id="wEb">Six providers · Latest models</div><h2 id="wH">Every frontier model. <em>One sidebar.</em></h2></div>
+    <div id="grid">
+      <div class="card" style="--c:var(--p-claude)"><div class="top"><span class="mk" style="background:var(--p-claude)" data-mark="claude"></span><div><div class="pn">Claude</div><div class="pv">Anthropic</div></div></div>
+        <div class="models"><span class="m def">Sonnet 5.5</span><span class="m">Opus 5.5</span><span class="m">Fable 5.1</span><span class="m">Haiku 5.5</span></div></div>
+      <div class="card" style="--c:var(--p-openai)"><div class="top"><span class="mk" style="background:var(--p-openai)" data-mark="openai"></span><div><div class="pn">OpenAI</div><div class="pv">GPT-6 family</div></div></div>
+        <div class="models"><span class="m def">GPT-6 Luna</span><span class="m">GPT-6.1 Sol</span><span class="m">GPT-6 Astra</span></div></div>
+      <div class="card" style="--c:var(--p-gemini)"><div class="top"><span class="mk" style="background:var(--p-gemini)" data-mark="gemini"></span><div><div class="pn">Gemini</div><div class="pv">Google</div></div></div>
+        <div class="models"><span class="m def">3.5 Flash-Lite</span><span class="m">3.8 Flash</span><span class="m">3.1 Pro</span></div></div>
+      <div class="card" style="--c:#8f897c"><div class="top"><span class="mk" style="background:var(--p-grok)" data-mark="grok"></span><div><div class="pn">Grok</div><div class="pv">xAI</div></div></div>
+        <div class="models"><span class="m def">Grok 4.3</span><span class="m">Grok 4.20 fast</span><span class="m">Grok 4.7</span></div></div>
+      <div class="card" style="--c:var(--p-groq)"><div class="top"><span class="mk" style="background:var(--p-groq)" data-mark="groq"></span><div><div class="pn">Groq</div><div class="pv">Free tier · LPU speed</div></div></div>
+        <div class="models"><span class="m def">GPT-OSS 120B</span><span class="m">GPT-OSS 20B</span></div></div>
+      <div class="card" style="--c:var(--p-ollama)"><div class="top"><span class="mk" style="background:var(--p-ollama)" data-mark="ollama"></span><div><div class="pn">Ollama</div><div class="pv">Local · no key · offline</div></div></div>
+        <div class="models"><span class="m def">Qwen 3.5</span><span class="m">Gemma 4</span><span class="m">GPT-OSS 20B</span><span class="m">Llama 3.2</span></div></div>
+    </div>
+    <div id="sweep"></div>
+    <div id="wallFoot">Or type any model id. <code>Custom…</code> keeps you current the day a model ships.</div>
+  </div>
+
+  <!-- ===== Outro ===== -->
+  <div id="outro">
+    <div id="outroMark"><svg viewBox="0 0 32 32" fill="none"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0a07f"/><stop offset="1" stop-color="#c96846"/></linearGradient></defs>
+      <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="url(#g2)"/><circle cx="16" cy="27.6" r="1.7" fill="#e08866"/></svg></div>
+    <div id="outroName">Aside</div>
+    <div id="outroLine">Any model. Any page. <em>One keystroke.</em></div>
+    <div id="outroMeta">
+      <span class="cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Free &amp; open source</span>
+      <span>Bring your own keys</span>
+      <span>github.com/Royc4515/Aside</span>
+    </div>
+  </div>
+
+  <div id="vignette"></div>
+  <div id="grain"></div>
+  <div id="fade"></div>
+</div>
+
+<script>
+/* ================= Provider monograms (from shared/provider-marks.js) ================= */
+const STROKE = 'stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+const MARKS = {
+  claude: `<svg viewBox="0 0 16 16" fill="none" ${STROKE}><path d="M8 1.5C8.6 4 9.8 5.6 12.5 6.3 9.8 7 8.6 8.6 8 11.1 7.4 8.6 6.2 7 3.5 6.3 6.2 5.6 7.4 4 8 1.5z"/><path d="M12.2 11.6c.2.6.6 1 1.3 1.2-.7.2-1.1.6-1.3 1.3-.2-.7-.6-1.1-1.3-1.3.7-.2 1.1-.6 1.3-1.2z" fill="white" stroke="none"/></svg>`,
+  openai: `<svg viewBox="0 0 16 16" fill="none" ${STROKE}><path d="M8 2.5 11.5 4.5 11.5 8.5 8 10.5 4.5 8.5 4.5 4.5 8 2.5z"/><path d="M8 5.5 9.7 6.5 9.7 8.5 8 9.5 6.3 8.5 6.3 6.5 8 5.5z" fill="white" stroke="none"/><path d="M4.5 8.5 4.5 12.5 8 14.5 11.5 12.5 11.5 8.5"/></svg>`,
+  gemini: `<svg viewBox="0 0 16 16"><path d="M8 1.5 9.5 6.5 14.5 8 9.5 9.5 8 14.5 6.5 9.5 1.5 8 6.5 6.5z" fill="white"/></svg>`,
+  grok:   `<svg viewBox="0 0 16 16" fill="none" ${STROKE} stroke-width="2.2"><path d="M3 3 13 13M13 3 3 13"/></svg>`,
+  groq:   `<svg viewBox="0 0 16 16" fill="none" ${STROKE}><path d="M9 1.5 3.5 9 7.5 9 6 14.5 12.5 7 8.5 7z" fill="white"/></svg>`,
+  ollama: `<svg viewBox="0 0 16 16" fill="none" ${STROKE}><path d="M4 7c0-2.2 1.8-4 4-4s4 1.8 4 4v3.5c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7z" fill="white"/><path d="M5 2.5 6 5.5M11 2.5 10 5.5" stroke-width="1.5"/><circle cx="6.5" cy="8" r="0.7" fill="#7e57c2" stroke="none"/><circle cx="9.5" cy="8" r="0.7" fill="#7e57c2" stroke="none"/></svg>`,
+};
+document.querySelectorAll('[data-mark]').forEach(el => { el.innerHTML = MARKS[el.dataset.mark]; });
+
+/* ================= Tiny deterministic tween engine ================= */
+const EASE = {
+  linear: p => p,
+  inCubic: p => p * p * p,
+  outCubic: p => 1 - Math.pow(1 - p, 3),
+  outQuart: p => 1 - Math.pow(1 - p, 4),
+  outQuint: p => 1 - Math.pow(1 - p, 5),
+  inOutCubic: p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2,
+  inOutQuart: p => p < .5 ? 8 * p ** 4 : 1 - Math.pow(-2 * p + 2, 4) / 2,
+  outExpo: p => p >= 1 ? 1 : 1 - Math.pow(2, -10 * p),
+  inOutExpo: p => p <= 0 ? 0 : p >= 1 ? 1 : p < .5 ? Math.pow(2, 20 * p - 10) / 2 : (2 - Math.pow(2, -20 * p + 10)) / 2,
+  inExpo: p => p <= 0 ? 0 : Math.pow(2, 10 * p - 10),
+  // Critically-damped-ish spring with a soft overshoot; exact 1 at p = 1.
+  spring: p => p >= 1 ? 1 : 1 - Math.exp(-7 * p) * Math.cos(8.5 * p) * (1 - p * 0.02),
+};
+const DEF = { x: 0, y: 0, z: 0, rx: 0, ry: 0, rot: 0, scale: 1, opacity: 1, blur: 0, bright: 1 };
+const TRACKS = new Map();   // el -> { prop -> [seg] }
+
+function els(t) { return typeof t === 'string' ? [...document.querySelectorAll(t)] : Array.isArray(t) ? t : [t]; }
+function lastEnd(segs, prop) { return segs.length ? segs[segs.length - 1].b : (prop in DEF ? DEF[prop] : 0); }
+/** Tween `props` on `target` from t0 for dur seconds. A prop is [from, to] or just `to`. */
+function A(target, t0, dur, props, ease = 'outExpo') {
+  for (const el of els(target)) {
+    if (!TRACKS.has(el)) TRACKS.set(el, {});
+    const tr = TRACKS.get(el);
+    for (const [k, v] of Object.entries(props)) {
+      const segs = tr[k] || (tr[k] = []);
+      const [a, b] = Array.isArray(v) ? v : [lastEnd(segs, k), v];
+      segs.push({ t0, t1: t0 + dur, a, b, e: EASE[ease] });
+      segs.sort((p, q) => p.t0 - q.t0);
+    }
+  }
+}
+/** Stagger helper: same tween over a list, offset by `step` seconds. */
+function S(target, t0, step, dur, props, ease) { els(target).forEach((el, i) => A(el, t0 + i * step, dur, props, ease)); }
+
+function valueAt(segs, t) {
+  if (t <= segs[0].t0) return segs[0].a;
+  let s = segs[0];
+  for (const seg of segs) { if (seg.t0 <= t) s = seg; else break; }
+  if (t >= s.t1) return s.b;
+  const p = s.e((t - s.t0) / Math.max(1e-6, s.t1 - s.t0));
+  return s.a + (s.b - s.a) * p;
+}
+
+function applyAll(t) {
+  for (const [el, tr] of TRACKS) {
+    const v = {};
+    for (const k in tr) v[k] = valueAt(tr[k], t);
+    const has = k => k in v;
+    if (['x', 'y', 'z', 'rx', 'ry', 'rot', 'scale'].some(has)) {
+      el.style.transform =
+        `translate3d(${v.x || 0}px, ${v.y || 0}px, ${v.z || 0}px)` +
+        (has('rx') ? ` rotateX(${v.rx}deg)` : '') + (has('ry') ? ` rotateY(${v.ry}deg)` : '') +
+        (has('rot') ? ` rotate(${v.rot}deg)` : '') + (has('scale') ? ` scale(${v.scale})` : '');
+    }
+    if (has('opacity')) el.style.opacity = Math.max(0, Math.min(1, v.opacity));
+    if (has('blur') || has('bright')) {
+      el.style.filter = (has('blur') && v.blur > 0.05 ? `blur(${v.blur}px) ` : '') + (has('bright') ? `brightness(${v.bright})` : '') || 'none';
+    }
+    for (const k in v) if (k.startsWith('--')) el.style.setProperty(k, v[k]);
+  }
+}
+
+/* ================= Text streaming ================= */
+const STREAMS = [...document.querySelectorAll('.st')].map(el => {
+  const full = el.textContent;
+  return { el, full, t0: parseFloat(el.dataset.s), cps: parseFloat(el.dataset.cps || 70) };
+});
+function streamAt(t) {
+  for (const s of STREAMS) {
+    const n = Math.max(0, Math.min(s.full.length, Math.floor((t - s.t0) * s.cps)));
+    const txt = s.full.slice(0, n);
+    if (s.el.textContent !== txt) s.el.textContent = txt;
+    const end = s.t0 + s.full.length / s.cps;
+    s.el.classList.toggle('typing', t >= s.t0 && t < end + 0.12);
+  }
+}
+
+/* ================= Layout helpers (untransformed offsets) ================= */
+const browser = document.getElementById('browser');
+function at(sel, fx = .5, fy = .5) {
+  let el = document.querySelector(sel), x = 0, y = 0;
+  const w = el.offsetWidth, h = el.offsetHeight;
+  while (el && el !== browser) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
+  return { x: x + w * fx, y: y + h * fy };
+}
+/** Cursor path: glide between points; click = quick press. */
+function moveCursor(t0, dur, to, ease = 'inOutCubic') { A('#cursor', t0, dur, { x: to.x - 4, y: to.y - 3 }, ease); }
+function click(t, p) {
+  A('#cursor', t - .06, .08, { scale: .82 }, 'outCubic');
+  A('#cursor', t + .04, .22, { scale: 1 }, 'outQuart');
+  A('#ripple', t, .001, { x: [p.x, p.x], y: [p.y, p.y], opacity: [0, .9], scale: [.3, .3] }, 'linear');
+  A('#ripple', t, .55, { scale: 1.25, opacity: 0 }, 'outCubic');
+}
+
+/* ================= Grain ================= */
+(function makeGrain() {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const g = c.getContext('2d'), img = g.createImageData(256, 256);
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < img.data.length; i += 4) { const v = rnd() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  g.putImageData(img, 0, 0);
+  document.getElementById('grain').style.backgroundImage = `url(${c.toDataURL()})`;
+})();
+function grainAt(t) {
+  const f = Math.floor(t * 24);   // film-rate grain
+  const gx = (f * 73) % 256, gy = (f * 151) % 256;
+  document.getElementById('grain').style.backgroundPosition = `${gx}px ${gy}px`;
+}
+
+/* ================= Timeline ================= */
+const DURATION = 31;
+function build() {
+  // Fade from black / to black
+  A('#fade', 0, .9, { opacity: [1, 0] }, 'outCubic');
+  A('#fade', 30.2, .8, { opacity: 1 }, 'inOutCubic');
+
+  // Ambient light drift (very slow, always on)
+  A('#glowA', 0, DURATION, { x: [0, -260], y: [0, 120], scale: [1, 1.15] }, 'inOutCubic');
+  A('#glowB', 0, DURATION, { x: [0, 300], y: [0, -140] }, 'inOutCubic');
+  A('#glowC', 0, 2.5, { opacity: [0, 1], scale: [.6, 1] }, 'outCubic');
+  A('#glowC', 3, 2, { opacity: .35 }, 'inOutCubic');
+  A('#glowC', 21.6, 2, { opacity: 1, scale: 1.4 }, 'inOutCubic');
+
+  // ---- 1. Intro ----
+  A('#introMark', .25, 1.5, { scale: [.35, 1], rot: [-40, 0], blur: [26, 0], opacity: [0, 1] }, 'outExpo');
+  A('#introRing', .4, 2.2, { scale: [.2, 1.25], opacity: [0, 1] }, 'outExpo');
+  A('#introRing', 2.0, 1.2, { opacity: .55 }, 'inOutCubic');
+  S('#wordmark span', .95, .07, 1.0, { y: [70, 0], opacity: [0, 1], blur: [14, 0] }, 'outExpo');
+  A('#tagline', 1.65, 1.1, { y: [26, 0], opacity: [0, 1], blur: [10, 0] }, 'outExpo');
+  A('#intro', 3.05, .75, { y: -70, opacity: 0, blur: 18, scale: .96 }, 'inOutCubic');
+
+  // ---- 2. Browser rises ----
+  A('#browser', 3.2, 1.55, { y: [260, 0], rx: [24, 0], scale: [.88, 1], opacity: [0, 1] }, 'outExpo');
+  A('#camera', 3.2, 1.6, { scale: [1.04, 1] }, 'outExpo');
+  S('#article .ln', 3.75, .07, .9, { y: [18, 0], opacity: [0, 1] }, 'outExpo');
+  A('#sidebar', 0, .001, { x: [500, 500], opacity: [0, 0] }, 'linear');
+
+  // Keycaps: Alt + A
+  A('#keys', 4.9, .8, { y: [60, 0], opacity: [0, 1], blur: [10, 0], scale: [.94, 1] }, 'outExpo');
+  A('#kAlt', 5.75, .1, { y: 5, bright: .8 }, 'outCubic');
+  A('#kA', 5.85, .1, { y: 5, bright: .8 }, 'outCubic');
+  A('#kAlt', 6.15, .25, { y: 0, bright: 1 }, 'outQuart');
+  A('#kA', 6.2, .25, { y: 0, bright: 1 }, 'outQuart');
+  A('#keys', 6.75, .6, { y: 40, opacity: 0, blur: 8 }, 'inOutCubic');
+
+  // Sidebar slides in with a spring
+  A('#sidebar', 5.95, 1.15, { x: 0, opacity: 1 }, 'spring');
+  A('#pageDim', 5.95, .9, { opacity: [0, .04] }, 'outCubic');
+  S('#empty .es', 6.35, .06, .8, { y: [16, 0], opacity: [0, 1] }, 'outExpo');
+
+  // Camera pushes in toward the sidebar
+  A('#camera', 7.0, 1.6, { scale: 1.15, x: -326, y: -41 }, 'inOutCubic');
+
+  // ---- 3. Summarize ----
+  const chip1 = at('#chip1', .32, .55);
+  A('#cursor', 0, .001, { x: [1560, 1560], y: [940, 940], opacity: [0, 0] }, 'linear');
+  A('#cursor', 8.1, .3, { opacity: 1 }, 'outCubic');
+  moveCursor(8.1, 1.05, chip1);
+  click(9.25, chip1);
+  A('#chip1p', 9.2, .15, { opacity: [0, 1] }, 'outCubic');
+  A('#empty', 9.45, .5, { opacity: 0, y: -14, blur: 8 }, 'inOutCubic');
+  A('#u1', 9.75, .6, { y: [18, 0], opacity: [0, 1], scale: [.96, 1] }, 'outExpo');
+  A('#a1h', 10.05, .5, { y: [10, 0], opacity: [0, 1] }, 'outExpo');
+  A('#think1', 10.15, .25, { opacity: [0, 1] }, 'outCubic');
+  document.querySelectorAll('#think1 i').forEach((d, i) => {
+    for (let k = 0; k < 3; k++) {
+      A(d, 10.15 + k * .27 + i * .09, .14, { y: [0, -4] }, 'outCubic');
+      A(d, 10.29 + k * .27 + i * .09, .14, { y: 0 }, 'inCubic');
+    }
+  });
+  A('#think1', 10.85, .1, { opacity: 0 }, 'linear');
+  ['#hl1', '#hl2', '#hl3'].forEach((h, i) => A(h, [11.35, 12.45, 13.5][i], .7, { '--hl': [0, 1] }, 'inOutCubic'));
+  moveCursor(10.0, 1.5, { x: 840, y: 470 }, 'inOutCubic');
+  // Bullets appear as their first words stream in
+  document.querySelectorAll('.aiText li').forEach(li => {
+    const s0 = parseFloat(li.querySelector('.st').dataset.s);
+    A(li, s0 - .06, .35, { opacity: [0, 1], x: [-8, 0] }, 'outExpo');
+  });
+
+  // ---- 4. Switch provider ----
+  const pill = at('#pill', .45, .55);
+  moveCursor(14.35, .95, pill);
+  click(15.35, pill);
+  A('#menu', 0, .001, { opacity: [0, 0], scale: [.94, .94], y: [-10, -10] }, 'linear');
+  A('#menu', 15.42, .5, { opacity: 1, scale: 1, y: 0 }, 'outExpo');
+  S('#menu .row', 15.5, .04, .5, { x: [10, 0], opacity: [0, 1] }, 'outExpo');
+  A('#ckB', 0, .001, { opacity: [0, 0] }, 'linear');
+  const rowH = document.getElementById('r-openai').offsetTop - document.getElementById('r-claude').offsetTop;
+  document.getElementById('menuHi').style.top = document.getElementById('r-claude').offsetTop + 'px';
+  const rows = ['claude', 'openai', 'gemini'];
+  const p0 = at('#r-claude', .55, .5);
+  moveCursor(16.0, .3, { x: p0.x, y: p0.y }, 'outCubic');
+  rows.forEach((r, i) => {
+    if (!i) return;
+    const p = at('#r-' + r, .55, .5);
+    moveCursor(16.25 + (i - 1) * .3, .3, p, 'inOutCubic');
+    A('#menuHi', 16.25 + (i - 1) * .3, .3, { y: rowH * i }, 'inOutCubic');
+  });
+  const gem = at('#r-gemini', .55, .5);
+  click(17.0, gem);
+  A('#ckA', 17.0, .15, { opacity: 0 }, 'outCubic');
+  A('#ckB', 17.0, .2, { opacity: 1 }, 'outCubic');
+  A('#menu', 17.25, .35, { opacity: 0, scale: .96, y: -6 }, 'inOutCubic');
+  A('#pillA', 17.2, .35, { opacity: [1, 0], y: [0, -8] }, 'inOutCubic');
+  A('#pillB', 17.2, .45, { opacity: [0, 1], y: [8, 0] }, 'outExpo');
+  A('#mcA', 17.3, .35, { opacity: [1, 0], y: [0, -6] }, 'inOutCubic');
+  A('#mcB', 17.3, .45, { opacity: [0, 1], y: [6, 0] }, 'outExpo');
+
+  // ---- 5. Follow-up on a different provider ----
+  const comp = at('#composer', .35, .3);
+  moveCursor(17.55, .8, comp);
+  click(18.38, comp);
+  A('#composerFocus', 18.38, .3, { opacity: [0, 1] }, 'outCubic');
+  A('#ph', 18.5, .12, { opacity: [1, 0] }, 'linear');
+  const send = at('#send');
+  moveCursor(18.8, .55, { x: send.x + 40, y: send.y + 60 }, 'inOutCubic');
+  moveCursor(19.45, .35, send, 'inOutCubic');
+  click(19.85, send);
+  A('#send', 19.8, .1, { scale: .88 }, 'outCubic');
+  A('#send', 19.9, .3, { scale: 1 }, 'outQuart');
+  A('#typed', 19.95, .2, { opacity: [1, 0] }, 'linear');
+  A('#ph', 20.1, .3, { opacity: 1 }, 'linear');
+  A('#composerFocus', 20.0, .4, { opacity: 0 }, 'linear');
+  A('#u2', 19.95, .55, { y: [18, 0], opacity: [0, 1], scale: [.96, 1] }, 'outExpo');
+  A('#a2h', 20.15, .45, { y: [10, 0], opacity: [0, 1] }, 'outExpo');
+  A('#think2', 20.15, .2, { opacity: [0, 1] }, 'outCubic');
+  A('#think2', 20.4, .05, { opacity: 0 }, 'linear');
+  A('#cursor', 20.0, .4, { opacity: 0 }, 'linear');
+
+  // Scroll the conversation so the new answer is in view
+  const vp = document.getElementById('sbBody').offsetHeight;
+  STREAMS.forEach(s => (s.el.textContent = s.full));
+  const fullH = document.getElementById('msgs').offsetHeight;
+  STREAMS.forEach(s => (s.el.textContent = ''));
+  const scroll = Math.max(0, fullH - vp + 8);
+  A('#msgs', 19.9, 1.3, { y: [0, -scroll] }, 'inOutCubic');
+  A('#u2', 0, .001, { opacity: [0, 0] }, 'linear');
+
+  // ---- 6. Model wall ----
+  A('#camera', 23.3, 1.4, { scale: .8, y: 30, opacity: 0, blur: 14 }, 'inOutCubic');
+  A('#wall', 0, .001, { opacity: [0, 0] }, 'linear');
+  A('#wall', 23.6, .2, { opacity: 1 }, 'linear');
+  A('#wEb', 23.7, .9, { y: [20, 0], opacity: [0, 1] }, 'outExpo');
+  A('#wH', 23.8, 1.1, { y: [34, 0], opacity: [0, 1], blur: [12, 0] }, 'outExpo');
+  S('#grid .card', 24.1, .09, 1.2, { y: [90, 0], rx: [-28, 0], opacity: [0, 1], scale: [.92, 1], blur: [10, 0] }, 'outExpo');
+  A('#wallFoot', 25.0, .9, { y: [14, 0], opacity: [0, 1] }, 'outExpo');
+  A('#sweep', 25.3, 1.6, { x: [-400, 2100], rot: [14, 14] }, 'inOutCubic');
+  A('#grid', 24.1, 4, { scale: [1, 1.025] }, 'outCubic');
+  A('#wall', 27.6, .7, { opacity: 0, blur: 14, scale: 1.03 }, 'inOutCubic');
+
+  // ---- 7. Outro ----
+  A('#outro', 0, .001, { opacity: [0, 0] }, 'linear');
+  A('#outro', 27.9, .01, { opacity: 1 }, 'linear');
+  A('#outroMark', 27.95, 1.3, { scale: [.4, 1], rot: [-30, 0], blur: [20, 0], opacity: [0, 1] }, 'outExpo');
+  A('#outroName', 28.15, 1.1, { y: [40, 0], opacity: [0, 1], blur: [12, 0] }, 'outExpo');
+  A('#outroLine', 28.35, 1.1, { y: [28, 0], opacity: [0, 1], blur: [10, 0] }, 'outExpo');
+  S('#outroMeta span', 28.6, .08, 1.0, { y: [20, 0], opacity: [0, 1] }, 'outExpo');
+}
+
+/* ================= Driver ================= */
+function renderAt(t) { applyAll(t); streamAt(t); grainAt(t); }
+window.renderAt = renderAt;
+window.DURATION = DURATION;
+const FONTS = ['400 16px Inter', '500 16px Inter', '600 16px Inter', '700 16px Inter',
+  '400 20px "Source Serif 4"', '600 40px "Source Serif 4"',
+  '400 12px "JetBrains Mono"', '500 12px "JetBrains Mono"'];
+window.__ready = Promise.all(FONTS.map(f => document.fonts.load(f, 'Aa'))).then(() => document.fonts.ready).then(() => { build(); renderAt(0); return true; });
+
+if (!new URLSearchParams(location.search).has('render')) {
+  window.__ready.then(() => {
+    const start = performance.now();
+    const tick = now => { renderAt(((now - start) / 1000) % DURATION); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+}
+</script>
+</body>
+</html>

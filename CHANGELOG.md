@@ -4,6 +4,31 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## 1.1.3 - 2026-10-08 · Claude Haiku 5.5, landing-page demo video
+
+### Changed
+
+- **Claude:** `claude-haiku-4-5` in the picker is now `claude-haiku-5-5`
+  (Claude Haiku 5.5, released after the 1.1.2 refresh, low effort for speed).
+  Haiku 4.5 is still Active, so it is not mapped as retired and keeps working
+  as a custom id. Its tentative retirement is "not sooner than 2026-10-15".
+  Sources: https://platform.claude.com/docs/en/about-claude/models/overview and
+  https://platform.claude.com/docs/en/about-claude/model-deprecations
+- OpenAI, Gemini, xAI, Groq and Ollama re-checked against their docs: unchanged.
+
+### Added
+
+- **Landing page:** a 30-second product demo video with music (muted
+  autoplay, one-click sound toggle) and a
+  "Latest models" section that lists each provider's current lineup.
+- **README:** demo video near the top.
+- `marketing/demo/`: the demo's source (`demo.html`, a deterministic HTML
+  animation), `music_edit.py` (cuts the music to the animation on the track's
+  bar grid) and `render.mjs`, which renders everything to MP4/WebM with
+  puppeteer and ffmpeg, so the video can be re-cut whenever the catalog changes.
+- Demo music: "Minimal Technology" by BerryDeep, edited to the demo, used under
+  the Pixabay Content License: https://pixabay.com/music/ambient-minimal-technology-612982/
+
 ## 1.1.2 - 2026-10-06 · Monthly tech update (October 2026)
 
 Small refresh. Nothing was broken; two catalog entries moved to newer models.

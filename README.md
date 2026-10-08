@@ -23,8 +23,22 @@ or just chat. Six providers, one keystroke, zero context-switching.
 
 <br/><br/>
 
-**[Why Aside](#why-aside) · [Install](#install) · [How it works](#how-it-works) · [Privacy](#privacy) · [For developers](#for-developers)**
+**[Demo](#see-it-in-action) · [Why Aside](#why-aside) · [Install](#install) · [How it works](#how-it-works) · [Privacy](#privacy) · [For developers](#for-developers)**
 
+</div>
+
+---
+
+## See it in action
+
+<div align="center">
+  <a href="https://royc4515.github.io/Aside/#demo">
+    <img src="marketing/demo-poster.jpg" alt="Watch the 30-second Aside demo" width="92%"/>
+  </a>
+  <br/>
+  <sub><b>30 seconds, sound on:</b> <code>Alt + A</code> on an article, a streamed summary from Claude Sonnet 5.5,
+  then a one-click switch to Gemini for a follow-up.
+  <a href="https://royc4515.github.io/Aside/#demo">Watch on the site</a> · <a href="site/assets/video/aside-demo.mp4">MP4</a></sub>
 </div>
 
 ---
@@ -68,7 +82,7 @@ don't have to paste anything. You pick the model. You stay on the page.
 
 | Provider | What you need | Default model | Also selectable |
 |---|---|---|---|
-| **Claude** (Anthropic) | API key | `claude-sonnet-5-5` | Opus 5.5, Fable 5.1, Haiku 4.5 |
+| **Claude** (Anthropic) | API key | `claude-sonnet-5-5` | Opus 5.5, Fable 5.1, Haiku 5.5 |
 | **Gemini** (Google) | API key | `gemini-3.5-flash-lite` | 3.8 Flash, 3.1 Pro (preview) |
 | **OpenAI** | API key | `gpt-6-luna` | GPT-6.1 Sol, GPT-6 Astra |
 | **Grok** (xAI) | API key | `grok-4.3` | Grok 4.20 (no reasoning), Grok 4.7 |
