@@ -262,6 +262,174 @@ section { padding: 88px 0; }
 }
 .feature p { font-size: 14.5px; color: var(--ink-3); }
 
+/* ---------- Demo video ---------- */
+.demo { position: relative; overflow: hidden; }
+.demo .section-head .eyebrow { margin-bottom: 16px; }
+.demo-stage {
+  position: relative;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+/* Soft accent halo behind the frame - the "lit from behind" premium cue. */
+.demo-stage::before {
+  content: "";
+  position: absolute;
+  inset: 8% 6% -6%;
+  background:
+    radial-gradient(60% 70% at 70% 30%, color-mix(in oklab, var(--accent) 38%, transparent), transparent 70%),
+    radial-gradient(50% 60% at 20% 80%, color-mix(in oklab, var(--p-ollama) 22%, transparent), transparent 70%);
+  filter: blur(60px);
+  opacity: .55;
+  z-index: 0;
+  pointer-events: none;
+}
+.demo-frame {
+  position: relative;
+  z-index: 1;
+  padding: 10px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 92%, #fff 8%), var(--surface));
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-lg), 0 40px 90px -30px rgba(20, 18, 14, .45);
+}
+.demo-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  background: #1b1916;
+  object-fit: cover;
+}
+.demo-toggle, .demo-sound {
+  position: absolute;
+  inset-inline-end: 26px;
+  bottom: 26px;
+  width: 44px; height: 44px;
+  padding: 0;
+  justify-content: center;
+  color: #eeece2;
+  background: rgba(27, 25, 22, .55);
+  border: 1px solid rgba(238, 236, 226, .18);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  opacity: .75;
+}
+.demo-toggle:hover, .demo-toggle:focus-visible,
+.demo-sound:hover, .demo-sound:focus-visible { opacity: 1; transform: scale(1.05); }
+.demo-toggle:focus-visible, .demo-sound:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.demo-toggle svg, .demo-sound svg { width: 18px; height: 18px; }
+.demo-toggle .i-pause { display: none; }
+.demo-toggle.is-playing .i-play { display: none; }
+.demo-toggle.is-playing .i-pause { display: block; }
+.demo-sound { inset-inline-end: 80px; }
+.demo-sound .i-sound { display: none; }
+.demo-sound.is-on .i-muted { display: none; }
+.demo-sound.is-on .i-sound { display: block; }
+/* Muted is the default state; a soft accent ring invites the first click. */
+.demo-sound:not(.is-on) { box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 55%, transparent); }
+@media (max-width: 720px) {
+  .demo-frame { padding: 6px; border-radius: 16px; }
+  .demo-video { border-radius: 11px; }
+  .demo-toggle, .demo-sound { bottom: 14px; width: 40px; height: 40px; }
+  .demo-toggle { inset-inline-end: 14px; }
+  .demo-sound { inset-inline-end: 62px; }
+}
+
+/* ---------- Latest models ---------- */
+.models .section-head .eyebrow { margin-bottom: 16px; }
+.models-grid {
+  display: grid; gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.model-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 22px 22px 24px;
+  transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+/* Each card carries its provider hue as --c; a faint corner wash ties it in. */
+.model-card::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(90% 80% at 0% 0%, color-mix(in oklab, var(--c) 16%, transparent), transparent 62%);
+  pointer-events: none;
+}
+[dir="rtl"] .model-card::before {
+  background: radial-gradient(90% 80% at 100% 0%, color-mix(in oklab, var(--c) 16%, transparent), transparent 62%);
+}
+.model-card:hover {
+  border-color: color-mix(in oklab, var(--c) 40%, var(--line-strong));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.model-head { position: relative; display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.model-mark {
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: 11px;
+  background: var(--c);
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 16px -6px color-mix(in oklab, var(--c) 70%, transparent);
+}
+.model-mark svg { width: 20px; height: 20px; }
+.model-head h3 { font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.model-head p { font-size: 13px; color: var(--ink-4); }
+.model-badge {
+  margin-inline-start: auto;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent-on-soft);
+  background: var(--accent-soft);
+  padding: 4px 9px; border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.model-chips {
+  position: relative;
+  list-style: none;
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.model-chip {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  padding: 5px 11px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  direction: ltr;
+}
+.model-chip.is-default {
+  color: var(--ink);
+  background: color-mix(in oklab, var(--c) 14%, var(--surface));
+  border-color: color-mix(in oklab, var(--c) 45%, transparent);
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.model-chip.is-default::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--c);
+}
+.models-note {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 14.5px;
+  color: var(--ink-3);
+}
+[dir="rtl"] .model-card { text-align: right; }
+/* Grok's brand hue is the ink color, which vanishes on the dark surface. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .model-card--grok { --c: #8f897c !important; }
+}
+:root[data-theme="dark"] .model-card--grok { --c: #8f897c !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .model-card, .demo-toggle, .demo-sound { transition: none; }
+  .model-card:hover, .demo-toggle:hover, .demo-sound:hover { transform: none; }
+}
+
 /* ---------- Screenshots gallery ---------- */
 /* Each shot is a full designed banner (its own heading + different aspect
    ratio), so stack them full-width one under another — no ragged grid gaps. */

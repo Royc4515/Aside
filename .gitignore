@@ -18,6 +18,7 @@ screenshots/
 
 # Build output
 dist/
+marketing/demo/out/
 *.zip
 
 # Local secrets (API keys for scripts/check-models-live.mjs)

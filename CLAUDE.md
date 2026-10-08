@@ -13,7 +13,7 @@ Vanilla JS, no build step, no bundler, no npm deps. Node is only used by mainten
 - `providers/` - `BaseProvider` -> `OpenAICompatProvider` (OpenAI, Grok, Groq) plus Claude, Gemini, Ollama; `provider-factory.js`; `models.js` is the single source of truth for model ids.
 - `shared/store.js` - the only settings storage layer (`chrome.storage.local`).
 - `site/` - landing page, deployed to GitHub Pages (royc4515.github.io/Aside/) by `.github/workflows/deploy-site.yml`.
-- `scripts/` - model catalog checks and ZIP builders. `docs/` - ARCHITECTURE.md, MONTHLY_UPDATE.md runbook. `marketing/` - images only.
+- `scripts/` - model catalog checks and ZIP builders. `docs/` - ARCHITECTURE.md, MONTHLY_UPDATE.md runbook. `marketing/` - images, plus `demo/` (source of the landing-page demo video: `demo.html` animation, `music_edit.py` music cut, `render.mjs` renderer; their headers cover re-rendering and the Pixabay track, which is deliberately not committed).
 
 ## Commands
 - Run: `chrome://extensions` -> Developer mode -> Load unpacked -> repo root. Reload the extension after edits.

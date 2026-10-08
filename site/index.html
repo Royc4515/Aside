@@ -78,6 +78,7 @@
         <span>Aside</span>
       </a>
       <nav class="nav-links" aria-label="Primary">
+        <a href="#demo" data-i18n="nav.demo">Demo</a>
         <a href="#features" data-i18n="nav.features">Features</a>
         <a href="#install" data-i18n="nav.install">Install</a>
         <a href="privacy.html" data-i18n="nav.privacy">Privacy</a>
@@ -147,6 +148,35 @@
       </div>
     </section>
 
+    <!-- Demo video -->
+    <section id="demo" class="demo">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" data-i18n="demo.eyebrow">Watch · 30 seconds</span>
+          <h2 data-i18n="demo.title">See Aside in action</h2>
+          <p data-i18n="demo.sub">Alt + A opens the sidebar, a page summary streams in seconds, and switching providers is one click.</p>
+        </div>
+        <div class="demo-stage">
+          <div class="demo-frame">
+            <video class="demo-video" muted loop playsinline preload="metadata" width="1920" height="1080"
+                   poster="assets/video/aside-demo-poster.jpg"
+                   data-i18n-attr="aria-label:demo.alt" aria-label="Aside demo: summarizing an article, then switching from Claude to Gemini for a follow-up">
+              <source src="assets/video/aside-demo.mp4" type="video/mp4">
+              <source src="assets/video/aside-demo.webm" type="video/webm">
+            </video>
+            <button class="demo-sound" type="button" aria-pressed="false" aria-label="Turn sound on">
+              <svg class="i-muted" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
+              <svg class="i-sound" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+            </button>
+            <button class="demo-toggle" type="button" aria-pressed="false" aria-label="Play demo">
+              <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+              <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Features -->
     <section id="features">
       <div class="container">
@@ -198,6 +228,44 @@
             <p data-i18n="feat.6.body">The interface is English or Hebrew (full RTL); ask the model to reply in any of eight — English, Hebrew, Spanish, French, German, Chinese, Arabic, or Japanese.</p>
           </article>
         </div>
+      </div>
+    </section>
+
+    <!-- Latest models -->
+    <section id="models" class="models">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" data-i18n="models.eyebrow">Updated October 2026</span>
+          <h2 data-i18n="models.title">The latest models, from every provider</h2>
+          <p data-i18n="models.sub">Each provider ships with a fast default plus a few picks from cheap to flagship. The highlighted chip is the default.</p>
+        </div>
+        <div class="models-grid">
+          <article class="model-card" style="--c:var(--p-claude)">
+            <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C8.6 4 9.8 5.6 12.5 6.3 9.8 7 8.6 8.6 8 11.1 7.4 8.6 6.2 7 3.5 6.3 6.2 5.6 7.4 4 8 1.5z"/><path d="M12.2 11.6c.2.6.6 1 1.3 1.2-.7.2-1.1.6-1.3 1.3-.2-.7-.6-1.1-1.3-1.3.7-.2 1.1-.6 1.3-1.2z" fill="#fff" stroke="none"/></svg></span><div><h3>Claude</h3><p>Anthropic</p></div></header>
+            <ul class="model-chips"><li class="model-chip is-default">Sonnet 5.5</li><li class="model-chip">Opus 5.5</li><li class="model-chip">Fable 5.1</li><li class="model-chip">Haiku 5.5</li></ul>
+          </article>
+          <article class="model-card" style="--c:var(--p-gpt)">
+            <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5 11.5 4.5 11.5 8.5 8 10.5 4.5 8.5 4.5 4.5 8 2.5z"/><path d="M8 5.5 9.7 6.5 9.7 8.5 8 9.5 6.3 8.5 6.3 6.5 8 5.5z" fill="#fff" stroke="none"/><path d="M4.5 8.5 4.5 12.5 8 14.5 11.5 12.5 11.5 8.5"/></svg></span><div><h3>OpenAI</h3><p>GPT-6 family</p></div></header>
+            <ul class="model-chips"><li class="model-chip is-default">GPT-6 Luna</li><li class="model-chip">GPT-6.1 Sol</li><li class="model-chip">GPT-6 Astra</li></ul>
+          </article>
+          <article class="model-card" style="--c:var(--p-gemini)">
+            <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5 9.5 6.5 14.5 8 9.5 9.5 8 14.5 6.5 9.5 1.5 8 6.5 6.5z" fill="#fff" stroke="none"/></svg></span><div><h3>Gemini</h3><p>Google</p></div><span class="model-badge" data-i18n="models.free">Free tier</span></header>
+            <ul class="model-chips"><li class="model-chip is-default">3.5 Flash-Lite</li><li class="model-chip">3.8 Flash</li><li class="model-chip">3.1 Pro</li></ul>
+          </article>
+          <article class="model-card model-card--grok" style="--c:var(--p-grok)">
+            <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3 13 13M13 3 3 13" stroke-width="2.2"/></svg></span><div><h3>Grok</h3><p>xAI</p></div></header>
+            <ul class="model-chips"><li class="model-chip is-default">Grok 4.3</li><li class="model-chip">Grok 4.20</li><li class="model-chip">Grok 4.7</li></ul>
+          </article>
+          <article class="model-card" style="--c:var(--p-groq)">
+            <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.5 3.5 9 7.5 9 6 14.5 12.5 7 8.5 7z" fill="#fff"/></svg></span><div><h3>Groq</h3><p>GroqCloud</p></div><span class="model-badge" data-i18n="models.free">Free tier</span></header>
+            <ul class="model-chips"><li class="model-chip is-default">GPT-OSS 120B</li><li class="model-chip">GPT-OSS 20B</li></ul>
+          </article>
+          <article class="model-card" style="--c:var(--p-ollama)">
+            <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7c0-2.2 1.8-4 4-4s4 1.8 4 4v3.5c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7z" fill="#fff"/><path d="M5 2.5 6 5.5M11 2.5 10 5.5" stroke-width="1.5"/></svg></span><div><h3>Ollama</h3><p>Self-hosted</p></div><span class="model-badge" data-i18n="models.local">Local · no key</span></header>
+            <ul class="model-chips"><li class="model-chip is-default">Qwen 3.5</li><li class="model-chip">Gemma 4</li><li class="model-chip">GPT-OSS 20B</li><li class="model-chip">Llama 3.2</li></ul>
+          </article>
+        </div>
+        <p class="models-note" data-i18n="models.note">Want a model that isn't listed yet? Choose Custom… and type any model id the provider supports.</p>
       </div>
     </section>
 
@@ -386,7 +454,7 @@
           </details>
           <details class="faq-item">
             <summary data-i18n="faq.q6">Can I choose which model each provider uses?</summary>
-            <p data-i18n="faq.a6">Yes. Each provider ships with a sensible default, and you can switch model right from the composer — or in Settings → Model — e.g. Claude Sonnet 5.5, Opus 5.5, or Haiku 4.5. There's also a Custom field to type any model id the provider supports, so you're never stuck waiting for us to add a new one. Custom ids are saved per provider, so they reappear under Saved custom for one-click reuse.</p>
+            <p data-i18n="faq.a6">Yes. Each provider ships with a sensible default, and you can switch model right from the composer (or in Settings → Model), e.g. Claude Sonnet 5.5, Opus 5.5, or Haiku 5.5. There's also a Custom field to type any model id the provider supports, so you're never stuck waiting for us to add a new one. Custom ids are saved per provider, so they reappear under Saved custom for one-click reuse.</p>
           </details>
           <details class="faq-item">
             <summary data-i18n="faq.q3">Which providers are supported?</summary>
@@ -419,5 +487,6 @@
 
   <script src="assets/i18n.js" defer></script>
   <script src="assets/theme.js" defer></script>
+  <script src="assets/demo.js" defer></script>
 </body>
 </html>
