@@ -1,5 +1,5 @@
 {
-  "ext_name":         { "message": "Aside — AI in your sidebar" },
+  "ext_name":         { "message": "Aside - AI in your sidebar" },
   "ext_description":  { "message": "Summarize, translate, extract, and chat about any page. Bring your own keys; works with Claude, Gemini, GPT, Grok, Groq, and Ollama." },
   "onboarding_title": { "message": "Set up your AI" },
   "onboarding_sub":   { "message": "Pick a provider (Claude, Gemini, Groq, etc.) and add your API key. Keys stay on your device." },
