@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- Chrome Web Store promo tiles, rendered by render-promo.mjs.
+     ?size=small -> 440x280 small tile, ?size=marquee -> 1400x560 marquee. -->
+<html lang="en"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../shared/tokens.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--ink); font-family: var(--font-sans); overflow: hidden; }
+  .tile { position: relative; display: flex; align-items: center; overflow: hidden;
+    background: radial-gradient(70% 90% at 85% 40%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 70%), var(--bg); }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+  .brand svg { flex-shrink: 0; }
+  h1 { font-family: var(--font-serif); font-weight: 600; letter-spacing: -0.015em; line-height: 1.05; }
+  .sub { color: var(--ink-2); }
+  .dots { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--ink-2); font-weight: 600; }
+  .dots span { display: inline-flex; align-items: center; gap: 6px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  /* small tile: 440x280, text only (store guidance: little text, readable when shrunk) */
+  .small { width: 440px; height: 280px; padding: 0 34px; }
+  .small .brand { font-size: 20px; margin-bottom: 14px; }
+  .small h1 { font-size: 38px; margin-bottom: 12px; }
+  .small .sub { font-size: 15px; margin-bottom: 16px; }
+  .small .dots { font-size: 11.5px; gap: 4px 9px; flex-wrap: nowrap; }
+  /* marquee: 1400x560, text left + real sidebar screenshot right */
+  .marquee { width: 1400px; height: 560px; padding: 0 80px; gap: 60px; }
+  .marquee .text { flex: 1; }
+  .marquee .brand { font-size: 28px; margin-bottom: 22px; }
+  .marquee h1 { font-size: 76px; margin-bottom: 20px; }
+  .marquee .sub { font-size: 24px; margin-bottom: 28px; max-width: 560px; line-height: 1.4; }
+  .marquee .dots { font-size: 18px; }
+  .marquee .shot { align-self: flex-end; width: 470px; height: 520px; overflow: hidden;
+    border-radius: 18px 18px 0 0; box-shadow: var(--shadow-lg); border: 1px solid var(--line-strong); border-bottom: 0; }
+  .marquee .shot img { width: 470px; display: block; }
+</style></head>
+<body>
+<div class="tile" id="tile">
+  <div class="text">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="#da7756"/>
+        <circle cx="16" cy="27" r="1.7" fill="#da7756"/>
+      </svg>Aside
+    </div>
+    <h1>AI in your sidebar.</h1>
+    <p class="sub">Summarize, translate or chat about any page. Your own API key.</p>
+    <div class="dots">
+      <span><i style="background:var(--p-claude)"></i>Claude</span>
+      <span><i style="background:var(--p-gpt)"></i>OpenAI</span>
+      <span><i style="background:var(--p-gemini)"></i>Gemini</span>
+      <span><i style="background:var(--p-grok)"></i>Grok</span>
+      <span><i style="background:var(--p-groq)"></i>Groq</span>
+      <span><i style="background:var(--p-ollama)"></i>Ollama</span>
+    </div>
+  </div>
+  <div class="shot" hidden><img src="sidebar-crop.png" alt=""></div>
+</div>
+<script>
+  const size = new URLSearchParams(location.search).get('size') || 'small';
+  const tile = document.getElementById('tile');
+  tile.classList.add(size);
+  if (size === 'marquee') tile.querySelector('.shot').hidden = false;
+</script>
+</body></html>
