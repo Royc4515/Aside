@@ -6,6 +6,13 @@ on:
     paths:
       - "site/**"
       - "shared/tokens.css"
+      - "scripts/build-site.mjs"
+      - ".github/workflows/deploy-site.yml"
+  # PRs only run the build job's checks; the deploy job is main-only.
+  pull_request:
+    paths:
+      - "site/**"
+      - "scripts/build-site.mjs"
       - ".github/workflows/deploy-site.yml"
   workflow_dispatch:
 
@@ -15,7 +22,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  # PR check runs get their own group so they never queue a real deploy.
+  group: ${{ github.event_name == 'pull_request' && format('pages-pr-{0}', github.ref) || 'pages' }}
   cancel-in-progress: false
 
 jobs:
@@ -24,6 +32,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # site/index.html (static text + JSON-LD) and site/he/index.html are built
+      # from site/assets/i18n.js; fail if someone edited one without the other.
+      - name: Static pages in sync with the i18n dictionary
+        run: node scripts/build-site.mjs --check
 
       - name: Assemble publish tree
         run: |
@@ -37,6 +54,8 @@ jobs:
           cp shared/tokens.css _site/tokens.css
           # Sanity check.
           test -f _site/index.html
+          test -f _site/he/index.html
+          test -f _site/llms.txt
           test -f _site/privacy.html
           test -f _site/tokens.css
           test -f _site/sitemap.xml
@@ -54,6 +73,7 @@ jobs:
           path: _site
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

@@ -1,4 +1,32 @@
+# Aside landing page. Everything is public and every crawler is welcome,
+# including AI search and assistant crawlers, so answers can cite this page.
+#
+# Note: crawlers only read robots.txt from the host root
+# (https://royc4515.github.io/robots.txt). This copy under /Aside/ documents
+# intent and takes effect if the site moves to its own domain.
+
 User-agent: *
+Allow: /
+
+# AI crawlers, listed explicitly so a future wildcard rule can't block them by accident.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bingbot
+User-agent: CCBot
+User-agent: Meta-ExternalAgent
+User-agent: Amazonbot
+User-agent: DuckAssistBot
+User-agent: cohere-ai
+User-agent: MistralAI-User
 Allow: /
 
 Sitemap: https://royc4515.github.io/Aside/sitemap.xml
