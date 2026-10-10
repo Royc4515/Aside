@@ -620,7 +620,7 @@ async function renderHistoryList() {
         <svg class="sb-history-empty-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
         <div>${historySearch
             ? (t('history_no_results') || 'No matching threads')
-            : (t('history_empty') || 'No saved chats yet — start one below.')}
+            : (t('history_empty') || 'No saved chats yet - start one below.')}
         </div>
       </div>`;
   } else {
@@ -1133,8 +1133,8 @@ function renderContextPill() {
   pill.classList.toggle('is-off', off);
   pill.setAttribute('aria-pressed', String(!off));
   pill.title = off
-    ? (t('context_off_title') || 'Page context off — click to include this page')
-    : (t('context_on_title')  || 'Page context on — click to exclude this page');
+    ? (t('context_off_title') || 'Page context off - click to include this page')
+    : (t('context_on_title')  || 'Page context on - click to exclude this page');
   txt.textContent = off
     ? (t('context_off') || 'Page context off')
     : `${t('context_including') || 'Including page context'} · ~${human} tokens`;

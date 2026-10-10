@@ -17,7 +17,7 @@
       id: 'eli5',
       label: 'ELI5',
       icon: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.7 1.5 1.5 1.5 2.5h5c0-1 .7-1.8 1.5-2.5A6 6 0 0 0 12 3z"/>',
-      prompt: 'Explain this page like I\'m five — short, simple, fun.',
+      prompt: 'Explain this page like I\'m five - short, simple, fun.',
     },
     {
       id: 'bullets',
@@ -59,7 +59,7 @@
       id: 'jargon',
       label: 'No jargon',
       icon: '<path d="M14 4l6 6L9 21H3v-6z"/>',
-      prompt: 'Rewrite this page in plain language — no jargon, no buzzwords.',
+      prompt: 'Rewrite this page in plain language - no jargon, no buzzwords.',
     },
   ];
 

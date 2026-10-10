@@ -4,6 +4,20 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## 1.1.4 - 2026-10-10 · Sidebar header fits every width, no em dashes
+
+### Fixed
+
+- **Sidebar header:** at the default 420px width the provider pill covered
+  the "Aside" name, and at the 320px minimum the header overflowed and pushed
+  the close button off-screen. The header now gives way in steps instead:
+  tighter spacing up to 440px, the logo mark without the name up to 412px,
+  then slimmer icon buttons. Every provider fits at every width from 320 to
+  720px, in English and Hebrew (RTL). Wider sidebars look the same as before.
+- **Text:** em dashes in the extension name, settings page, prompt templates
+  and all eight sidebar languages are now plain hyphens, matching the
+  project's style rule.
+
 ## 1.1.3 - 2026-10-08 · Claude Haiku 5.5, landing-page demo video
 
 ### Changed

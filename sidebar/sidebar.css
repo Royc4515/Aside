@@ -41,11 +41,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   background: var(--bg);
   flex-shrink: 0; position: relative; z-index: 5;
 }
-.sb-brand { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sb-brand { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .sb-brand-name { font-weight: 600; font-size: 14.5px; letter-spacing: -0.01em; color: var(--ink); }
 .sb-brand-mark { width: 22px; height: 22px; flex-shrink: 0; }
 
-.sb-header-right { display: flex; align-items: center; gap: 4px; }
+/* don't touch / min-width: 0 lets this group, not the brand, give way when the
+   sidebar is narrow. Past bug: at the default 420px the provider pill covered
+   "Aside", and at the 320px minimum the close button was pushed off-screen. */
+.sb-header-right { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.sb-header-right > * { flex-shrink: 0; }
 .sb-header-divider {
   width: 1px;
   height: 18px;
@@ -64,7 +68,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   transition: background .15s, border-color .15s;
 }
 .sb-model:hover { background: var(--surface-3); border-color: var(--line-strong); }
-.sb-model-name { font-weight: 600; }
+.sb-header-right > .sb-model { flex-shrink: 1; min-width: 0; }   /* last resort: the name truncates */
+.sb-model-name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sb-model-sub  { color: var(--ink-3); font-size: 11.5px; }
 /* Compare bar (above composer, visible only in compare mode) */
 .sb-compare-bar {
@@ -117,6 +122,24 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   transition: background .15s, color .15s;
 }
 .sb-icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+
+/* The sidebar is its own iframe, so these media queries track the sidebar
+   width (320-720px, content.js). The full header needs about 435px. */
+@media (max-width: 440px) {
+  .sb-header { padding-inline: 10px; }
+  .sb-header-right { gap: 2px; }
+  .sb-header-divider { margin: 0 2px; }
+}
+@media (max-width: 412px) {
+  .sb-brand-name { display: none; }   /* the mark still identifies the brand */
+}
+@media (max-width: 380px) {
+  .sb-header-right .sb-icon-btn { width: 26px; }
+}
+@media (max-width: 340px) {
+  .sb-header-right .sb-icon-btn { width: 24px; }
+  .sb-model > svg { display: none; }   /* the pill still opens the picker */
+}
 
 /* Language button */
 .sb-lang-wrap { position: relative; }
