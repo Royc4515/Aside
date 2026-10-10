@@ -4,6 +4,14 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## 1.1.5 - unreleased
+
+### Fixed
+
+- **Text:** the sidebar welcome line in English and Hebrew still had an em
+  dash, written as a `\u2014` escape that the 1.1.4 cleanup missed. It is a
+  plain hyphen now.
+
 ## 1.1.4 - 2026-10-10 · Sidebar header fits every width, no em dashes
 
 ### Fixed
