@@ -134,10 +134,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   .sb-brand-name { display: none; }   /* the mark still identifies the brand */
 }
 @media (max-width: 380px) {
-  .sb-icon-btn { width: 26px; }
+  .sb-header-right .sb-icon-btn { width: 26px; }
 }
 @media (max-width: 340px) {
-  .sb-icon-btn { width: 24px; }
+  .sb-header-right .sb-icon-btn { width: 24px; }
   .sb-model > svg { display: none; }   /* the pill still opens the picker */
 }
 
