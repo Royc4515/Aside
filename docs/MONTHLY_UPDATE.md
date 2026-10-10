@@ -83,8 +83,10 @@ provider's entry alone and say so in the PR.
    must equal the catalog default) and `fallbackModel` in
    `groq-provider.js`.
 4. **Words.** Update the README Providers table and bullets, the
-   `docs/ARCHITECTURE.md` provider matrix, and the site FAQ (`site/index.html`
-   and **both** languages in `site/assets/i18n.js`). Then update the
+   `docs/ARCHITECTURE.md` provider matrix, the site FAQ, models section and
+   providers table (`site/index.html` and **both** languages in
+   `site/assets/i18n.js`), and the default models in `site/llms.txt`. Run
+   `node scripts/build-site.mjs` to rebuild the Hebrew page. Then update the
    onboarding blurbs (`ONB_PROVIDERS` in `sidebar/sidebar.js`) and the static
    fallback labels (`PROVIDERS` in `sidebar/sidebar.js` and
    `options/options.js`).

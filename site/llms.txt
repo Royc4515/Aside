@@ -1,0 +1,26 @@
+# Aside
+
+> Aside is a free, open-source (MIT) Chrome extension that opens an AI sidebar on any webpage. It reads the page you are on, so you can summarize, translate, extract data or chat about it with Claude, OpenAI GPT, Gemini, Grok, Groq or a local Ollama model, without copy-pasting or leaving the tab. It is bring-your-own-key (BYOK): API keys stay in the browser's local storage and every request goes straight from the browser to the chosen provider. The interface is in English and Hebrew with full right-to-left (RTL) support.
+
+Key facts:
+
+- Open the sidebar with Alt + A, the toolbar icon, or the right-click menu. It can sit on the right or the left of the page.
+- Providers and default models: Claude (Anthropic) - Claude Sonnet 5.5; OpenAI - GPT-6 Luna; Gemini (Google) - Gemini 3.5 Flash-Lite; Grok (xAI) - Grok 4.3; Groq - GPT-OSS 120B; Ollama (local, no key) - Qwen 3.5. Any other model id a provider supports can be entered as a custom model.
+- Gemini and Groq have free API tiers. Chat subscriptions such as ChatGPT Plus or Claude Pro do not work; Aside uses API keys.
+- Page actions: summarize, extract key data, translate, rewrite, find on page, plus one-tap prompt templates. Compare mode runs one prompt on two providers side by side.
+- Replies in eight languages (English, Hebrew, Spanish, French, German, Chinese, Arabic, Japanese); on Auto it answers in the page's language.
+- Privacy: no analytics, no telemetry, no server in the middle. Page text (trimmed to 12,000 characters) is sent only with a prompt you send, and page context can be switched off. Conversation history stays in local browser storage.
+- Install: not on the Chrome Web Store yet. Download aside.zip from the latest GitHub release, open chrome://extensions, turn on Developer mode, click Load unpacked. Requires Chrome 114 or later.
+
+## Pages
+
+- [Landing page (English)](https://royc4515.github.io/Aside/): features, demo video, providers, install steps, FAQ
+- [Landing page (Hebrew)](https://royc4515.github.io/Aside/he/): the same page in Hebrew
+- [Privacy policy](https://royc4515.github.io/Aside/privacy.html)
+- [Support](https://royc4515.github.io/Aside/support.html)
+
+## Source
+
+- [GitHub repository](https://github.com/Royc4515/Aside): source code, README, MIT license
+- [Latest release](https://github.com/Royc4515/Aside/releases/latest): aside.zip download
+- [Architecture](https://github.com/Royc4515/Aside/blob/main/docs/ARCHITECTURE.md)
