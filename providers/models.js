@@ -16,7 +16,7 @@
  *   Custom ids get no hints and BaseProvider.CUSTOM_OUTPUT_CAP (4k), which
  *   every still-served model accepts.
  *
- * Model ids verified against each provider's official docs (October 2026):
+ * Model ids verified against each provider's official docs (November 2026):
  *   Anthropic  platform.claude.com/docs/en/about-claude/models/overview
  *   OpenAI     developers.openai.com/api/docs/models (+ /deprecations)
  *   Gemini     ai.google.dev/gemini-api/docs/models (+ /deprecations)
@@ -57,7 +57,8 @@ const PROVIDER_MODELS = {
     options: [
       { id: 'gemini-3.5-flash-lite',  label: 'Gemini 3.5 Flash-Lite' },
       { id: 'gemini-3.8-flash',       label: 'Gemini 3.8 Flash', effort: 'low' },
-      { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro (preview, paid key)' },
+      // Gemini 4 Argon is Google's stable flagship reasoning model; `low` thinking keeps the sidebar fast.
+      { id: 'gemini-4-argon',         label: 'Gemini 4 Argon (flagship)', effort: 'low' },
     ],
   },
   grok: {
