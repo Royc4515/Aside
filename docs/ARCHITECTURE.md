@@ -110,7 +110,7 @@ id — custom ids are remembered for reuse. The table below mirrors the catalog.
 |---|---|---|
 | **Claude** (Anthropic) | `claude-sonnet-5-5` | `claude-opus-5-5` · `claude-fable-5-1` · `claude-haiku-5-5` |
 | **OpenAI** | `gpt-6-luna` | `gpt-6.1-sol` · `gpt-6-astra` |
-| **Gemini** (Google) | `gemini-3.5-flash-lite` | `gemini-3.8-flash` · `gemini-3.1-pro-preview` |
+| **Gemini** (Google) | `gemini-3.5-flash-lite` | `gemini-3.8-flash` · `gemini-4-argon` |
 | **Grok** (xAI) † | `grok-4.3` | `grok-4.20-0309-non-reasoning` · `grok-4.7` |
 | **Groq** † | `openai/gpt-oss-120b` | `openai/gpt-oss-20b` |
 | **Ollama** (local) | `qwen3.5` | `qwen3.5:4b` · `gemma4` · `gpt-oss:20b` · `llama3.2` · `llama3.1` · any locally pulled model |

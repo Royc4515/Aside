@@ -6,6 +6,14 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
 
 ## 1.1.5 - unreleased
 
+### Changed
+
+- **Gemini:** the preview Pro pick (`gemini-3.1-pro-preview`) is replaced by the
+  stable flagship `gemini-4-argon` (thinking level `low`). The old id is not
+  retired, so anyone who chose it keeps it as a custom model. Source:
+  https://ai.google.dev/gemini-api/docs/models. Claude, OpenAI, xAI, Groq and
+  Ollama catalogs were checked and are current.
+
 ### Fixed
 
 - **Text:** the sidebar welcome line in English and Hebrew still had an em
