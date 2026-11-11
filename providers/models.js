@@ -13,6 +13,10 @@
  *     reasoning_effort, Gemini thinkingLevel, Ollama think.
  *   - `maxOutput`: the model's output-token limit, when it is below its
  *     provider's cap (16k for Claude/OpenAI/xAI/Gemini, 4k for Groq).
+ *   - `short`: the chip name on the landing page and in the live demo, when
+ *     the default rule gets it wrong (scripts/build-site.mjs: the label minus
+ *     a "Claude "/"Gemini " prefix and any "(…)" hint). Options that share a
+ *     short name show once.
  *   Custom ids get no hints and BaseProvider.CUSTOM_OUTPUT_CAP (4k), which
  *   every still-served model accepts.
  *
@@ -86,12 +90,12 @@ const PROVIDER_MODELS = {
     // isn't installed, OllamaProvider falls back to one that is.
     default: 'qwen3.5',
     options: [
-      { id: 'qwen3.5',     label: 'Qwen 3.5 9B',           effort: 'none' },
-      { id: 'qwen3.5:4b',  label: 'Qwen 3.5 4B (laptops)', effort: 'none' },
+      { id: 'qwen3.5',     label: 'Qwen 3.5 9B',           effort: 'none', short: 'Qwen 3.5' },
+      { id: 'qwen3.5:4b',  label: 'Qwen 3.5 4B (laptops)', effort: 'none', short: 'Qwen 3.5' },
       { id: 'gemma4',      label: 'Gemma 4',               effort: 'none' },
       { id: 'gpt-oss:20b', label: 'GPT-OSS 20B (16 GB+ RAM)', effort: 'low' },
-      { id: 'llama3.2',    label: 'Llama 3.2 3B (smallest)' },
-      { id: 'llama3.1',    label: 'Llama 3.1 8B' },
+      { id: 'llama3.2',    label: 'Llama 3.2 3B (smallest)', short: 'Llama 3.2' },
+      { id: 'llama3.1',    label: 'Llama 3.1 8B',          short: 'Llama 3.1' },
     ],
   },
 };

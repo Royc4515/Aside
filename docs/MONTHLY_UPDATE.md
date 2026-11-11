@@ -83,10 +83,14 @@ provider's entry alone and say so in the PR.
    must equal the catalog default) and `fallbackModel` in
    `groq-provider.js`.
 4. **Words.** Update the README Providers table and bullets, the
-   `docs/ARCHITECTURE.md` provider matrix, the site FAQ, models section and
-   providers table (`site/index.html` and **both** languages in
-   `site/assets/i18n.js`), and the default models in `site/llms.txt`. Run
-   `node scripts/build-site.mjs` to rebuild the Hebrew page. Then update the
+   `docs/ARCHITECTURE.md` provider matrix, the site FAQ and providers table
+   (`site/index.html` and **both** languages in `site/assets/i18n.js`), the
+   "Updated <month>" badge (`models.eyebrow`, both languages), and the default
+   models in `site/llms.txt`. Run `node scripts/build-site.mjs`: it rebuilds
+   the Hebrew page and regenerates the "Latest models" chips and the live
+   demo's model names (`site/demo/catalog.js`) from the catalog. A chip name
+   that reads wrong gets a `short` on its option. The demo needs no
+   re-render; the README video shows no model names. Then update the
    onboarding blurbs (`ONB_PROVIDERS` in `sidebar/sidebar.js`) and the static
    fallback labels (`PROVIDERS` in `sidebar/sidebar.js` and
    `options/options.js`).

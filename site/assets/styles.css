@@ -316,7 +316,7 @@ section { padding: 88px 0; }
 }
 .feature p { font-size: 14.5px; color: var(--ink-3); }
 
-/* ---------- Demo video ---------- */
+/* ---------- Demo (live) ---------- */
 .demo { position: relative; overflow: hidden; }
 .demo .section-head .eyebrow { margin-bottom: 16px; }
 .demo-stage {
@@ -346,15 +346,26 @@ section { padding: 88px 0; }
   border: 1px solid var(--line-strong);
   box-shadow: var(--shadow-lg), 0 40px 90px -30px rgba(20, 18, 14, .45);
 }
-.demo-video {
-  display: block;
-  width: 100%;
-  height: auto;
+.demo-screen {
+  position: relative;
   aspect-ratio: 16 / 9;
   border-radius: 16px;
+  overflow: hidden;
   background: #1b1916;
-  object-fit: cover;
 }
+.demo-poster, .demo-live {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.demo-poster { object-fit: cover; }
+/* Fades in over the poster once loaded. No pointer events: a tap anywhere on
+   it must reach this page, where it counts as the gesture that unmutes. */
+.demo-live { opacity: 0; transition: opacity .35s ease; pointer-events: none; }
+.demo-live.is-ready { opacity: 1; }
 .demo-toggle, .demo-sound {
   position: absolute;
   inset-inline-end: 26px;
@@ -384,8 +395,8 @@ section { padding: 88px 0; }
 .demo-sound:not(.is-on) { box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 55%, transparent); }
 @media (max-width: 720px) {
   .demo-frame { padding: 6px; border-radius: 16px; }
-  .demo-video { border-radius: 11px; }
-  /* On a phone the video is ~180px tall; 40px buttons covered a quarter of it. */
+  .demo-screen { border-radius: 11px; }
+  /* On a phone the demo is ~180px tall; 40px buttons covered a quarter of it. */
   .demo-toggle, .demo-sound { bottom: 10px; width: 32px; height: 32px; }
   .demo-toggle svg, .demo-sound svg { width: 14px; height: 14px; }
   .demo-toggle { inset-inline-end: 10px; }

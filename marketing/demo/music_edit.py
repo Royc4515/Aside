@@ -1,5 +1,5 @@
 """
-Cut the demo's music bed to fit marketing/demo/demo.html.
+Cut the demo's music bed to fit site/demo/demo.html.
 
 Track: "Minimal Technology" by BerryDeep, Pixabay Content License
 https://pixabay.com/music/ambient-minimal-technology-612982/
@@ -18,7 +18,8 @@ intro's silence). The edit, in video time:
                   drop-out, a breath right before the outro.
   27.94 -> 31.00  the track's final hit on the outro logo, with the drop-out's
                   pad tail fading underneath
-Writes out/music.wav by default; render.mjs picks it up from there.
+Writes out/music.wav by default; render.mjs picks it up from there (and
+writes the music.m4a that the live demo plays).
 """
 import os
 import subprocess
