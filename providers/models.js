@@ -16,7 +16,7 @@
  *   Custom ids get no hints and BaseProvider.CUSTOM_OUTPUT_CAP (4k), which
  *   every still-served model accepts.
  *
- * Model ids verified against each provider's official docs (October 2026):
+ * Model ids verified against each provider's official docs (November 2026, re-checked 2026-11-11):
  *   Anthropic  platform.claude.com/docs/en/about-claude/models/overview
  *   OpenAI     developers.openai.com/api/docs/models (+ /deprecations)
  *   Gemini     ai.google.dev/gemini-api/docs/models (+ /deprecations)
@@ -35,7 +35,7 @@ const PROVIDER_MODELS = {
       // answers fast and cheap.
       { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5', effort: 'low' },
       { id: 'claude-opus-5-5',  label: 'Claude Opus 5.5' },
-      { id: 'claude-fable-5-1', label: 'Claude Fable 5.1' },
+      { id: 'claude-fable-5-2', label: 'Claude Fable 5.2' },
       // Haiku 5.5 defaults to `medium` effort; `low` keeps it the fastest pick.
       { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5', effort: 'low' },
     ],
@@ -45,9 +45,10 @@ const PROVIDER_MODELS = {
     // GPT-6 models reason by default (`medium`); pin lighter effort for a
     // snappy sidebar. Astra's minimum is `low`.
     options: [
-      { id: 'gpt-6-luna',  label: 'GPT-6 Luna',  effort: 'none' },
-      { id: 'gpt-6.1-sol', label: 'GPT-6.1 Sol', effort: 'low' },
-      { id: 'gpt-6-astra', label: 'GPT-6 Astra', effort: 'low' },
+      { id: 'gpt-6-luna',    label: 'GPT-6 Luna',    effort: 'none' },
+      { id: 'gpt-6.1-terra', label: 'GPT-6.1 Terra', effort: 'none' },
+      { id: 'gpt-6.1-sol',   label: 'GPT-6.1 Sol',   effort: 'low' },
+      { id: 'gpt-6-astra',   label: 'GPT-6 Astra',   effort: 'low' },
     ],
   },
   gemini: {
@@ -57,7 +58,9 @@ const PROVIDER_MODELS = {
     options: [
       { id: 'gemini-3.5-flash-lite',  label: 'Gemini 3.5 Flash-Lite' },
       { id: 'gemini-3.8-flash',       label: 'Gemini 3.8 Flash', effort: 'low' },
-      { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro (preview, paid key)' },
+      // Argon is the efficient Gemini 4 reasoning model (Carbon is the bigger
+      // one); `low` thinking keeps the sidebar fast.
+      { id: 'gemini-4-argon',         label: 'Gemini 4 Argon', effort: 'low' },
     ],
   },
   grok: {
