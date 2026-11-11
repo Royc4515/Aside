@@ -7,12 +7,15 @@ on:
       - "site/**"
       - "shared/tokens.css"
       - "scripts/build-site.mjs"
+      # The model chips and the live demo's catalog.js are built from it.
+      - "providers/models.js"
       - ".github/workflows/deploy-site.yml"
   # PRs only run the build job's checks; the deploy job is main-only.
   pull_request:
     paths:
       - "site/**"
       - "scripts/build-site.mjs"
+      - "providers/models.js"
       - ".github/workflows/deploy-site.yml"
   workflow_dispatch:
 
@@ -37,9 +40,10 @@ jobs:
         with:
           node-version: 22
 
-      # site/index.html (static text + JSON-LD) and site/he/index.html are built
-      # from site/assets/i18n.js; fail if someone edited one without the other.
-      - name: Static pages in sync with the i18n dictionary
+      # site/index.html (static text + JSON-LD), site/he/index.html and
+      # site/demo/catalog.js are built from site/assets/i18n.js and
+      # providers/models.js; fail if someone edited one without the other.
+      - name: Static pages in sync with the i18n dictionary and model catalog
         run: node scripts/build-site.mjs --check
 
       - name: Assemble publish tree
@@ -63,6 +67,9 @@ jobs:
           test -f _site/assets/img/hero-light.png
           test -f _site/assets/img/hero-light-1920.webp
           test -f _site/assets/img/og-card.png
+          test -f _site/demo/demo.html
+          test -f _site/demo/catalog.js
+          test -f _site/demo/music.m4a
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

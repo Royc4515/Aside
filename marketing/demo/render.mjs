@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 /**
- * Render marketing/demo/demo.html to an MP4 master, then web-sized MP4/WebM
- * encodes and a poster (out/web/), which ship in site/assets/video/.
+ * Render site/demo/demo.html to an MP4 master, then web-sized MP4/WebM
+ * encodes and a poster (out/web/), which ship in site/assets/video/. The
+ * landing page plays the same file live; this video is for the README.
+ *
+ * The video's model wall shows no model names (demo.html's ?render=1 mode),
+ * so it only needs a re-render when the demo's UI or timeline changes, not
+ * when the model catalog does.
  *
  * Frames are captured at SUBFRAMES × 60 fps and blended down to 60 fps,
  * which gives a natural 180°-shutter motion blur. Every frame is a pure
@@ -11,10 +16,13 @@
  *   CHROME=/path/to/chrome FFMPEG=/path/to/ffmpeg node render.mjs [outDir]
  *   node render.mjs --stills 2,7,12        # QA: PNG stills at given seconds
  *
- * Music: run music_edit.py first. It cuts "Minimal Technology" by BerryDeep
- * (Pixabay Content License) to the animation and writes out/music.wav, which
- * is mixed in here (override the path with MUSIC). The track is never
- * committed: the license forbids redistributing it on its own.
+ * Music: by default the finished music bed the live demo plays,
+ * site/demo/music.m4a, is reused as is. Only a change to the timeline needs a
+ * new edit: run music_edit.py, which cuts "Minimal Technology" by BerryDeep
+ * (Pixabay Content License) to the animation and writes out/music.wav; that
+ * file wins when present (override the path with MUSIC). The source track is
+ * never committed: the license forbids redistributing it on its own, and
+ * only the edit, cut to this animation, ships.
  *
  * Needs `puppeteer-core` resolvable (set NODE_PATH or install it locally) and
  * an ffmpeg build with libx264 + libvpx-vp9 (e.g. the `ffmpeg-static` package).
@@ -36,7 +44,11 @@ const HEIGHT = 1080;
 
 const CHROME = process.env.CHROME;
 const FFMPEG = process.env.FFMPEG || 'ffmpeg';
-const MUSIC = process.env.MUSIC || join(HERE, 'out', 'music.wav');
+const EDIT_WAV = join(HERE, 'out', 'music.wav');
+const SHIPPED_MUSIC = join(HERE, '..', '..', 'site', 'demo', 'music.m4a');
+const MUSIC = process.env.MUSIC || (existsSync(EDIT_WAV) ? EDIT_WAV : SHIPPED_MUSIC);
+// A fresh edit gets loudness-normalized; the shipped bed already was.
+const PREMASTERED = !MUSIC.endsWith('.wav');
 if (!CHROME) {
   console.error('Set CHROME to a Chrome/Chromium executable.');
   process.exit(1);
@@ -82,7 +94,7 @@ const browser = await puppeteer.launch({
 
 try {
   const page = await browser.newPage();
-  const url = pathToFileURL(join(HERE, 'demo.html')).href + '?render=1';
+  const url = pathToFileURL(join(HERE, '..', '..', 'site', 'demo', 'demo.html')).href + '?render=1';
   await page.goto(url, { waitUntil: 'networkidle0' });
   await page.evaluate(() => window.__ready);
   const duration = await page.evaluate(() => window.DURATION);
@@ -161,25 +173,33 @@ try {
     const web = join(outDir, 'web');
     mkdirSync(web, { recursive: true });
     const q = ['-y', '-hide_banner', '-loglevel', 'error'];
-    // Music bed: the already-cut edit from music_edit.py (see the header).
-    // Without it the encodes are silent. No -shortest: with VP9 stream timing
-    // it truncated the WebM; -t pins the length instead.
+    // Music bed (see the header). Without it the encodes are silent. No
+    // -shortest: with VP9 stream timing it truncated the WebM; -t pins the
+    // length instead.
     const hasMusic = existsSync(MUSIC);
-    if (!hasMusic) console.warn(`No music at ${MUSIC} - rendering silent (run music_edit.py first)`);
+    if (!hasMusic) console.warn(`No music at ${MUSIC} - rendering silent`);
+    else console.log(`music: ${MUSIC}${PREMASTERED ? ' (premastered, used as is)' : ''}`);
     const audioIn = hasMusic ? ['-i', MUSIC] : [];
     // -18 LUFS: a background level, not a track.
-    const audioFilter = hasMusic ? loudnormFilter(MUSIC) : '';
+    const audioFilter = hasMusic && !PREMASTERED ? ['-af', loudnormFilter(MUSIC)] : [];
     const audio = codec => (hasMusic
-      ? ['-map', '0:v', '-map', '1:a', '-af', audioFilter, '-t', String(duration), ...codec]
+      ? ['-map', '0:v', '-map', '1:a', ...audioFilter, '-t', String(duration), ...codec]
       : ['-an']);
+    // The shipped bed is already AAC: copy it into the MP4 instead of re-encoding.
+    const mp4Audio = PREMASTERED ? ['-c:a', 'copy'] : ['-c:a', 'aac', '-b:a', '160k'];
     await run(FFMPEG, [...q, '-i', mp4, ...audioIn, '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '23',
       '-maxrate', '3500k', '-bufsize', '7000k', '-profile:v', 'high', '-pix_fmt', 'yuv420p',
-      ...audio(['-c:a', 'aac', '-b:a', '160k']), '-movflags', '+faststart', join(web, 'aside-demo.mp4')]);
+      ...audio(mp4Audio), '-movflags', '+faststart', join(web, 'aside-demo.mp4')]);
     await run(FFMPEG, [...q, '-i', mp4, ...audioIn, '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '34', '-row-mt', '1',
       '-deadline', 'good', '-cpu-used', '2', ...audio(['-c:a', 'libopus', '-b:a', '128k']), join(web, 'aside-demo.webm')]);
     await run(FFMPEG, [...q, '-ss', '12.6', '-i', mp4, '-frames:v', '1', '-vf', 'scale=1600:-1', '-q:v', '3',
       join(web, 'aside-demo-poster.jpg')]);
-    console.log('wrote', web, '- copy its files to site/assets/video/ (poster also to marketing/demo-poster.jpg)');
+    // A fresh music edit is also the live demo's: copy it next to demo.html.
+    if (hasMusic && !PREMASTERED) {
+      await run(FFMPEG, [...q, '-i', join(web, 'aside-demo.mp4'), '-vn', '-c:a', 'copy', join(web, 'music.m4a')]);
+    }
+    console.log('wrote', web, '- copy aside-demo.* to site/assets/video/, the poster also to marketing/demo-poster.jpg'
+      + (hasMusic && !PREMASTERED ? ', and music.m4a to site/demo/' : ''));
   }
 } finally {
   await browser.close();

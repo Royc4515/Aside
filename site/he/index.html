@@ -186,8 +186,8 @@
   </script>
   <!-- jsonld:end -->
 
-  <link rel="stylesheet" href="../tokens.css?v=1.1.5">
-  <link rel="stylesheet" href="../assets/styles.css?v=1.1.5">
+  <link rel="stylesheet" href="../tokens.css?v=1.1.5.1">
+  <link rel="stylesheet" href="../assets/styles.css?v=1.1.5.1">
   <script>
     // Apply stored theme before paint to avoid flash.
     try {
@@ -274,7 +274,7 @@
       </div>
     </section>
 
-    <!-- Demo video -->
+    <!-- Demo: live HTML animation (site/demo/demo.html), started by assets/demo.js -->
     <section id="demo" class="demo">
       <div class="container">
         <div class="section-head">
@@ -284,12 +284,10 @@
         </div>
         <div class="demo-stage">
           <div class="demo-frame">
-            <video class="demo-video" loop playsinline preload="metadata" width="1920" height="1080"
-                   poster="../assets/video/aside-demo-poster.jpg"
-                   data-i18n-attr="aria-label:demo.alt" aria-label="דמו של Aside: סיכום כתבה ואז מעבר מ-Claude ל-Gemini לשאלת המשך">
-              <source src="../assets/video/aside-demo.mp4" type="video/mp4">
-              <source src="../assets/video/aside-demo.webm" type="video/webm">
-            </video>
+            <div class="demo-screen" role="img"
+                 data-i18n-attr="aria-label:demo.alt" aria-label="דמו של Aside: סיכום כתבה ואז מעבר מ-Claude ל-Gemini לשאלת המשך">
+              <img class="demo-poster" src="../assets/video/aside-demo-poster.jpg" alt="" width="1920" height="1080" decoding="async">
+            </div>
             <button class="demo-sound" type="button" aria-pressed="false" aria-label="Turn sound on">
               <svg class="i-muted" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
               <svg class="i-sound" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
@@ -398,27 +396,27 @@
         <div class="models-grid">
           <article class="model-card" style="--c:var(--p-claude)">
             <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C8.6 4 9.8 5.6 12.5 6.3 9.8 7 8.6 8.6 8 11.1 7.4 8.6 6.2 7 3.5 6.3 6.2 5.6 7.4 4 8 1.5z"/><path d="M12.2 11.6c.2.6.6 1 1.3 1.2-.7.2-1.1.6-1.3 1.3-.2-.7-.6-1.1-1.3-1.3.7-.2 1.1-.6 1.3-1.2z" fill="#fff" stroke="none"/></svg></span><div><h3>Claude</h3><p>Anthropic</p></div></header>
-            <ul class="model-chips"><li class="model-chip is-default">Sonnet 5.5</li><li class="model-chip">Opus 5.5</li><li class="model-chip">Fable 5.2</li><li class="model-chip">Haiku 5.5</li></ul>
+            <ul class="model-chips" data-catalog="claude"><li class="model-chip is-default">Sonnet 5.5</li><li class="model-chip">Opus 5.5</li><li class="model-chip">Fable 5.2</li><li class="model-chip">Haiku 5.5</li></ul>
           </article>
           <article class="model-card" style="--c:var(--p-gpt)">
             <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.5 11.5 4.5 11.5 8.5 8 10.5 4.5 8.5 4.5 4.5 8 2.5z"/><path d="M8 5.5 9.7 6.5 9.7 8.5 8 9.5 6.3 8.5 6.3 6.5 8 5.5z" fill="#fff" stroke="none"/><path d="M4.5 8.5 4.5 12.5 8 14.5 11.5 12.5 11.5 8.5"/></svg></span><div><h3>OpenAI</h3><p>GPT-6 family</p></div></header>
-            <ul class="model-chips"><li class="model-chip is-default">GPT-6 Luna</li><li class="model-chip">GPT-6.1 Terra</li><li class="model-chip">GPT-6.1 Sol</li><li class="model-chip">GPT-6 Astra</li></ul>
+            <ul class="model-chips" data-catalog="openai"><li class="model-chip is-default">GPT-6 Luna</li><li class="model-chip">GPT-6.1 Terra</li><li class="model-chip">GPT-6.1 Sol</li><li class="model-chip">GPT-6 Astra</li></ul>
           </article>
           <article class="model-card" style="--c:var(--p-gemini)">
             <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5 9.5 6.5 14.5 8 9.5 9.5 8 14.5 6.5 9.5 1.5 8 6.5 6.5z" fill="#fff" stroke="none"/></svg></span><div><h3>Gemini</h3><p>Google</p></div><span class="model-badge" data-i18n="models.free">חינמי</span></header>
-            <ul class="model-chips"><li class="model-chip is-default">3.5 Flash-Lite</li><li class="model-chip">3.8 Flash</li><li class="model-chip">4 Argon</li></ul>
+            <ul class="model-chips" data-catalog="gemini"><li class="model-chip is-default">3.5 Flash-Lite</li><li class="model-chip">3.8 Flash</li><li class="model-chip">4 Argon</li></ul>
           </article>
           <article class="model-card model-card--grok" style="--c:var(--p-grok)">
             <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3 13 13M13 3 3 13" stroke-width="2.2"/></svg></span><div><h3>Grok</h3><p>xAI</p></div></header>
-            <ul class="model-chips"><li class="model-chip is-default">Grok 4.3</li><li class="model-chip">Grok 4.20</li><li class="model-chip">Grok 4.7</li></ul>
+            <ul class="model-chips" data-catalog="grok"><li class="model-chip is-default">Grok 4.3</li><li class="model-chip">Grok 4.20</li><li class="model-chip">Grok 4.7</li></ul>
           </article>
           <article class="model-card" style="--c:var(--p-groq)">
             <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.5 3.5 9 7.5 9 6 14.5 12.5 7 8.5 7z" fill="#fff"/></svg></span><div><h3>Groq</h3><p>GroqCloud</p></div><span class="model-badge" data-i18n="models.free">חינמי</span></header>
-            <ul class="model-chips"><li class="model-chip is-default">GPT-OSS 120B</li><li class="model-chip">GPT-OSS 20B</li></ul>
+            <ul class="model-chips" data-catalog="groq"><li class="model-chip is-default">GPT-OSS 120B</li><li class="model-chip">GPT-OSS 20B</li></ul>
           </article>
           <article class="model-card" style="--c:var(--p-ollama)">
             <header class="model-head"><span class="model-mark" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7c0-2.2 1.8-4 4-4s4 1.8 4 4v3.5c0 1.7-1.3 3-3 3H7c-1.7 0-3-1.3-3-3V7z" fill="#fff"/><path d="M5 2.5 6 5.5M11 2.5 10 5.5" stroke-width="1.5"/></svg></span><div><h3>Ollama</h3><p>Self-hosted</p></div><span class="model-badge" data-i18n="models.local">מקומי · בלי מפתח</span></header>
-            <ul class="model-chips"><li class="model-chip is-default">Qwen 3.5</li><li class="model-chip">Gemma 4</li><li class="model-chip">GPT-OSS 20B</li><li class="model-chip">Llama 3.2</li></ul>
+            <ul class="model-chips" data-catalog="ollama"><li class="model-chip is-default">Qwen 3.5</li><li class="model-chip">Gemma 4</li><li class="model-chip">GPT-OSS 20B</li><li class="model-chip">Llama 3.2</li></ul>
           </article>
         </div>
         <p class="models-note" data-i18n="models.note">רוצים מודל שעוד לא ברשימה? בחרו Custom… והקלידו כל מזהה מודל שהספק תומך בו.</p>
@@ -632,8 +630,8 @@
     </div>
   </footer>
 
-  <script src="../assets/i18n.js?v=1.1.5" defer></script>
-  <script src="../assets/theme.js?v=1.1.5" defer></script>
-  <script src="../assets/demo.js?v=1.1.5" defer></script>
+  <script src="../assets/i18n.js?v=1.1.5.1" defer></script>
+  <script src="../assets/theme.js?v=1.1.5.1" defer></script>
+  <script src="../assets/demo.js?v=1.1.5.1" defer></script>
 </body>
 </html>
