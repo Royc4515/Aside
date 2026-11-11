@@ -56,8 +56,10 @@ provider's entry alone and say so in the PR.
 ## 3 · Edit
 
 1. **`providers/models.js`** (the single source of truth). Update
-   `default`/`options`, and bump the "verified" month and sources in the
-   header comment.
+   `default`/`options`, bump `CATALOG_VERIFIED` to this month (`YYYY-MM`),
+   and update the sources in the header comment if they moved. Bump
+   `CATALOG_VERIFIED` even when no model changed: the landing page's
+   "Updated <month>" badge is generated from it.
    - Add every removed id that is retired or retiring to `RETIRED_MODELS`
      (`{ provider: { oldId: successorId } }`). Users who picked it get moved
      to the successor instead of an error. A removed id that still works
@@ -84,11 +86,12 @@ provider's entry alone and say so in the PR.
    `groq-provider.js`.
 4. **Words.** Update the README Providers table and bullets, the
    `docs/ARCHITECTURE.md` provider matrix, the site FAQ and providers table
-   (`site/index.html` and **both** languages in `site/assets/i18n.js`), the
-   "Updated <month>" badge (`models.eyebrow`, both languages), and the default
-   models in `site/llms.txt`. Run `node scripts/build-site.mjs`: it rebuilds
-   the Hebrew page and regenerates the "Latest models" chips and the live
-   demo's model names (`site/demo/catalog.js`) from the catalog. A chip name
+   (`site/index.html` and **both** languages in `site/assets/i18n.js`), and
+   the default models in `site/llms.txt`. Run `node scripts/build-site.mjs`:
+   it rebuilds the Hebrew page and regenerates, from the catalog, the
+   "Latest models" chips, the live demo's model names
+   (`site/demo/catalog.js`) and the "Updated <month>" badge in both
+   languages (from `CATALOG_VERIFIED`; don't edit `models.eyebrow` by hand). A chip name
    that reads wrong gets a `short` on its option. The demo needs no
    re-render; the README video shows no model names. Then update the
    onboarding blurbs (`ONB_PROVIDERS` in `sidebar/sidebar.js`) and the static
@@ -122,5 +125,8 @@ for this section.
    on `main`. It publishes `aside.zip` with this version's CHANGELOG section
    as the notes.
 
-If nothing changed this month, don't open a PR. Report "catalog current as of
-YYYY-MM-DD" instead.
+If no model changed this month, still open a small draft PR titled
+`chore: catalog verified YYYY-MM` that only bumps `CATALOG_VERIFIED` and
+reruns `node scripts/build-site.mjs`, so the landing page's "Updated <month>"
+badge stays truthful. It needs no CHANGELOG entry or version bump. Say
+"catalog current as of YYYY-MM-DD" in its description.

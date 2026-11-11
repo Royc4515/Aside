@@ -44,7 +44,7 @@ Vanilla JS, no build step, no bundler, no npm deps. Node is only used by mainten
 
 ## Gotchas
 - Adding a provider or host: update the CSP `connect-src` in `manifest.json` or every fetch is blocked. Ollama is only allowed at `http://localhost:11434`, and Ollama itself must run with `OLLAMA_ORIGINS=chrome-extension://*`.
-- Any model id change must go through `providers/models.js` and keep the `model || '<default>'` fallback in each `providers/*-provider.js` equal to the catalog default; `check-models.mjs` enforces this and also scans README, docs, site, sidebar, options, popup, _locales. Retired ids go in `RETIRED_MODELS`.
+- Any model id change must go through `providers/models.js` and keep the `model || '<default>'` fallback in each `providers/*-provider.js` equal to the catalog default; `check-models.mjs` enforces this and also scans README, docs, site, sidebar, options, popup, _locales. Retired ids go in `RETIRED_MODELS`. Bump `CATALOG_VERIFIED` (YYYY-MM) in the same file on every monthly check, even with no model change: build-site.mjs writes the site's "Updated <month>" badge (`models.eyebrow`, EN and HE) from it, so never edit that entry by hand.
 - Reasoning tokens count against the output cap. Caps: 16k Claude/OpenAI/xAI/Gemini, 4k Groq (free-tier TPM), 4k for custom ids (`BaseProvider.CUSTOM_OUTPUT_CAP`). Past bugs: blank or cut-off answers saved as complete (CHANGELOG 1.1.0).
 - OpenAI current models reject `max_tokens`; `openai-provider.js` must send `max_completion_tokens` (past bug, CHANGELOG 1.1.0).
 - `GroqProvider` retries once on `fallbackModel` when the model is gone; the regex match on the error text is load-bearing.

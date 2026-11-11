@@ -20,7 +20,8 @@
  *   Custom ids get no hints and BaseProvider.CUSTOM_OUTPUT_CAP (4k), which
  *   every still-served model accepts.
  *
- * Model ids verified against each provider's official docs (November 2026, re-checked 2026-11-11):
+ * Model ids verified against each provider's official docs, in the month
+ * CATALOG_VERIFIED below names:
  *   Anthropic  platform.claude.com/docs/en/about-claude/models/overview
  *   OpenAI     developers.openai.com/api/docs/models (+ /deprecations)
  *   Gemini     ai.google.dev/gemini-api/docs/models (+ /deprecations)
@@ -31,6 +32,13 @@
  * (one place) — every provider, the factory, and both UIs read this catalog.
  * Refreshed monthly: see docs/MONTHLY_UPDATE.md.
  */
+/**
+ * The month (YYYY-MM) these ids were last checked against the sources above.
+ * Bump it on every monthly update, even when nothing changed: the landing
+ * page's "Updated <month>" badge is generated from it (scripts/build-site.mjs).
+ */
+const CATALOG_VERIFIED = '2026-11';
+
 const PROVIDER_MODELS = {
   claude: {
     default: 'claude-sonnet-5-5',
@@ -200,6 +208,7 @@ function forgetCustomModel(providerId, modelId, customModels = {}) {
   return base;
 }
 
+self.CATALOG_VERIFIED = CATALOG_VERIFIED;
 self.PROVIDER_MODELS = PROVIDER_MODELS;
 self.RETIRED_MODELS = RETIRED_MODELS;
 self.resolveModel = resolveModel;
