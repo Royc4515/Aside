@@ -8,6 +8,8 @@
  *   2. site/he/index.html  - a static Hebrew copy of the landing page.
  *   3. The "Latest models" chips in both pages and site/demo/catalog.js (the
  *      live demo's model names), from providers/models.js.
+ *   4. The "Updated <month>" badge (models.eyebrow in site/assets/i18n.js,
+ *      both languages), from CATALOG_VERIFIED in providers/models.js.
  *
  * Why: the site translates in the browser, so crawlers that don't run JS
  * (most AI crawlers) only ever saw the HTML fallback text, which had drifted
@@ -35,8 +37,7 @@ const CHECK = process.argv.includes('--check');
 
 // ── Dictionary ───────────────────────────────────────────────────────────────
 
-function loadDict() {
-  const src = readFileSync(join(SITE, 'assets', 'i18n.js'), 'utf8');
+function loadDict(src) {
   // Just enough of a browser for the IIFE to define the dictionary; init()
   // waits for DOMContentLoaded, which never fires here.
   const sandbox = {
@@ -62,7 +63,34 @@ function loadCatalog() {
   vm.runInNewContext(readFileSync(join(ROOT, 'providers', 'models.js'), 'utf8'), { self: sandbox },
     { filename: 'providers/models.js' });
   if (!sandbox.PROVIDER_MODELS) throw new Error('providers/models.js no longer defines PROVIDER_MODELS');
-  return sandbox.PROVIDER_MODELS;
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(sandbox.CATALOG_VERIFIED || '')) {
+    throw new Error('providers/models.js: CATALOG_VERIFIED must be "YYYY-MM"');
+  }
+  return sandbox;
+}
+
+const MONTHS = {
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December'],
+  he: ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר',
+    'נובמבר', 'דצמבר'],
+};
+
+/** "2026-11" -> { en: "Updated November 2026", he: "עודכן בנובמבר 2026" } */
+function badgeText(verified) {
+  const [year, month] = verified.split('-').map(Number);
+  return {
+    en: `Updated ${MONTHS.en[month - 1]} ${year}`,
+    he: `עודכן ב${MONTHS.he[month - 1]} ${year}`,
+  };
+}
+
+/** Rewrite both "models.eyebrow" entries in i18n.js (en first, then he, as the dictionary is ordered). */
+function withBadge(i18nSrc, badge) {
+  let n = 0;
+  const out = i18nSrc.replace(/("models\.eyebrow": )"[^"]*"/g, (_, key) => key + JSON.stringify(n++ ? badge.he : badge.en));
+  if (n !== 2) throw new Error(`site/assets/i18n.js: expected 2 "models.eyebrow" entries, found ${n}`);
+  return out;
 }
 
 /** Chip name: "Claude Sonnet 5.5" -> "Sonnet 5.5", "GPT-OSS 20B (fastest)" -> "GPT-OSS 20B". */
@@ -232,13 +260,17 @@ function buildHebrew(src, dict) {
   return withJsonLd(html, dict.he, 'he');
 }
 
-const dict = loadDict();
-const models = showcase(loadCatalog());
+const catalog = loadCatalog();
+const i18nPath = join(SITE, 'assets', 'i18n.js');
+const i18nSrc = withBadge(readFileSync(i18nPath, 'utf8'), badgeText(catalog.CATALOG_VERIFIED));
+const dict = loadDict(i18nSrc);
+const models = showcase(catalog.PROVIDER_MODELS);
 const indexPath = join(SITE, 'index.html');
 const hePath = join(SITE, 'he', 'index.html');
 const catalogPath = join(SITE, 'demo', 'catalog.js');
 const src = withModelChips(readFileSync(indexPath, 'utf8'), models);
 const outputs = [
+  [i18nPath, i18nSrc],
   [indexPath, buildEnglish(src, dict)],
   [hePath, buildHebrew(src, dict)],
   [catalogPath, demoCatalog(models)],
