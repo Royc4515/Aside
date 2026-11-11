@@ -4,15 +4,28 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
-## 1.1.5 - unreleased
+## 1.1.5 - 2026-11-11 · Monthly tech update (November 2026)
 
 ### Changed
 
+- **Claude:** `claude-fable-5-1` in the picker is now `claude-fable-5-2`
+  (Claude Fable 5.2, released 2026-11-09). Fable 5.1 is still Active, so it is
+  not mapped as retired and keeps working as a custom id. Sources:
+  https://platform.claude.com/docs/en/about-claude/models/overview and
+  https://platform.claude.com/docs/en/about-claude/model-deprecations
+- **OpenAI:** added `gpt-6.1-terra` (GPT-6.1 Terra), a fast, cheaper middle
+  pick between GPT-6 Luna and GPT-6.1 Sol, with reasoning effort `none` so it
+  answers quickly. Source:
+  https://developers.openai.com/api/docs/models/gpt-6.1-terra
 - **Gemini:** the preview Pro pick (`gemini-3.1-pro-preview`) is replaced by the
-  stable flagship `gemini-4-argon` (thinking level `low`). The old id is not
-  retired, so anyone who chose it keeps it as a custom model. Source:
-  https://ai.google.dev/gemini-api/docs/models. Claude, OpenAI, xAI, Groq and
-  Ollama catalogs were checked and are current.
+  stable `gemini-4-argon` (Gemini 4 Argon, thinking level `low`). The old id is
+  not retired, so anyone who chose it keeps it as a custom model. Source:
+  https://ai.google.dev/gemini-api/docs/models
+- xAI, Groq and Ollama re-checked against their docs: unchanged.
+- **Landing page:** the "Latest models" section (English and Hebrew) lists the
+  new models and reads "Updated November 2026"; CSS/JS cache-busters are
+  `?v=1.1.5`. The demo source (`marketing/demo/demo.html`) lists the new
+  models too; the demo video itself has not been re-rendered yet.
 
 ### Fixed
 
