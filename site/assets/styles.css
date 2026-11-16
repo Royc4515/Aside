@@ -711,7 +711,7 @@ body { transition: margin .45s cubic-bezier(.2,.8,.2,1); }
   padding: 10px 12px 10px 18px; border-radius: 999px; background: #262421; color: #eeece2; font-size: 15px; border: 1px solid rgba(238,236,226,.16);
   box-shadow: 0 18px 50px rgba(0,0,0,.35); cursor: pointer; font-family: inherit; transition: transform .3s ease, opacity .3s ease; white-space: nowrap; }
 .try-pill kbd { font: 500 13px var(--font-mono); padding: 5px 9px; border-radius: 8px; background: linear-gradient(#3b3833,#2e2b27); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 2px 0 #191714; }
-html.try-open .try-pill, html.try-used .try-pill { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
+html.try-open .try-pill, html.try-used .try-pill, html.try-hero .try-pill { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
 .try-sb { position: fixed; z-index: 85; top: 12px; bottom: 12px; inset-inline-end: 12px; width: min(400px, calc(100vw - 24px)); border-radius: 18px;
   background: #262421; color: #eeece2; display: flex; flex-direction: column; overflow: hidden; font-family: var(--font-sans);
   box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 30px 80px rgba(20,18,14,.45); transform: translateX(calc(100% + 30px)); opacity: 0;
@@ -758,6 +758,8 @@ html.try-open .try-sb { transform: none; opacity: 1; }
 .try-keys { display: inline-flex; gap: 6px; }
 .try-sb:focus { outline: none; }
 @media (hover: none) { .try-keys { display: none; } .try-pill { padding-inline-end: 18px; } }
+/* Hero screenshot: English or Hebrew, following the page language (also after the in-place toggle). */
+html[lang="he"] .shot-en, html:not([lang="he"]) .shot-he { display: none; }
 /* The hero screenshot is the preview's closed state: clicking it opens the preview, and it steps aside while
    the preview is open, so the page never shows two sidebars next to each other. */
 .hero-art.is-try { cursor: pointer; transition: opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1); }

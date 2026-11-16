@@ -158,6 +158,12 @@
   pill.addEventListener("click", () => setOpen(true));
   document.body.append(pill);
   document.querySelectorAll(".js-try").forEach((b) => { b.hidden = false; b.addEventListener("click", () => setOpen(true)); });
+  // In the hero the "Try it" button and the screenshot already offer this, and the pill would cover them.
+  const hero = document.querySelector(".hero");
+  if (hero && "IntersectionObserver" in window) {
+    root.classList.add("try-hero");
+    new IntersectionObserver((entries) => root.classList.toggle("try-hero", entries[0].isIntersecting), { threshold: 0.35 }).observe(hero);
+  }
   // The hero screenshot opens the preview too (see .hero-art.is-try in styles.css).
   const art = document.querySelector(".hero-art");
   if (art) {
