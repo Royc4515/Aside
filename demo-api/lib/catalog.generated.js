@@ -22,13 +22,6 @@ export const DEMO_MODELS = {
       "provider": "gemini",
       "id": "gemini-3.5-flash-lite",
       "label": "Gemini 3.5 Flash-Lite"
-    },
-    {
-      "key": "gemini:gemini-3.8-flash",
-      "provider": "gemini",
-      "id": "gemini-3.8-flash",
-      "label": "Gemini 3.8 Flash",
-      "effort": "low"
     }
   ],
   "claude": [

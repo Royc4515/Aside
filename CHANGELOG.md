@@ -34,6 +34,16 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   and every provider has its own daily cap. A paid model is called only when
   the visitor picked it. The automatic chain now starts with GPT-OSS 120B.
   Requests without a model behave as before.
+- **Landing page: pick the model, or compare two.** The "try it" preview's
+  composer now has a model picker and a compare toggle, like the extension's
+  sidebar: Groq GPT-OSS 120B or 20B, Gemini 3.5 Flash-Lite, Claude Haiku 5.5
+  or Sonnet 5.5. A compared question shows both answers, each labelled with
+  its model; a model that cannot answer says why (unavailable, region, daily
+  limit), and a substitute answer says so. Ready-made answers are labelled
+  "Ready-made answer". Gemini 3.8 Flash was offered at first and dropped: on
+  the free tier it timed out or returned 503 on most calls.
+- Demo server: a failed pick reports a fixed reason code, and slow models get
+  up to 20 seconds within a 26-second request budget.
 
 ### Changed
 

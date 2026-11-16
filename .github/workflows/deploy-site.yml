@@ -82,6 +82,7 @@ jobs:
           test -f _site/demo/demo.html
           test -f _site/demo/catalog.js
           test -f _site/assets/demo-config.js
+          test -f _site/assets/try-models.js
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

@@ -776,6 +776,36 @@ html.try-open .try-sb { transform: none; opacity: 1; }
   text-transform: uppercase; color: #e08866; border: 1px solid rgba(224,136,102,.5); }
 .try-ai-t { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }   /* live answers come with their own line breaks */
 .try-ai-t + .try-more { margin-top: 12px; }
+/* Model picker and compare bar above the input, after the extension's own composer (sidebar/sidebar.html). */
+.try-foot { position: relative; }
+.try-models { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; min-width: 0; }
+.try-models.is-compare { padding: 5px; border-radius: 12px; background: rgba(224,136,102,.1); }
+.try-sb .try-model { display: inline-flex; align-items: center; gap: 7px; min-width: 0; height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid rgba(238,236,226,.16); background: #2a2824; color: #eeece2; font: 600 13px var(--font-sans); cursor: pointer; transition: background-color .18s ease, border-color .18s ease; }   /* don't touch / the global button padding and nowrap leak in otherwise */
+.try-models.is-compare .try-model { flex: 1; }
+.try-model:hover, .try-model[aria-expanded="true"] { border-color: rgba(224,136,102,.7); background: #302d28; }
+.try-model-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.try-model svg { width: 12px; height: 12px; flex: none; color: #a9a293; }
+.try-model[hidden], .try-vs[hidden], .try-cmp[hidden], .try-menu[hidden] { display: none; }
+.try-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.try-vs { display: inline-flex; color: #e08866; flex: none; }
+.try-vs svg { width: 15px; height: 15px; }
+.try-sb .try-cmp { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px; margin-inline-start: auto; border-radius: 999px; border: 1px solid rgba(238,236,226,.16); background: none; color: #d4ccb8; font: 500 13px var(--font-sans); cursor: pointer; flex: none; transition: background-color .18s ease, border-color .18s ease, color .18s ease; }   /* don't touch / global button padding */
+.try-cmp svg { width: 14px; height: 14px; }
+.try-models.is-compare .try-cmp { width: 32px; padding: 0; justify-content: center; }
+.try-models.is-compare .try-cmp span { display: none; }
+.try-cmp:hover { border-color: rgba(224,136,102,.7); color: #eeece2; }
+.try-cmp[aria-pressed="true"] { background: #e08866; border-color: #e08866; color: #fff; }
+.try-menu { position: absolute; z-index: 2; bottom: calc(100% - 4px); inset-inline: 14px; max-height: min(320px, 45vh); overflow: auto; padding: 6px; border-radius: 14px; background: #2f2c28; box-shadow: 0 0 0 1px rgba(238,236,226,.12), 0 18px 40px rgba(0,0,0,.45); }
+.try-sb .try-opt { display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px 10px; border: 0; border-radius: 9px; background: none; color: #eeece2; font: 14px var(--font-sans); text-align: start; cursor: pointer; white-space: normal; }   /* don't touch / global button padding */
+.try-opt:hover, .try-opt:focus-visible { background: #3a3631; }
+.try-opt[aria-selected="true"] { background: rgba(224,136,102,.16); }
+.try-model-chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; border: 1px solid rgba(238,236,226,.16); font: 500 12px var(--font-sans); color: #d4ccb8; min-width: 0; }
+.try-model-chip span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.try-ai-h { flex-wrap: wrap; }
+.try-ai-badge { color: #a9a293; }
+.try-swap { font-size: 12.5px; color: #c9a27f; margin: 0 0 6px; }
+.try-ai-t.is-error { color: #a9a293; font-style: italic; }
+.try-ai + .try-ai { padding-top: 14px; border-top: 1px dashed rgba(238,236,226,.12); }
 .try-live { color: #e08866; font-weight: 600; }
 .try-model { padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(238,236,226,.16); font: 500 11.5px var(--font-mono); color: #a9a293; }
 .try-ai.is-thinking .try-ai-t { color: #7d776b; animation: try-think 1.2s ease-in-out infinite; }

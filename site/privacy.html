@@ -143,12 +143,13 @@
     <p>
       When live answers are switched on, a question you <strong>type</strong>
       into that preview is different: it is sent to a small demo server we run
-      for the website, which passes it to one AI provider (Groq, Google Gemini
-      or Anthropic) and returns the answer. The answer is labelled with the
-      model that gave it. What that involves:
+      for the website, which passes it to the AI provider you picked (Groq, Google Gemini
+      or Anthropic), or to two of them when you compare models, and returns the
+      answers. Each answer is labelled with the model that gave it. What that
+      involves:
     </p>
     <ul>
-      <li>Only the text of your question and the page language are sent. No API key, no cookies, no page content from your browser.</li>
+      <li>Only the text of your question, the page language and the model you picked are sent. No API key, no cookies, no page content from your browser.</li>
       <li>The demo server does not store or log your question or the answer. To limit use, it keeps a daily counter under a salted one-way hash of your IP address, which expires after about a day. The IP address itself is not stored.</li>
       <li>The AI provider receives your question. On a provider’s free tier, questions may be used to improve its products and may be read by human reviewers, so do not type anything private. Google’s free tier is not used for visitors from the European Economic Area, Switzerland or the United Kingdom.</li>
       <li>The server is hosted on Vercel, which, like any web host, sees your IP address when your browser connects.</li>
