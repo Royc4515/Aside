@@ -50,6 +50,9 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   On a first visit on a wide screen the preview opens by itself, once per
   browser (not after a #link, a scroll or a click, and not with reduced
   motion).
+- **Landing page in Hebrew:** the hero and gallery screenshots are Hebrew on
+  the Hebrew page (and after switching language), taken from the demo's
+  Hebrew mode.
 - **Landing page: "Stop shuffling tabs".** A new section plays the usual
   copy, switch tab, paste, switch back routine next to the Aside way, step
   by step.
