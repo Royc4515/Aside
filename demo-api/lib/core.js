@@ -24,7 +24,8 @@ const MAX_ANSWER_CHARS = 1200;
 const PROVIDER_TIMEOUT_MS = 9000;
 const DAY_SECONDS = 26 * 3600;   // counters outlive their UTC day by a margin, then expire
 
-const DEFAULTS = { PER_VISITOR_PER_DAY: 5, ALL_VISITORS_PER_DAY: 300, CLAUDE_PER_DAY: 30 };
+// Caps count model calls, not questions: a comparison is two calls.
+const DEFAULTS = { PER_VISITOR_PER_DAY: 10, ALL_VISITORS_PER_DAY: 300, GROQ_PER_DAY: 300, GEMINI_PER_DAY: 200, CLAUDE_PER_DAY: 30 };
 const DEFAULT_ORIGINS = 'https://royc4515.github.io';
 
 // don't touch / Google's Gemini API terms: the free tier may not serve users in the EEA, Switzerland or the UK.
@@ -96,6 +97,9 @@ const CALL = {
 };
 const KEY_ENV = { groq: 'GROQ_API_KEY', gemini: 'GEMINI_API_KEY', claude: 'ANTHROPIC_API_KEY' };
 const ORDER = ['groq', 'gemini', 'claude'];   // free tiers first, the paid one last
+const PAID = new Set(['claude']);
+/** Every model a visitor may pick, by the key the page sends. Nothing else can be requested. */
+const MODEL_BY_KEY = new Map(Object.values(DEMO_MODELS).flat().map((m) => [m.key, m]));
 
 /**
  * DEMO_PROVIDERS (optional, set in Vercel, never by a visitor) picks and orders the providers, e.g.
@@ -113,9 +117,10 @@ function store(env, fetchFn) {
   const url = env.UPSTASH_REDIS_REST_URL || env.KV_REST_API_URL;
   const token = env.UPSTASH_REDIS_REST_TOKEN || env.KV_REST_API_TOKEN;
   if (!url || !token) return null;
-  /** Add 1 to each key (setting its expiry on first use) and return the new counts. Throws on any failure. */
-  return async function increment(keys) {
-    const commands = keys.flatMap((k) => [['INCR', k], ['EXPIRE', k, DAY_SECONDS, 'NX']]);
+  /** Add to each [key, amount] (setting its expiry on first use) and return the new counts. Throws on any failure. */
+  return async function increment(pairs) {
+    const keys = pairs.map(([k]) => k);
+    const commands = pairs.flatMap(([k, n]) => [['INCRBY', k, n], ['EXPIRE', k, DAY_SECONDS, 'NX']]);
     const res = await fetchFn(`${url.replace(/\/$/, '')}/pipeline`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -167,31 +172,73 @@ export async function handleAsk(request, { env, fetch: fetchFn, now }) {
   if (question.length < 2 || question.length > MAX_QUESTION_CHARS) return fallback(400, 'bad_question');
   const lang = input.lang === 'he' ? 'he' : 'en';
 
-  const providers = providerOrder(env).filter((id) => env[KEY_ENV[id]] && DEMO_MODELS[id]);
-  if (!providers.length || !env.DEMO_SALT) return fallback(503, 'not_configured');
+  // A visitor's own pick (one model, or two to compare). Absent: the automatic chain, as before.
+  let picks = null;
+  if (input.models !== undefined) {
+    if (!Array.isArray(input.models) || input.models.length < 1 || input.models.length > 2) return fallback(400, 'bad_model');
+    picks = input.models.map((key) => (typeof key === 'string' ? MODEL_BY_KEY.get(key) : undefined));
+    // don't touch / only catalog entries, looked up by key: a client string never reaches a provider URL or body.
+    if (!picks.every(Boolean) || new Set(picks).size !== picks.length) return fallback(400, 'bad_model');
+  }
+
+  const enabled = providerOrder(env).filter((id) => env[KEY_ENV[id]] && DEMO_MODELS[id]?.length);
+  if (!enabled.length || !env.DEMO_SALT) return fallback(503, 'not_configured');
   const increment = store(env, fetchFn);
   if (!increment) return fallback(503, 'no_store');   // fail closed: without counters there are no caps
 
   const day = now().toISOString().slice(0, 10);
+  const calls = picks ? picks.length : 1;
   try {
-    const [mine, everyone] = await increment([`demo:v:${day}:${await visitorKey(request, day, env)}`, `demo:all:${day}`]);
+    const [mine, everyone] = await increment([[`demo:v:${day}:${await visitorKey(request, day, env)}`, calls], [`demo:all:${day}`, calls]]);
     if (mine > intEnv(env, 'PER_VISITOR_PER_DAY')) return fallback(429, 'visitor_cap');
     if (everyone > intEnv(env, 'ALL_VISITORS_PER_DAY')) return fallback(429, 'daily_cap');
   } catch { return fallback(503, 'store_error'); }
 
   const country = (request.headers.get('x-vercel-ip-country') || '').toUpperCase();
+  // An unknown country counts as blocked: the terms are the provider's, so when in doubt, skip.
+  const blockedHere = (m) => m.provider === 'gemini' && (!country || GEMINI_FREE_TIER_BLOCKED.has(country));
   const system = systemPrompt(lang);
-  for (const id of providers) {
-    // An unknown country counts as blocked: the terms are the provider's, so when in doubt, skip.
-    if (id === 'gemini' && (!country || GEMINI_FREE_TIER_BLOCKED.has(country))) continue;
+  /** Reserve one call on the provider's own daily cap. Throws if the store fails. */
+  const reserve = async (provider) => (await increment([[`demo:${provider}:${day}`, 1]]))[0] <= intEnv(env, `${provider.toUpperCase()}_PER_DAY`);
+  const run = async (m) => {
     try {
-      if (id === 'claude') {
-        const [paid] = await increment([`demo:claude:${day}`]);
-        if (paid > intEnv(env, 'CLAUDE_PER_DAY')) continue;
-      }
-      const text = String(await CALL[id](fetchFn, env[KEY_ENV[id]], DEMO_MODELS[id], system, question) || '').trim();
-      if (text) return reply(200, { answer: text.slice(0, MAX_ANSWER_CHARS), provider: id, model: DEMO_MODELS[id].label });
-    } catch { /* rate limit, timeout, outage: try the next provider */ }
-  }
-  return fallback(503, 'unavailable');
+      const text = String(await CALL[m.provider](fetchFn, env[KEY_ENV[m.provider]], m, system, question) || '').trim();
+      if (text) return { answer: text.slice(0, MAX_ANSWER_CHARS), provider: m.provider, model: m.label, key: m.key };
+    } catch { /* rate limit, timeout, outage, cut off */ }
+    return { error: 'unavailable' };
+  };
+  /** The first model of each enabled provider in turn, skipping `skip`. Paid providers only when `paid`. */
+  const chain = async (skip, paid) => {
+    for (const id of enabled) {
+      const m = DEMO_MODELS[id][0];
+      if ((PAID.has(id) && !paid) || m === skip || blockedHere(m)) continue;
+      if (!(await reserve(id))) continue;
+      const r = await run(m);
+      if (r.answer) return r;
+    }
+    return null;
+  };
+
+  try {
+    if (!picks) {
+      const r = await chain(null, true);
+      return r ? reply(200, { answer: r.answer, provider: r.provider, model: r.model }) : fallback(503, 'unavailable');
+    }
+
+    // Each pick: check it may run here and reserve its provider's cap, all before any model is called.
+    const plan = [];
+    for (const m of picks) {
+      if (!enabled.includes(m.provider)) plan.push({ error: 'unavailable' });
+      else if (blockedHere(m)) plan.push({ error: 'region' });
+      else plan.push((await reserve(m.provider)) ? m : { error: 'cap' });
+    }
+    const answers = await Promise.all(plan.map((p, i) => (p.error ? { ...p, key: picks[i].key } : run(p).then((r) => ({ ...r, key: picks[i].key })))));
+
+    // One pick that could not answer: a free provider answers instead, and says so. Never a paid one the visitor did not pick.
+    if (picks.length === 1 && answers[0].error) {
+      const r = await chain(picks[0], false);
+      if (r) return reply(200, { answers: [{ ...r, requested: picks[0].key, notice: answers[0].error }] });
+    }
+    return answers.some((a) => a.answer) ? reply(200, { answers }) : reply(503, { fallback: true, reason: answers[0].error, answers });
+  } catch { return fallback(503, 'store_error'); }
 }

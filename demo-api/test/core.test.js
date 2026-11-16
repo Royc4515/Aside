@@ -22,7 +22,7 @@ function world({ over = {}, storeDown = false, counts = {} } = {}) {
     calls.push({ url: String(url), init });
     if (host === 'store.test') {
       if (storeDown) return json({ error: 'down' }, 500);
-      return json(JSON.parse(init.body).map(([cmd, key]) => ({ result: cmd === 'INCR' ? (counts[key] = (counts[key] || 0) + 1) : 1 })));
+      return json(JSON.parse(init.body).map(([cmd, key, n]) => ({ result: cmd === 'INCRBY' ? (counts[key] = (counts[key] || 0) + n) : 1 })));
     }
     const id = host.includes('groq') ? 'groq' : host.includes('google') ? 'gemini' : 'claude';
     return (over[id] || UPSTREAM[id])();
@@ -42,7 +42,7 @@ test('answers from the first free provider and says which model answered', async
   const w = world();
   const res = await ask(w);
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { answer: 'groq says hi', provider: 'groq', model: DEMO_MODELS.groq.label });
+  assert.deepEqual(await res.json(), { answer: 'groq says hi', provider: 'groq', model: DEMO_MODELS.groq[0].label });
   assert.equal(res.headers.get('access-control-allow-origin'), ORIGIN);
   assert.equal(w.called('googleapis') + w.called('anthropic'), 0);
 });
@@ -93,13 +93,13 @@ test('Claude has its own daily cap', async () => {
   assert.equal(w.called('anthropic'), 0);
 });
 
-test('per-visitor cap: the sixth question of the day gets no model call', async () => {
+test('per-visitor cap: the eleventh call of the day gets no model call', async () => {
   const w = world();
-  for (let i = 0; i < 5; i++) assert.equal((await ask(w)).status, 200);
+  for (let i = 0; i < 10; i++) assert.equal((await ask(w)).status, 200);
   const res = await ask(w);
   assert.equal(res.status, 429);
   assert.equal((await res.json()).reason, 'visitor_cap');
-  assert.equal(w.called('groq'), 5);
+  assert.equal(w.called('groq'), 10);
   assert.equal((await ask(w, { ip: '5.6.7.8' })).status, 200, 'another visitor is not affected');
 });
 
@@ -129,7 +129,7 @@ test('fails closed when the store is missing or down', async () => {
 test('Vercel\'s own IP header wins over a forwarded-for header', async () => {
   const w = world();
   const forged = (n) => ask(w, { ip: `9.9.9.${n}`, headers: { 'x-vercel-forwarded-for': '1.2.3.4' } });
-  for (let i = 0; i < 5; i++) assert.equal((await forged(i)).status, 200);
+  for (let i = 0; i < 10; i++) assert.equal((await forged(i)).status, 200);
   assert.equal((await forged(9)).status, 429, 'a new x-forwarded-for each time must not reset the cap');
 });
 
@@ -202,4 +202,109 @@ test('no response ever contains a key', async () => {
 test('a very long answer is cut', async () => {
   const w = world({ over: { groq: () => json({ choices: [{ message: { content: 'a'.repeat(5000) } }] }) } });
   assert.equal((await (await ask(w)).json()).answer.length, 1200);
+});
+
+// ── The visitor's own pick, and compare ─────────────────────────────────────
+
+const K = { g120: 'groq:openai/gpt-oss-120b', g20: 'groq:openai/gpt-oss-20b', lite: 'gemini:gemini-3.5-flash-lite', flash: 'gemini:gemini-3.8-flash', haiku: 'claude:claude-haiku-5-5', sonnet: 'claude:claude-sonnet-5-5' };
+const pick = (...models) => ({ body: { question: 'Is Aside free?', lang: 'en', models } });
+const sentModel = (w, host) => JSON.parse(w.calls.find((c) => c.url.includes(host)).init.body).model;
+
+test('every pick key exists in the generated catalog', () => {
+  const keys = Object.values(DEMO_MODELS).flat().map((m) => m.key);
+  assert.deepEqual(Object.values(K).sort(), keys.sort());
+});
+
+test('a single pick calls exactly that model', async () => {
+  const w = world();
+  const { answers } = await (await ask(w, pick(K.sonnet))).json();
+  assert.equal(answers.length, 1);
+  assert.equal(answers[0].key, K.sonnet);
+  assert.equal(answers[0].provider, 'claude');
+  assert.equal(sentModel(w, 'anthropic'), 'claude-sonnet-5-5');
+  assert.equal(w.called('groq') + w.called('googleapis'), 0);
+  const w2 = world();
+  await ask(w2, pick(K.flash));
+  assert.ok(w2.calls.find((c) => c.url.includes('googleapis')).url.includes('/models/gemini-3.8-flash:generateContent'));
+});
+
+test('compare runs two models side by side and counts two calls', async () => {
+  const w = world();
+  const { answers } = await (await ask(w, pick(K.g20, K.haiku))).json();
+  assert.deepEqual(answers.map((a) => a.key), [K.g20, K.haiku]);
+  assert.deepEqual(answers.map((a) => a.answer), ['groq says hi', 'claude says hi']);
+  assert.equal(sentModel(w, 'groq'), 'openai/gpt-oss-20b');
+  assert.equal(w.counts['demo:all:2026-11-16'], 2);
+  assert.equal(w.counts['demo:claude:2026-11-16'], 1);
+});
+
+test('unknown, unlisted, malformed or duplicate picks are refused before anything is counted', async () => {
+  for (const models of [['claude:claude-opus-5-5'], ['openai/gpt-oss-120b'], ['groq:../../evil'], [K.g20, K.g20], [K.g20, K.lite, K.haiku], [], 'groq', [42], { 0: K.g20 }]) {
+    const w = world();
+    const res = await ask(w, { body: { question: 'Is Aside free?', models } });
+    assert.equal(res.status, 400, JSON.stringify(models));
+    assert.equal((await res.json()).reason, 'bad_model');
+    assert.equal(w.calls.length, 0);
+  }
+});
+
+test('a failed single pick falls back to a free provider and says so; never to Claude', async () => {
+  const w = world({ over: { gemini: () => json({}, 429) } });
+  const { answers } = await (await ask(w, pick(K.flash))).json();
+  assert.equal(answers[0].provider, 'groq');
+  assert.equal(answers[0].requested, K.flash);
+  assert.equal(answers[0].notice, 'unavailable');
+  const w2 = world({ over: { groq: () => json({}, 429), gemini: () => json({}, 429) } });
+  assert.equal((await ask(w2, pick(K.g120))).status, 503);
+  assert.equal(w2.called('anthropic'), 0);
+});
+
+test('a failed side of a comparison stays failed; the other side still answers', async () => {
+  const w = world({ over: { claude: () => json({}, 500) } });
+  const { answers } = await (await ask(w, pick(K.g120, K.sonnet))).json();
+  assert.equal(answers[0].answer, 'groq says hi');
+  assert.deepEqual(answers[1], { error: 'unavailable', key: K.sonnet });
+  assert.equal(w.called('groq'), 1, 'no stand-in for the failed side');
+});
+
+test('Gemini picked from a blocked region: the reason is "region"', async () => {
+  const w = world();
+  const { answers } = await (await ask(w, { ...pick(K.lite, K.g20), country: 'FR' })).json();
+  assert.deepEqual(answers[0], { error: 'region', key: K.lite });
+  assert.equal(w.called('googleapis'), 0);
+  const single = await (await ask(world(), { ...pick(K.lite), country: '' })).json();
+  assert.equal(single.answers[0].notice, 'region');
+  assert.equal(single.answers[0].provider, 'groq');
+});
+
+test('each provider has its own daily cap', async () => {
+  const w = world({ counts: { 'demo:gemini:2026-11-16': 200 } });
+  const { answers } = await (await ask(w, pick(K.lite, K.g20))).json();
+  assert.deepEqual(answers[0], { error: 'cap', key: K.lite });
+  assert.equal(w.called('googleapis'), 0);
+  const c = world({ counts: { 'demo:claude:2026-11-16': 30 } });
+  assert.equal((await (await ask(c, pick(K.haiku, K.sonnet))).json()).reason, 'cap');
+  assert.equal(c.called('anthropic'), 0);
+});
+
+test('a provider switched off by DEMO_PROVIDERS or without a key cannot be picked into a call', async () => {
+  const w = world();
+  const { answers } = await (await ask(w, { ...pick(K.haiku, K.g20), env: { ...ENV, DEMO_PROVIDERS: 'groq,gemini' } })).json();
+  assert.equal(answers[0].error, 'unavailable');
+  const w2 = world();
+  await ask(w2, { ...pick(K.sonnet), env: { ...ENV, ANTHROPIC_API_KEY: '' } });
+  assert.equal(w.called('anthropic') + w2.called('anthropic'), 0);
+});
+
+test('compare counts against the visitor cap as two', async () => {
+  const w = world();
+  for (let i = 0; i < 5; i++) assert.equal((await ask(w, pick(K.g20, K.lite))).status, 200);
+  assert.equal((await (await ask(w, pick(K.g20))).json()).reason, 'visitor_cap');
+});
+
+test('no answer from either side of a comparison: fallback', async () => {
+  const w = world({ over: { groq: () => json({}, 500), gemini: () => json({}, 500) } });
+  const res = await ask(w, pick(K.g20, K.lite));
+  assert.equal(res.status, 503);
+  assert.equal((await res.json()).fallback, true);
 });

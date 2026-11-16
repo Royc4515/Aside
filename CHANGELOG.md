@@ -27,6 +27,13 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
     empty that string, or set `DEMO_ALL_VISITORS_PER_DAY=0` in Vercel for an
     immediate stop.
 - The privacy policy has a section about the website's preview.
+- **Demo server: the visitor's own model, and compare.** A request may name
+  one model, or two to compare, from a fixed list of two per provider (Groq
+  GPT-OSS 120B and 20B, Gemini 3.5 Flash-Lite and 3.8 Flash, Claude Haiku 5.5
+  and Sonnet 5.5). Caps now count model calls, so a comparison counts twice,
+  and every provider has its own daily cap. A paid model is called only when
+  the visitor picked it. The automatic chain now starts with GPT-OSS 120B.
+  Requests without a model behave as before.
 
 ### Changed
 
