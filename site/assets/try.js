@@ -21,6 +21,15 @@
   // question key -> the dictionary key that answers it (also the element on the page it is quoted from)
   const QA = [["try.q1", "about.body"], ["try.q2", "faq.a2"], ["try.q3", "faq.a1"], ["try.q4", "faq.a7"]];
 
+  // Line icons, in the sidebar's own style (they inherit the text colour).
+  const svg = (cls, d) => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const ICON = {
+    arrow: svg("try-ico try-ico-dir", '<path d="M5 12h14M13 6l6 6-6 6"/>'),   // try-ico-dir: mirrored on right-to-left pages
+    close: svg("", '<path d="M6 6l12 12M18 6 6 18"/>'),
+    locate: svg("try-ico", '<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>'),
+    mark: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="#e08866"/><circle cx="16" cy="27.6" r="1.9" fill="#e08866"/></svg>',
+  };
+
   /** An element whose text follows the page language (i18n.js re-applies [data-i18n] on a language switch). */
   function el(tag, cls, key) {
     const node = document.createElement(tag);
@@ -38,10 +47,10 @@
     <div class="try-head">
       <div class="try-brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c2 5 5.5 8.5 10.5 10.5C21.5 15.5 18 19 16 24 14 19 10.5 15.5 5.5 13.5 10.5 11.5 14 8 16 3z" fill="#e08866"/><circle cx="16" cy="27.6" r="1.9" fill="#e08866"/></svg>Aside</div>
       <span class="try-badge" data-i18n="try.badge"></span>
-      <button class="try-x" type="button" data-i18n-attr="aria-label:try.close">&times;</button>
+      <button class="try-x" type="button" data-i18n-attr="aria-label:try.close">${ICON.close}</button>
     </div>
     <div class="try-body"><div class="try-empty"><h3 data-i18n="try.title"></h3><p data-i18n="try.sub"></p></div></div>
-    <div class="try-foot"><form><input data-i18n-attr="placeholder:try.placeholder"><button data-i18n-attr="aria-label:try.send">&rarr;</button></form>
+    <div class="try-foot"><form><input data-i18n-attr="placeholder:try.placeholder"><button data-i18n-attr="aria-label:try.send">${ICON.arrow}</button></form>
       <div class="try-note" data-i18n="try.note"></div></div>`;
   sb.querySelectorAll("[data-i18n]").forEach((n) => { n.textContent = tr(n.getAttribute("data-i18n")); });
   sb.querySelectorAll("[data-i18n-attr]").forEach((n) => {
@@ -53,9 +62,12 @@
   const empty = sb.querySelector(".try-empty");
   let busy = false;
 
+  /** A question button. The label sits in its own span: i18n.js rewrites a [data-i18n] element's whole text. */
   function chip(cls, qKey, aKey) {
-    const b = el("button", cls, qKey);
+    const b = el("button", cls);
     b.type = "button";
+    b.append(el("span", "", qKey));
+    if (cls) b.insertAdjacentHTML("beforeend", ICON.arrow);
     b.addEventListener("click", () => ask(qKey, aKey));
     return b;
   }
@@ -96,7 +108,8 @@
     user.append(freeText ? Object.assign(document.createElement("span"), { textContent: freeText }) : el("span", "", qKey));
     const ai = el("div", "try-ai");
     const head = el("div", "try-ai-h");
-    head.append("Aside · ", el("span", "", "try.badge"));
+    head.innerHTML = `${ICON.mark}<b>Aside</b>`;
+    head.append(el("span", "", "try.badge"));
     const text = el("p", "try-ai-t");
     ai.append(head, text);
     body.append(user, ai);
@@ -107,8 +120,10 @@
 
     const src = aKey && document.querySelector(`main [data-i18n="${aKey}"]`);
     if (src) {
-      const show = el("button", "try-src", "try.source");
+      const show = el("button", "try-src");
       show.type = "button";
+      show.innerHTML = ICON.locate;
+      show.append(el("span", "", "try.source"));
       show.addEventListener("click", () => showSource(src));
       ai.append(show);
       showSource(src);
