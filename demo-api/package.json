@@ -1,0 +1,8 @@
+{
+  "name": "aside-demo-api",
+  "private": true,
+  "type": "module",
+  "description": "The one server-side piece of Aside: answers typed questions in the landing page's try-it preview.",
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test" }
+}

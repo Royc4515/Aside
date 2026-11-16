@@ -4,6 +4,33 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## Unreleased
+
+### Added
+
+- **Landing page: live answers in the "try it" preview (off until a demo
+  server is configured).** A question a visitor types can now be answered by
+  a real model instead of "this preview only knows the questions below". The
+  answer is labelled "Live answer" with the model that gave it, and a note
+  under the input says where the question goes. The ready-made questions are
+  unchanged and still call no model.
+  - `demo-api/` is a small Vercel function, the only server-side code in the
+    repo. The extension never talks to it and it is not in the release ZIP.
+  - Built so it cannot cost money: the server owns the prompt and the facts,
+    questions are capped at 300 characters, and daily caps (5 per visitor, 300
+    in total, 30 for the one paid provider) live in Redis. If it cannot count,
+    it refuses. Free tiers go first (Groq, then Gemini), Claude last and only
+    if its key is set. Gemini's free tier is skipped for the EEA, the UK and
+    Switzerland, as Google's terms require.
+  - The site ships with `site/assets/demo-config.js` empty, so nothing is
+    sent anywhere until a server URL is put there.
+- The privacy policy has a section about the website's preview.
+
+### Changed
+
+- FAQ wording: "there is no server we control" is now "the extension has no
+  server at all", which stays true with the website's demo server.
+
 ## 1.1.5 - 2026-11-16 · New models, a live demo and "try it" on the site
 
 ### Changed

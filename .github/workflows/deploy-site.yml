@@ -9,6 +9,7 @@ on:
       - "scripts/build-site.mjs"
       # The model chips and the live demo's catalog.js are built from it.
       - "providers/models.js"
+      - "demo-api/**"
       - ".github/workflows/deploy-site.yml"
   # PRs only run the build job's checks; the deploy job is main-only.
   pull_request:
@@ -16,6 +17,7 @@ on:
       - "site/**"
       - "scripts/build-site.mjs"
       - "providers/models.js"
+      - "demo-api/**"
       - ".github/workflows/deploy-site.yml"
   workflow_dispatch:
 
@@ -46,6 +48,12 @@ jobs:
       - name: Static pages in sync with the i18n dictionary and model catalog
         run: node scripts/build-site.mjs --check
 
+      # The demo server is deployed elsewhere (see demo-api/README.md), but its caps are what keep
+      # the try-it preview from costing money, so they are tested here. Mocked fetch: no keys, no network.
+      - name: Demo server tests
+        run: node --test
+        working-directory: demo-api
+
       - name: Assemble publish tree
         run: |
           set -euo pipefail
@@ -73,6 +81,7 @@ jobs:
           test -f _site/assets/img/shot-followup-he-1x.png
           test -f _site/demo/demo.html
           test -f _site/demo/catalog.js
+          test -f _site/assets/demo-config.js
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

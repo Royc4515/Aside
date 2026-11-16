@@ -227,6 +227,7 @@ providers/          BaseProvider + 6 concrete providers + factory; models.js is 
 shared/             settings store (chrome.storage.local), provider monograms
 _locales/{en,he}/   chrome.i18n message catalogs
 site/               landing page (GitHub Pages): live demo, try-it preview, EN + HE
+demo-api/           optional server for live answers in the site's try-it preview (not part of the extension)
 scripts/            model catalog checks, site build, release ZIP
 docs/               architecture, monthly model update runbook
 marketing/          images, README video renderer, Chrome Web Store assets

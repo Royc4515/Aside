@@ -1,6 +1,8 @@
 node_modules/
 package-lock.json
 package.json
+# The demo server is the one place with a real package.json (it marks the folder as ES modules).
+!demo-api/package.json
 
 # Local dev / tooling caches
 .ruff_cache/
