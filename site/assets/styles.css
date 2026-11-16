@@ -73,6 +73,8 @@ button, .btn {
   border: 1px solid var(--line-strong);
 }
 .btn-secondary:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+.btn-secondary[disabled] { color: var(--ink-4); border-style: dashed; cursor: not-allowed; }
+.btn-secondary[disabled]:hover { background: transparent; color: var(--ink-4); }
 
 .container {
   max-width: 1120px;
@@ -760,6 +762,28 @@ html.try-open .try-sb { transform: none; opacity: 1; }
 @media (hover: none) { .try-keys { display: none; } .try-pill { padding-inline-end: 18px; } }
 /* Hero screenshot: English or Hebrew, following the page language (also after the in-place toggle). */
 html[lang="he"] .shot-en, html:not([lang="he"]) .shot-he { display: none; }
+/* The hero's one primary action: bigger than every other button, with the shortcut on it and a slow
+   pulse until the visitor has tried the preview once. It takes its own row above the other buttons. */
+.btn-try { flex-basis: 100%; justify-content: center; max-width: 380px; padding: 17px 26px; font-size: 18px; gap: 14px; position: relative;
+  box-shadow: 0 14px 34px -10px color-mix(in oklab, var(--accent) 70%, transparent), var(--shadow-md); }
+.btn-try kbd, .hero-art-cue kbd { font: 600 13px var(--font-mono); padding: 4px 9px; border-radius: 7px; color: #fff;
+  background: rgba(0, 0, 0, .22); border: 1px solid rgba(255, 255, 255, .35); box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+.btn-try::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid var(--accent); opacity: 0; pointer-events: none;
+  animation: try-pulse 2.4s ease-out infinite; }
+@keyframes try-pulse { 0% { opacity: .7; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(1.12, 1.45); } }
+html.try-used .btn-try::after { animation: none; }
+.btn-try.is-pressing kbd { transform: translateY(2px); box-shadow: none; background: rgba(0, 0, 0, .4); transition: all .12s ease; }
+/* A visible label on the screenshot: without it nothing says the picture can be clicked. */
+.hero-art-cue { position: absolute; z-index: 2; left: 50%; bottom: 22px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; white-space: nowrap;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .35); transition: transform .2s ease; }
+.hero-art.is-try:hover .hero-art-cue { transform: translateX(-50%) scale(1.05); }
+.hero-art-cue .cue-touch { display: none; }
+@media (hover: none) {
+  .btn-try .try-keys, .hero-art-cue .try-keys, .hero-art-cue .cue-mouse { display: none; }
+  .hero-art-cue .cue-touch { display: inline; }
+}
+@media (max-width: 880px) { .btn-try { max-width: none; } }
 /* The hero screenshot is the preview's closed state: clicking it opens the preview, and it steps aside while
    the preview is open, so the page never shows two sidebars next to each other. */
 .hero-art.is-try { cursor: pointer; transition: opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
@@ -779,6 +803,7 @@ html[lang="he"] .shot-en, html:not([lang="he"]) .shot-he { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   body, .try-sb, .try-pill, .try-mark, .hero-art.is-try { transition: none; }
+  .btn-try::after { animation: none; }
 }
 
 /* ---------- The race (assets/race.js) ---------- */

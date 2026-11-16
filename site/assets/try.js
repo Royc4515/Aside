@@ -151,13 +151,22 @@
 
   const pill = el("button", "try-pill");
   pill.type = "button";
-  const keys = el("span", "try-keys");
-  keys.dir = "ltr";   // "Alt A" keeps its order on the Hebrew page
-  keys.innerHTML = "<kbd>Alt</kbd><kbd>A</kbd>";
-  pill.append(el("span", "", "try.pill"), keys);
+  /** The shortcut as keycaps. On a Mac the Alt key is labelled Option. */
+  function keycaps() {
+    const keys = el("span", "try-keys");
+    keys.dir = "ltr";   // "Alt A" keeps its order on the Hebrew page
+    const mac = /Mac|iPhone|iPad/.test(navigator.platform || "");
+    keys.innerHTML = `<kbd>${mac ? "\u2325 Option" : "Alt"}</kbd><kbd>A</kbd>`;
+    return keys;
+  }
+  pill.append(el("span", "", "try.pill"), keycaps());
   pill.addEventListener("click", () => setOpen(true));
   document.body.append(pill);
-  document.querySelectorAll(".js-try").forEach((b) => { b.hidden = false; b.addEventListener("click", () => setOpen(true)); });
+  document.querySelectorAll(".js-try").forEach((b) => {
+    b.hidden = false;
+    if (b.classList.contains("btn-try")) b.append(keycaps());
+    b.addEventListener("click", () => setOpen(true));
+  });
   // In the hero the "Try it" button and the screenshot already offer this, and the pill would cover them.
   const hero = document.querySelector(".hero");
   if (hero && "IntersectionObserver" in window) {
@@ -172,6 +181,10 @@
     art.setAttribute("role", "button");
     art.setAttribute("data-i18n-attr", "aria-label:try.cta");
     art.setAttribute("aria-label", tr("try.cta"));
+    const cue = el("span", "hero-art-cue");
+    cue.setAttribute("aria-hidden", "true");   // the screenshot itself carries the button label
+    cue.append(el("span", "cue-mouse", "try.cue"), el("span", "cue-touch", "try.cue_touch"), keycaps());
+    art.append(cue);
     art.addEventListener("click", () => setOpen(true));
     art.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(true); } });
   }

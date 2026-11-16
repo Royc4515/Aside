@@ -45,6 +45,8 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   answers four common questions with the site's own FAQ text and marks where
   on the page each answer comes from. The answers are ready-made and labelled
   as a preview; no AI model is called. On phones it is a bottom sheet.
+  The hero's main button is the try button (large, with the shortcut on
+  it), and the hero screenshot carries a "Click to try it live" label.
 - **Landing page: "Stop shuffling tabs".** A new section plays the usual
   copy, switch tab, paste, switch back routine next to the Aside way, step
   by step.
