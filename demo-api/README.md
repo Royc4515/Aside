@@ -36,7 +36,7 @@ Set these in the Vercel project settings. Never commit them.
 
 | Name | Needed | What it is |
 |---|---|---|
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | yes | Added automatically by the Upstash Redis integration (`KV_REST_API_URL` / `KV_REST_API_TOKEN` also work). Without them every request falls back. |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | yes | From the database's REST API section in the Upstash console. Paste the values without quotes, and use the regular token, not the read-only one: counting writes. (`KV_REST_API_URL` / `KV_REST_API_TOKEN` also work.) Without them every request falls back. |
 | `DEMO_SALT` | yes | A long random string, kept secret. It is mixed into the visitor hash so stored counters cannot be traced back to an IP address. Without it every request falls back. |
 | `GROQ_API_KEY` | at least one provider key | Groq free tier. |
 | `GEMINI_API_KEY` | | Gemini free tier. Skipped for visitors from the EEA, the UK and Switzerland, and when the country is unknown: Google's terms allow only paid services there. |
@@ -44,6 +44,7 @@ Set these in the Vercel project settings. Never commit them.
 | `DEMO_PER_VISITOR_PER_DAY` | no (5) | Live answers per visitor per day. |
 | `DEMO_ALL_VISITORS_PER_DAY` | no (300) | Live answers for everyone per day. `0` turns live answers off. |
 | `DEMO_CLAUDE_PER_DAY` | no (30) | Claude calls per day. |
+| `DEMO_PROVIDERS` | no (`groq,gemini,claude`) | Which providers to try, in order. `gemini` alone tests one provider; `groq,gemini` keeps Claude off without deleting its key. |
 | `DEMO_ALLOWED_ORIGINS` | no | Comma-separated origins allowed to call the API. Default `https://royc4515.github.io`. |
 
 Days are UTC days.
@@ -52,10 +53,16 @@ Days are UTC days.
 
 1. Create a Vercel project from this repository with **Root Directory**
    `demo-api`. No framework, no build command.
-2. Add the Upstash Redis integration to the project (Storage tab). The free
-   plan is enough.
+2. Create a Redis database directly at console.upstash.com on the **Free**
+   plan (500K commands a month, no card), region `us-east-1`. Do not use
+   Vercel's Storage tab for this: it only offers paid plans. On the free plan
+   a flood of requests just exhausts the quota, the server then refuses, and
+   nothing is billed. Copy the REST URL and token into Vercel.
 3. Add `DEMO_SALT` (for example the output of `openssl rand -hex 32`) and
-   the provider keys as environment variables.
+   the provider keys as environment variables. Create the Gemini key in a
+   Google project without billing, and the Claude key in its own Anthropic
+   workspace with a monthly spend limit and an expiry date.
+   Environment variables take effect only after a redeploy.
 4. Deploy, then check from a terminal that a wrong origin is refused:
 
    ```bash

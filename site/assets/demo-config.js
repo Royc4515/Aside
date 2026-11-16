@@ -6,4 +6,4 @@
  * (demo-api/ in the repo; see its README for the caps and how to deploy it).
  * Example: "https://<your-project>.vercel.app/api/ask"
  */
-window.ASIDE_DEMO_API = "";
+window.ASIDE_DEMO_API = "https://aside-demo-api.vercel.app/api/ask";
