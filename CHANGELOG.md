@@ -47,9 +47,6 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   as a preview; no AI model is called. On phones it is a bottom sheet.
   The hero's main button is the try button (large, with the shortcut on
   it), and the hero screenshot carries a "Click to try it live" label.
-  On a first visit on a wide screen the preview opens by itself, once per
-  browser (not after a #link, a scroll or a click, and not with reduced
-  motion).
 - **Landing page: "Stop shuffling tabs".** A new section plays the usual
   copy, switch tab, paste, switch back routine next to the Aside way, step
   by step.
