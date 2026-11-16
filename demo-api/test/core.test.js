@@ -206,7 +206,7 @@ test('a very long answer is cut', async () => {
 
 // ── The visitor's own pick, and compare ─────────────────────────────────────
 
-const K = { g120: 'groq:openai/gpt-oss-120b', g20: 'groq:openai/gpt-oss-20b', lite: 'gemini:gemini-3.5-flash-lite', flash: 'gemini:gemini-3.8-flash', haiku: 'claude:claude-haiku-5-5', sonnet: 'claude:claude-sonnet-5-5' };
+const K = { g120: 'groq:openai/gpt-oss-120b', g20: 'groq:openai/gpt-oss-20b', lite: 'gemini:gemini-3.5-flash-lite', haiku: 'claude:claude-haiku-5-5', sonnet: 'claude:claude-sonnet-5-5' };
 const pick = (...models) => ({ body: { question: 'Is Aside free?', lang: 'en', models } });
 const sentModel = (w, host) => JSON.parse(w.calls.find((c) => c.url.includes(host)).init.body).model;
 
@@ -224,8 +224,8 @@ test('a single pick calls exactly that model', async () => {
   assert.equal(sentModel(w, 'anthropic'), 'claude-sonnet-5-5');
   assert.equal(w.called('groq') + w.called('googleapis'), 0);
   const w2 = world();
-  await ask(w2, pick(K.flash));
-  assert.ok(w2.calls.find((c) => c.url.includes('googleapis')).url.includes('/models/gemini-3.8-flash:generateContent'));
+  await ask(w2, pick(K.lite));
+  assert.ok(w2.calls.find((c) => c.url.includes('googleapis')).url.includes('/models/gemini-3.5-flash-lite:generateContent'));
 });
 
 test('compare runs two models side by side and counts two calls', async () => {
@@ -250,9 +250,9 @@ test('unknown, unlisted, malformed or duplicate picks are refused before anythin
 
 test('a failed single pick falls back to a free provider and says so; never to Claude', async () => {
   const w = world({ over: { gemini: () => json({}, 429) } });
-  const { answers } = await (await ask(w, pick(K.flash))).json();
+  const { answers } = await (await ask(w, pick(K.lite))).json();
   assert.equal(answers[0].provider, 'groq');
-  assert.equal(answers[0].requested, K.flash);
+  assert.equal(answers[0].requested, K.lite);
   assert.equal(answers[0].notice, 'unavailable');
   const w2 = world({ over: { groq: () => json({}, 429), gemini: () => json({}, 429) } });
   assert.equal((await ask(w2, pick(K.g120))).status, 503);
@@ -318,7 +318,7 @@ test('a failed pick says why, as a fixed code only', async () => {
   ];
   for (const [reply, detail] of cases) {
     const w = world({ over: { gemini: reply } });
-    const res = await ask(w, pick(K.flash, K.g20));
+    const res = await ask(w, pick(K.lite, K.g20));
     const text = await res.text();
     assert.equal(JSON.parse(text).answers[0].detail, detail);
     assert.ok(!text.includes('k-gemini'));
@@ -333,17 +333,17 @@ const slow = (ms) => (url, init) => new Promise((resolve, reject) => {
 
 test('a slow model is given time, up to the per-call limit', async () => {
   const w = world({ over: { gemini: slow(40) } });
-  const { answers } = await (await ask(w, { ...pick(K.flash), timeoutMs: 200 })).json();
+  const { answers } = await (await ask(w, { ...pick(K.lite), timeoutMs: 200 })).json();
   assert.equal(answers[0].answer, 'gemini says hi');
   const late = world({ over: { gemini: slow(400) } });
-  const r = await (await ask(late, { ...pick(K.flash, K.g20), timeoutMs: 50 })).json();
+  const r = await (await ask(late, { ...pick(K.lite, K.g20), timeoutMs: 50 })).json();
   assert.equal(r.answers[0].detail, 'timeout');
   assert.equal(r.answers[1].answer, 'groq says hi');
 });
 
 test('a fallback call never starts past the request deadline', async () => {
   const w = world({ over: { gemini: slow(400) } });
-  const res = await ask(w, { ...pick(K.flash), timeoutMs: 100, budgetMs: 120 });
+  const res = await ask(w, { ...pick(K.lite), timeoutMs: 100, budgetMs: 120 });
   assert.equal(res.status, 503, 'no time left for Groq after Gemini used the budget');
   assert.equal(w.called('groq'), 0);
 });
