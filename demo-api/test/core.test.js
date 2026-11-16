@@ -31,8 +31,8 @@ function world({ over = {}, storeDown = false, counts = {} } = {}) {
   return { fetch, calls, counts, called };
 }
 
-function ask(w, { body = { question: 'Is Aside free?', lang: 'en' }, env = ENV, country = 'IL', origin = ORIGIN, method = 'POST', ip = '1.2.3.4' } = {}) {
-  const headers = { origin, 'x-forwarded-for': ip, 'content-type': 'application/json' };
+function ask(w, { body = { question: 'Is Aside free?', lang: 'en' }, env = ENV, country = 'IL', origin = ORIGIN, method = 'POST', ip = '1.2.3.4', headers: extra = {} } = {}) {
+  const headers = { origin, 'x-forwarded-for': ip, 'content-type': 'application/json', ...extra };
   if (country) headers['x-vercel-ip-country'] = country;
   const request = new Request('https://demo.test/api/ask', { method, headers, body: method === 'POST' ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined });
   return handleAsk(request, { env, fetch: w.fetch, now: () => new Date('2026-11-16T10:00:00Z') });
@@ -124,6 +124,13 @@ test('fails closed when the store is missing or down', async () => {
   const down = world({ storeDown: true });
   assert.equal((await (await ask(down)).json()).reason, 'store_error');
   assert.equal(noStore.called('groq') + down.called('groq'), 0);
+});
+
+test('Vercel\'s own IP header wins over a forwarded-for header', async () => {
+  const w = world();
+  const forged = (n) => ask(w, { ip: `9.9.9.${n}`, headers: { 'x-vercel-forwarded-for': '1.2.3.4' } });
+  for (let i = 0; i < 5; i++) assert.equal((await forged(i)).status, 200);
+  assert.equal((await forged(9)).status, 429, 'a new x-forwarded-for each time must not reset the cap');
 });
 
 test('the store never sees an IP address', async () => {

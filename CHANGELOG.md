@@ -22,8 +22,10 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
     it refuses. Free tiers go first (Groq, then Gemini), Claude last and only
     if its key is set. Gemini's free tier is skipped for the EEA, the UK and
     Switzerland, as Google's terms require.
-  - The site ships with `site/assets/demo-config.js` empty, so nothing is
-    sent anywhere until a server URL is put there.
+  - Switched on: `site/assets/demo-config.js` points at
+    https://aside-demo-api.vercel.app/api/ask. To switch live answers off,
+    empty that string, or set `DEMO_ALL_VISITORS_PER_DAY=0` in Vercel for an
+    immediate stop.
 - The privacy policy has a section about the website's preview.
 
 ### Changed

@@ -121,7 +121,10 @@ function store(env, fetchFn) {
 }
 
 async function visitorKey(request, day, env) {
-  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || request.headers.get('x-real-ip') || 'unknown';
+  // don't touch / Vercel sets x-vercel-forwarded-for itself and overwrites x-forwarded-for, so a visitor
+  // cannot pick their own IP to dodge the per-visitor cap. Prefer Vercel's own header.
+  const forwarded = request.headers.get('x-vercel-forwarded-for') || request.headers.get('x-forwarded-for') || '';
+  const ip = forwarded.split(',')[0].trim() || request.headers.get('x-real-ip') || 'unknown';
   // don't touch / the secret salt is what makes this one-way: without it, every IPv4 address
   // could be hashed and matched in minutes. The handler refuses to run when it is missing.
   const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${ip}|${day}|${env.DEMO_SALT}`));
