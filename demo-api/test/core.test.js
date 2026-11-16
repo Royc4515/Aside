@@ -2,9 +2,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { handleAsk } from '../lib/core.js';
+import { DEMO_MODELS } from '../lib/catalog.generated.js';
 
 const ORIGIN = 'https://royc4515.github.io';
-const ENV = { GROQ_API_KEY: 'k-groq', GEMINI_API_KEY: 'k-gemini', ANTHROPIC_API_KEY: 'k-claude',
+const ENV = { DEMO_SALT: 'pepper', GROQ_API_KEY: 'k-groq', GEMINI_API_KEY: 'k-gemini', ANTHROPIC_API_KEY: 'k-claude',
   UPSTASH_REDIS_REST_URL: 'https://store.test', UPSTASH_REDIS_REST_TOKEN: 'k-store' };
 const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
 const UPSTREAM = {
@@ -41,7 +42,7 @@ test('answers from the first free provider and says which model answered', async
   const w = world();
   const res = await ask(w);
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { answer: 'groq says hi', provider: 'groq', model: 'GPT-OSS 20B' });
+  assert.deepEqual(await res.json(), { answer: 'groq says hi', provider: 'groq', model: DEMO_MODELS.groq.label });
   assert.equal(res.headers.get('access-control-allow-origin'), ORIGIN);
   assert.equal(w.called('googleapis') + w.called('anthropic'), 0);
 });
@@ -152,7 +153,24 @@ test('CORS preflight', async () => {
 
 test('not configured: no provider keys means no store call either', async () => {
   const w = world();
-  const res = await ask(w, { env: { UPSTASH_REDIS_REST_URL: ENV.UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN: 'k' } });
+  const res = await ask(w, { env: { DEMO_SALT: 'pepper', UPSTASH_REDIS_REST_URL: ENV.UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN: 'k' } });
+  assert.equal((await res.json()).reason, 'not_configured');
+  assert.equal(w.calls.length, 0);
+});
+
+test('an answer cut off by the token cap is not shown; the next provider answers', async () => {
+  const w = world({ over: {
+    groq: () => json({ choices: [{ finish_reason: 'length', message: { content: 'half an ans' } }] }),
+    gemini: () => json({ candidates: [{ finishReason: 'MAX_TOKENS', content: { parts: [{ text: 'half' }] } }] }),
+  } });
+  assert.equal((await (await ask(w)).json()).answer, 'claude says hi');
+  const cut = world({ over: { groq: () => json({}, 500), gemini: () => json({}, 500), claude: () => json({ stop_reason: 'max_tokens', content: [{ type: 'text', text: 'half' }] }) } });
+  assert.equal((await ask(cut)).status, 503);
+});
+
+test('refuses to run without the salt that keeps the visitor hash one-way', async () => {
+  const w = world();
+  const res = await ask(w, { env: { ...ENV, DEMO_SALT: '' } });
   assert.equal((await res.json()).reason, 'not_configured');
   assert.equal(w.calls.length, 0);
 });

@@ -62,13 +62,20 @@ async function postJson(fetchFn, url, headers, body) {
   return res.json();
 }
 
+// don't touch / an answer cut off by the token cap is a failure, not an answer: the extension once
+// saved cut-off replies as complete (CHANGELOG 1.1.0). The next provider gets a try instead.
+function complete(finished, text) {
+  if (!finished) throw new Error('cut off');
+  return text;
+}
+
 const CALL = {
   // Reasoning tokens count against the output cap, so the caps leave room for them.
   async groq(fetchFn, key, model, system, question) {
     const body = { model: model.id, max_completion_tokens: 700, messages: [{ role: 'system', content: system }, { role: 'user', content: question }] };
     if (model.effort) body.reasoning_effort = model.effort;
     const data = await postJson(fetchFn, 'https://api.groq.com/openai/v1/chat/completions', { Authorization: `Bearer ${key}` }, body);
-    return data.choices?.[0]?.message?.content;
+    return complete(data.choices?.[0]?.finish_reason !== 'length', data.choices?.[0]?.message?.content);
   },
   async gemini(fetchFn, key, model, system, question) {
     const generationConfig = { maxOutputTokens: 700 };
@@ -77,13 +84,14 @@ const CALL = {
     const data = await postJson(fetchFn, `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model.id)}:generateContent`,
       { 'x-goog-api-key': key },
       { systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: question }] }], generationConfig });
-    return (data.candidates?.[0]?.content?.parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join('');
+    const candidate = data.candidates?.[0];
+    return complete(candidate?.finishReason !== 'MAX_TOKENS', (candidate?.content?.parts || []).filter((p) => p.text && !p.thought).map((p) => p.text).join(''));
   },
   async claude(fetchFn, key, model, system, question) {
     const body = { model: model.id, max_tokens: 700, system, messages: [{ role: 'user', content: question }] };
     if (model.effort) body.output_config = { effort: model.effort };
     const data = await postJson(fetchFn, 'https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' }, body);
-    return (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+    return complete(data.stop_reason !== 'max_tokens', (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join(''));
   },
 };
 const KEY_ENV = { groq: 'GROQ_API_KEY', gemini: 'GEMINI_API_KEY', claude: 'ANTHROPIC_API_KEY' };
@@ -114,8 +122,9 @@ function store(env, fetchFn) {
 
 async function visitorKey(request, day, env) {
   const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || request.headers.get('x-real-ip') || 'unknown';
-  // Hashed with the day (and an optional secret), so the store never holds an IP address.
-  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${ip}|${day}|${env.DEMO_SALT || ''}`));
+  // don't touch / the secret salt is what makes this one-way: without it, every IPv4 address
+  // could be hashed and matched in minutes. The handler refuses to run when it is missing.
+  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${ip}|${day}|${env.DEMO_SALT}`));
   return [...new Uint8Array(bytes).slice(0, 12)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
@@ -146,7 +155,7 @@ export async function handleAsk(request, { env, fetch: fetchFn, now }) {
   const lang = input.lang === 'he' ? 'he' : 'en';
 
   const providers = ORDER.filter((id) => env[KEY_ENV[id]] && DEMO_MODELS[id]);
-  if (!providers.length) return fallback(503, 'not_configured');
+  if (!providers.length || !env.DEMO_SALT) return fallback(503, 'not_configured');
   const increment = store(env, fetchFn);
   if (!increment) return fallback(503, 'no_store');   // fail closed: without counters there are no caps
 

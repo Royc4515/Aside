@@ -22,6 +22,7 @@ in which case the page shows its ready-made text instead.
 - **Free tiers first.** Groq, then Gemini, then Claude. Claude is called only
   if `ANTHROPIC_API_KEY` is set and its own daily cap has room.
 - **Small answers.** 700 output tokens at most, with a 70-word instruction.
+  An answer cut off by that cap is discarded, not shown.
 - Nothing logs a question, an answer, an IP address or a key. The visitor
   counter is stored under a one-way hash of the IP and the date.
 
@@ -36,6 +37,7 @@ Set these in the Vercel project settings. Never commit them.
 | Name | Needed | What it is |
 |---|---|---|
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | yes | Added automatically by the Upstash Redis integration (`KV_REST_API_URL` / `KV_REST_API_TOKEN` also work). Without them every request falls back. |
+| `DEMO_SALT` | yes | A long random string, kept secret. It is mixed into the visitor hash so stored counters cannot be traced back to an IP address. Without it every request falls back. |
 | `GROQ_API_KEY` | at least one provider key | Groq free tier. |
 | `GEMINI_API_KEY` | | Gemini free tier. Skipped for visitors from the EEA, the UK and Switzerland, and when the country is unknown: Google's terms allow only paid services there. |
 | `ANTHROPIC_API_KEY` | | Claude. Paid per token. Leave it out to keep Claude off. |
@@ -43,7 +45,6 @@ Set these in the Vercel project settings. Never commit them.
 | `DEMO_ALL_VISITORS_PER_DAY` | no (300) | Live answers for everyone per day. `0` turns live answers off. |
 | `DEMO_CLAUDE_PER_DAY` | no (30) | Claude calls per day. |
 | `DEMO_ALLOWED_ORIGINS` | no | Comma-separated origins allowed to call the API. Default `https://royc4515.github.io`. |
-| `DEMO_SALT` | no | Any random string; mixed into the visitor hash. |
 
 Days are UTC days.
 
@@ -53,7 +54,8 @@ Days are UTC days.
    `demo-api`. No framework, no build command.
 2. Add the Upstash Redis integration to the project (Storage tab). The free
    plan is enough.
-3. Add the provider keys as environment variables.
+3. Add `DEMO_SALT` (for example the output of `openssl rand -hex 32`) and
+   the provider keys as environment variables.
 4. Deploy, then check from a terminal that a wrong origin is refused:
 
    ```bash

@@ -84,7 +84,7 @@
     <p>
       Aside stores everything in <strong><code>chrome.storage.local</code></strong>,
       which lives on your device only. Nothing is synced to your Google account,
-      uploaded, or transmitted to any server controlled by Aside (we do not have any).
+      uploaded, or transmitted to any server controlled by Aside (the extension has none).
     </p>
     <ul>
       <li>
@@ -149,7 +149,7 @@
     </p>
     <ul>
       <li>Only the text of your question and the page language are sent. No API key, no cookies, no page content from your browser.</li>
-      <li>The demo server does not store or log your question or the answer. To limit use, it keeps a daily counter under a one-way hash of your IP address, which expires after about a day. The IP address itself is not stored.</li>
+      <li>The demo server does not store or log your question or the answer. To limit use, it keeps a daily counter under a salted one-way hash of your IP address, which expires after about a day. The IP address itself is not stored.</li>
       <li>The AI provider receives your question. On a provider’s free tier, questions may be used to improve its products and may be read by human reviewers, so do not type anything private. Google’s free tier is not used for visitors from the European Economic Area, Switzerland or the United Kingdom.</li>
       <li>The server is hosted on Vercel, which, like any web host, sees your IP address when your browser connects.</li>
     </ul>
