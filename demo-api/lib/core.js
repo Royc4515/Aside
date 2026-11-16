@@ -21,7 +21,11 @@ import { FACTS } from './context.generated.js';
 const MAX_BODY_BYTES = 2000;
 const MAX_QUESTION_CHARS = 300;
 const MAX_ANSWER_CHARS = 1200;
-const PROVIDER_TIMEOUT_MS = 9000;
+// A thinking model (Gemini 3.8 Flash) took longer than 9s in production. Each call gets up to this long,
+// but never past the request's own deadline, which stays under vercel.json's maxDuration (30s).
+const PROVIDER_TIMEOUT_MS = 20000;
+const REQUEST_BUDGET_MS = 26000;
+const MIN_CALL_MS = 3000;   // less time left than this: do not start a call that cannot finish
 const DAY_SECONDS = 26 * 3600;   // counters outlive their UTC day by a margin, then expire
 
 // Caps count model calls, not questions: a comparison is two calls.
@@ -161,7 +165,8 @@ async function visitorKey(request, day, env) {
 
 // ── Handler ──────────────────────────────────────────────────────────────────
 
-export async function handleAsk(request, { env, fetch: fetchFn, now }) {
+export async function handleAsk(request, { env, fetch: fetchFn, now, timeoutMs = PROVIDER_TIMEOUT_MS, budgetMs = REQUEST_BUDGET_MS }) {
+  const deadline = Date.now() + budgetMs;
   const origin = request.headers.get('origin') || '';
   const allowed = (env.DEMO_ALLOWED_ORIGINS || DEFAULT_ORIGINS).split(',').map((s) => s.trim()).filter(Boolean);
   const cors = allowed.includes(origin)
@@ -214,8 +219,12 @@ export async function handleAsk(request, { env, fetch: fetchFn, now }) {
   /** Reserve one call on the provider's own daily cap. Throws if the store fails. */
   const reserve = async (provider) => (await increment([[`demo:${provider}:${day}`, 1]]))[0] <= intEnv(env, `${provider.toUpperCase()}_PER_DAY`);
   const run = async (m) => {
+    const ms = Math.min(timeoutMs, deadline - Date.now());
+    if (ms < Math.min(MIN_CALL_MS, timeoutMs)) return { error: 'unavailable', detail: 'timeout' };
+    // This signal replaces postJson's own, so each call is bounded by what is left of the request.
+    const timed = (url, init) => fetchFn(url, { ...init, signal: AbortSignal.timeout(ms) });
     try {
-      const text = String(await CALL[m.provider](fetchFn, env[KEY_ENV[m.provider]], m, system, question) || '').trim();
+      const text = String(await CALL[m.provider](timed, env[KEY_ENV[m.provider]], m, system, question) || '').trim();
       if (text) return { answer: text.slice(0, MAX_ANSWER_CHARS), provider: m.provider, model: m.label, key: m.key };
       return { error: 'unavailable', detail: 'empty' };
     } catch (err) {
