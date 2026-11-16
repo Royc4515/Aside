@@ -63,7 +63,7 @@
 
   <main class="page-body">
     <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: 31 May 2026</p>
+    <p class="updated">Last updated: 16 November 2026</p>
 
     <p>
       Aside is a Chrome extension that lets you chat with several AI providers
@@ -74,7 +74,7 @@
 
     <h2>The short version</h2>
     <ul>
-      <li>We do not operate any server. There is no “Aside backend” to send data to.</li>
+      <li>The extension has no server. There is no “Aside backend” for it to send data to.</li>
       <li>You provide your own API keys. They are stored in Chrome’s storage on your device.</li>
       <li>Your prompts and the AI’s replies are sent <strong>directly</strong> from your browser to the provider you chose - never through us.</li>
       <li>No analytics. No telemetry. No tracking pixels. No third-party scripts. (Aside’s UI does load web fonts from Google Fonts - see “Web fonts” below.)</li>
@@ -133,6 +133,26 @@
       text is sent to the provider. Selected text is only captured when you
       highlight it and use a selection action (such as “Ask Aside about selection”).
     </p>
+
+    <h2>This website’s “try it” preview</h2>
+    <p>
+      This section is about the Aside website, not the extension. The preview
+      of the sidebar on the landing page answers its ready-made questions from
+      text that is already on the page, and sends nothing anywhere.
+    </p>
+    <p>
+      When live answers are switched on, a question you <strong>type</strong>
+      into that preview is different: it is sent to a small demo server we run
+      for the website, which passes it to one AI provider (Groq, Google Gemini
+      or Anthropic) and returns the answer. The answer is labelled with the
+      model that gave it. What that involves:
+    </p>
+    <ul>
+      <li>Only the text of your question and the page language are sent. No API key, no cookies, no page content from your browser.</li>
+      <li>The demo server does not store or log your question or the answer. To limit use, it keeps a daily counter under a one-way hash of your IP address, which expires after about a day. The IP address itself is not stored.</li>
+      <li>The AI provider receives your question. On a provider’s free tier, questions may be used to improve its products and may be read by human reviewers, so do not type anything private. Google’s free tier is not used for visitors from the European Economic Area, Switzerland or the United Kingdom.</li>
+      <li>The server is hosted on Vercel, which, like any web host, sees your IP address when your browser connects.</li>
+    </ul>
 
     <h2>Web fonts</h2>
     <p>

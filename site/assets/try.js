@@ -2,11 +2,17 @@
  * Aside landing site - "try it on this page".
  *
  * Alt+A (or the button) opens a preview of the Aside sidebar on the landing
- * page itself. It is scripted: every answer is an existing string from the
- * i18n dictionary (FAQ / About), shown with the place on the page it came
- * from. No model is called and nothing is sent anywhere, and the UI says so.
- * It deliberately names no provider or model: a canned answer must not look
- * like one a real model gave.
+ * page itself. The question buttons are scripted: every answer is an existing
+ * string from the i18n dictionary (FAQ / About), shown with the place on the
+ * page it came from. No model is called for them, and a canned answer names
+ * no provider or model: it must not look like one a real model gave.
+ *
+ * Live answers (optional): when assets/demo-config.js names a demo server
+ * (demo-api/ in the repo), a question the visitor TYPES is sent there and a
+ * real model answers it. That answer is labelled "Live answer" with the model
+ * that gave it, and the note under the input says where the question goes.
+ * With no server configured, or when the server says no (caps, outage),
+ * nothing changes from the scripted preview.
  */
 (function () {
   const dict = window.ASIDE_SITE_DICT;
@@ -17,6 +23,14 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   // Matches the bottom-sheet breakpoint in styles.css.
   const narrow = () => window.matchMedia("(max-width: 1099px)").matches;
+
+  // don't touch / https only (http for local testing): the question must not travel in the clear.
+  const API = typeof window.ASIDE_DEMO_API === "string" ? window.ASIDE_DEMO_API.trim() : "";
+  const LIVE = /^https:\/\/\S+$/.test(API) || /^http:\/\/localhost(:\d+)?\/\S*$/.test(API);
+  const MAX_QUESTION = 300;      // the server's limit (demo-api/lib/core.js)
+  const LIVE_TIMEOUT_MS = 25000;
+  /** Copy that differs once live answers are on has a "<key>_live" twin in the dictionary. */
+  const liveKey = (key) => (LIVE && dict.en[`${key}_live`] ? `${key}_live` : key);
 
   // question key -> the dictionary key that answers it (also the element on the page it is quoted from)
   const QA = [["try.q1", "about.body"], ["try.q2", "faq.a2"], ["try.q3", "faq.a1"], ["try.q4", "faq.a7"]];
@@ -49,9 +63,9 @@
       <span class="try-badge" data-i18n="try.badge"></span>
       <button class="try-x" type="button" data-i18n-attr="aria-label:try.close">${ICON.close}</button>
     </div>
-    <div class="try-body"><div class="try-empty"><h3 data-i18n="try.title"></h3><p data-i18n="try.sub"></p></div></div>
+    <div class="try-body"><div class="try-empty"><h3 data-i18n="try.title"></h3><p data-i18n="${liveKey("try.sub")}"></p></div></div>
     <div class="try-foot"><form><input data-i18n-attr="placeholder:try.placeholder"><button data-i18n-attr="aria-label:try.send">${ICON.arrow}</button></form>
-      <div class="try-note" data-i18n="try.note"></div></div>`;
+      <div class="try-note" data-i18n="${liveKey("try.note")}"></div></div>`;
   sb.querySelectorAll("[data-i18n]").forEach((n) => { n.textContent = tr(n.getAttribute("data-i18n")); });
   sb.querySelectorAll("[data-i18n-attr]").forEach((n) => {
     const [attr, key] = n.getAttribute("data-i18n-attr").split(":");
@@ -60,6 +74,7 @@
   document.body.append(sb);
   const body = sb.querySelector(".try-body");
   const empty = sb.querySelector(".try-empty");
+  if (LIVE) sb.querySelector("input").maxLength = MAX_QUESTION;
   let busy = false;
 
   /** A question button. The label sits in its own span: i18n.js rewrites a [data-i18n] element's whole text. */
@@ -96,7 +111,35 @@
     src.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: narrow() ? "start" : "center" });
   }
 
-  /** `aKey` null means free text: the preview cannot answer it and says so. */
+  /**
+   * Ask the demo server. Resolves to { text, model } for a real answer, or { key } naming the
+   * dictionary line to show instead. Never rejects: any failure is "no live answer".
+   */
+  async function liveAnswer(question) {
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), LIVE_TIMEOUT_MS);
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, lang: lang() }),
+        signal: abort.signal,
+        credentials: "omit",
+        referrerPolicy: "no-referrer",
+      });
+      const data = await res.json();
+      if (res.ok && data && typeof data.answer === "string" && data.answer.trim()) {
+        return { text: data.answer.trim(), model: typeof data.model === "string" ? data.model.slice(0, 40) : "" };
+      }
+      return { key: /_cap$/.test(data && data.reason) ? "try.limit" : "try.unavailable" };
+    } catch (err) {
+      return { key: "try.unavailable" };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  /** `aKey` null means free text: a live answer when the demo server is on, otherwise the preview says it cannot answer. */
   async function ask(qKey, aKey, freeText) {
     if (busy) return;
     busy = true;
@@ -104,7 +147,7 @@
     if (empty.contains(document.activeElement)) sb.focus({ preventScroll: true });
     empty.hidden = true;
     const user = el("div", "try-user");
-    user.append(freeText ? Object.assign(document.createElement("span"), { textContent: freeText }) : el("span", "", qKey));
+    user.append(freeText ? Object.assign(document.createElement("span"), { textContent: freeText, dir: "auto" }) : el("span", "", qKey));
     const ai = el("div", "try-ai");
     const head = el("div", "try-ai-h");
     head.innerHTML = `${ICON.mark}<b>Aside</b>`;
@@ -113,9 +156,32 @@
     ai.append(head, text);
     body.append(user, ai);
     body.scrollTop = body.scrollHeight;
-    await sleep(reduceMotion ? 0 : 400);
-    await stream(text, tr(aKey || "try.fallback"));
-    text.setAttribute("data-i18n", aKey || "try.fallback");
+    let shownKey = aKey || "try.fallback";
+    let live = null;
+    if (freeText && LIVE) {
+      text.textContent = tr("try.thinking");
+      ai.classList.add("is-thinking");
+      const result = await liveAnswer(freeText.slice(0, MAX_QUESTION));
+      ai.classList.remove("is-thinking");
+      if (result.text) live = result; else shownKey = result.key;
+    } else {
+      await sleep(reduceMotion ? 0 : 400);
+    }
+    if (live) {
+      // A real answer: say so, and name the model that gave it. textContent only - this is model output.
+      head.lastElementChild.replaceWith(el("span", "try-live", "try.live"));
+      if (live.model) {
+        const model = el("span", "try-model");
+        model.dir = "ltr";
+        model.textContent = live.model;
+        head.append(model);
+      }
+      text.dir = "auto";   // the answer may be in a different language than the page
+      await stream(text, live.text);
+    } else {
+      await stream(text, tr(shownKey));
+      text.setAttribute("data-i18n", shownKey);
+    }
 
     const src = aKey && document.querySelector(`main [data-i18n="${aKey}"]`);
     if (src) {
