@@ -73,6 +73,10 @@ button, .btn {
   border: 1px solid var(--line-strong);
 }
 .btn-secondary:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+/* Keyboard focus on any button: the accent ring, not the browser's black default. */
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.btn-secondary[disabled] { color: var(--ink-4); background: var(--surface-2); border-color: transparent; cursor: not-allowed; }
+.btn-secondary[disabled]:hover { background: var(--surface-2); color: var(--ink-4); }
 
 .container {
   max-width: 1120px;
@@ -707,6 +711,8 @@ section { padding: 88px 0; }
 /* ---------- Try it on this page (assets/try.js) ---------- */
 body { transition: margin .45s cubic-bezier(.2,.8,.2,1); }
 @media (min-width: 1100px) { html.try-open body { margin-inline-end: 424px; } }
+/* Opened by the page itself (first visit): overlay, so the page does not shift without the visitor's input. */
+html.try-open.try-auto body { margin-inline-end: 0; }
 .try-pill { position: fixed; z-index: 80; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px;
   padding: 10px 12px 10px 18px; border-radius: 999px; background: #262421; color: #eeece2; font-size: 15px; border: 1px solid rgba(238,236,226,.16);
   box-shadow: 0 18px 50px rgba(0,0,0,.35); cursor: pointer; font-family: inherit; transition: transform .3s ease, opacity .3s ease; white-space: nowrap; }
@@ -721,30 +727,48 @@ html.try-open .try-sb { transform: none; opacity: 1; }
 .try-head { height: 58px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px 0 18px; border-bottom: 1px solid rgba(238,236,226,.09); }
 .try-brand { font-weight: 600; font-size: 17px; display: flex; gap: 8px; align-items: center; }
 .try-brand svg { width: 20px; height: 20px; }
-.try-x { width: 30px; height: 30px; border: 0; background: none; color: #a9a293; cursor: pointer; font-size: 20px; border-radius: 8px; }
+.try-x { width: 32px; height: 32px; display: grid; place-items: center; border: 0; background: none; color: #a9a293; cursor: pointer; border-radius: 9px; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.try-x svg { width: 16px; height: 16px; }
 .try-x:hover { color: #eeece2; background: rgba(238,236,226,.07); }
 .try-body { flex: 1; overflow-y: auto; padding: 20px 18px; }
 .try-empty { text-align: center; padding-top: 26px; }
 .try-empty h3 { font-family: var(--font-serif); font-size: 26px; font-weight: 600; margin: 0 0 6px; color: #eeece2; }
 .try-empty p { color: #a9a293; font-size: 14.5px; margin: 0 0 20px; }
-.try-chip { width: 100%; min-height: 46px; padding: 10px 14px; margin-bottom: 9px; border-radius: 13px; border: 1px solid rgba(238,236,226,.16); background: #2a2824; color: #d4ccb8; font: 15px var(--font-sans); text-align: start; cursor: pointer; display: flex; justify-content: space-between; gap: 10px; }
-.try-chip:hover { border-color: #e08866; color: #eeece2; }
+.try-chip { width: 100%; min-height: 46px; padding: 10px 14px; margin-bottom: 9px; border-radius: 13px; border: 1px solid rgba(238,236,226,.16); background: #2a2824; color: #d4ccb8; font: 15px var(--font-sans); text-align: start; cursor: pointer; align-items: center; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; display: flex; justify-content: space-between; gap: 10px; }
+.try-chip:hover { border-color: rgba(224,136,102,.75); background: #302d28; color: #eeece2; }
+.try-chip:active, .try-more button:active, .try-src:active { transform: scale(.985); }
+/* don't touch / the site's global `button` rule adds 12px 22px padding and nowrap: it made the round send button
+   an oval and would stop a long question from wrapping in a narrow sidebar. */
+.try-x, .try-foot form button { padding: 0; }
+.try-chip, .try-more button { white-space: normal; text-align: start; }
+.try-ico { width: 16px; height: 16px; flex: none; color: #7d776b; transition: transform .18s ease, color .18s ease; }
+.try-chip:hover .try-ico { color: #e08866; transform: translateX(3px); }
+[dir="rtl"] .try-ico-dir { transform: scaleX(-1); }
+[dir="rtl"] .try-chip:hover .try-ico { transform: scaleX(-1) translateX(3px); }
 .try-user { display: flex; justify-content: flex-end; margin: 0 0 16px; }
 .try-user span { background: #3d3a34; padding: 10px 15px; border-radius: 18px 18px 6px 18px; font-size: 15px; }
 [dir="rtl"] .try-user span { border-radius: 18px 18px 18px 6px; }
 .try-ai { margin-bottom: 20px; font-size: 15px; line-height: 1.6; color: #d4ccb8; }
-.try-ai-h { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #a9a293; margin-bottom: 8px; }
-.try-ai-h b { color: #d4ccb8; }
-.try-src { display: inline-block; margin: 8px 0 2px; padding: 4px 11px; border-radius: 999px; border: 1px solid rgba(238,236,226,.2); background: none; color: #e08866; font: 12px var(--font-mono); cursor: pointer; }
-.try-src:hover { background: rgba(224,136,102,.15); }
+.try-ai-h { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #a9a293; margin-bottom: 8px; }
+.try-ai-h svg { width: 15px; height: 15px; }
+.try-ai-h b { color: #d4ccb8; font-weight: 600; }
+.try-src { display: inline-flex; align-items: center; gap: 6px; margin: 10px 0 4px; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(224,136,102,.45); background: rgba(224,136,102,.08); color: #e89a7c; font: 500 13px var(--font-sans); cursor: pointer; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.try-src .try-ico { width: 13px; height: 13px; color: currentColor; }
+.try-src:hover { background: rgba(224,136,102,.18); border-color: rgba(224,136,102,.8); color: #f3b199; }
 .try-more { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.try-more button { padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(238,236,226,.16); background: none; color: #d4ccb8; font: 13.5px var(--font-sans); cursor: pointer; }
-.try-more button:hover { border-color: #e08866; }
+.try-more button { padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(238,236,226,.16); background: none; color: #d4ccb8; font: 13.5px var(--font-sans); cursor: pointer; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.try-more button:hover { border-color: rgba(224,136,102,.75); background: #2a2824; color: #eeece2; }
 .try-foot { flex: none; padding: 10px 14px 12px; border-top: 1px solid rgba(238,236,226,.09); }
-.try-foot form { display: flex; gap: 8px; background: #2a2824; border: 1px solid rgba(238,236,226,.16); border-radius: 14px; padding: 6px 6px 6px 14px; }
-.try-foot input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: #eeece2; font: 15px var(--font-sans); }
+.try-foot form { display: flex; align-items: center; gap: 8px; background: #2a2824; border: 1px solid rgba(238,236,226,.16); border-radius: 16px; padding: 7px; padding-inline-start: 16px; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.try-foot input { flex: 1; min-width: 0; height: 36px; background: none; border: 0; color: #eeece2; caret-color: #e08866; font: 16px var(--font-sans); }   /* don't touch / 16px: iOS Safari zooms the page when a focused input is smaller */
+.try-foot input::placeholder { color: #7d776b; }
+/* don't touch / the form shows the focus ring (focus-within); a second outline on the input drew a box inside it */
+.try-sb .try-foot input:focus-visible { outline: none; }
 .try-foot form:focus-within { border-color: rgba(224,136,102,.7); box-shadow: 0 0 0 4px rgba(224,136,102,.14); }
-.try-foot form button { width: 34px; height: 34px; border-radius: 50%; border: 0; background: #e08866; color: #fff; cursor: pointer; font-size: 16px; }
+.try-foot form button { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; border: 0; background: #e08866; color: #fff; cursor: pointer; box-shadow: 0 4px 14px rgba(224,136,102,.35); transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.try-foot form button svg { width: 16px; height: 16px; color: #fff; }
+.try-foot form button:hover { background: #ec9675; transform: scale(1.06); }
+.try-foot form button:active { transform: scale(.94); }
 .try-note { text-align: center; font-size: 11.5px; color: #7d776b; margin-top: 8px; }
 .try-mark { border-radius: 8px; scroll-margin: 120px; transition: background-color .6s ease, box-shadow .6s ease; }
 /* The whole block, not a text underline: a per-line gradient only tinted the last line of a paragraph. */
@@ -754,12 +778,37 @@ html.try-open .try-sb { transform: none; opacity: 1; }
   text-transform: uppercase; color: #e08866; border: 1px solid rgba(224,136,102,.5); }
 .try-ai-t { margin: 0; }
 .try-sb :focus-visible, .try-pill:focus-visible { outline: 2px solid #e08866; outline-offset: 2px; }
+.try-pill:hover { transform: translateX(-50%) translateY(-2px); box-shadow: 0 22px 56px rgba(0,0,0,.42); }
+.try-pill:active { transform: translateX(-50%) scale(.98); }
+.btn-try:active { transform: scale(.985); }
 .try-mark { scroll-margin-top: 90px; }
 .try-keys { display: inline-flex; gap: 6px; }
 .try-sb:focus { outline: none; }
 @media (hover: none) { .try-keys { display: none; } .try-pill { padding-inline-end: 18px; } }
 /* Hero screenshot: English or Hebrew, following the page language (also after the in-place toggle). */
 html[lang="he"] .shot-en, html:not([lang="he"]) .shot-he { display: none; }
+/* The hero's one primary action: bigger than every other button, with the shortcut on it and a slow
+   pulse until the visitor has tried the preview once. It takes its own row above the other buttons. */
+.btn-try { flex-basis: 100%; justify-content: center; max-width: 380px; padding: 17px 26px; font-size: 18px; gap: 14px; position: relative;
+  box-shadow: 0 14px 34px -10px color-mix(in oklab, var(--accent) 70%, transparent), var(--shadow-md); }
+.btn-try kbd, .hero-art-cue kbd { font: 600 13px var(--font-mono); padding: 4px 9px; border-radius: 7px; color: #fff;
+  background: rgba(0, 0, 0, .22); border: 1px solid rgba(255, 255, 255, .35); box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+.btn-try::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid var(--accent); opacity: 0; pointer-events: none;
+  animation: try-pulse 2.4s ease-out infinite; }
+@keyframes try-pulse { 0% { opacity: .7; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(1.12, 1.45); } }
+html.try-used .btn-try::after { animation: none; }
+.btn-try.is-pressing kbd { transform: translateY(2px); box-shadow: none; background: rgba(0, 0, 0, .4); transition: all .12s ease; }
+/* A visible label on the screenshot: without it nothing says the picture can be clicked. */
+.hero-art-cue { position: absolute; z-index: 2; left: 50%; bottom: 22px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; white-space: nowrap;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .35); transition: transform .2s ease; }
+.hero-art.is-try:hover .hero-art-cue { transform: translateX(-50%) scale(1.05); }
+.hero-art-cue .cue-touch { display: none; }
+@media (hover: none) {
+  .btn-try .try-keys, .hero-art-cue .try-keys, .hero-art-cue .cue-mouse { display: none; }
+  .hero-art-cue .cue-touch { display: inline; }
+}
+@media (max-width: 880px) { .btn-try { max-width: none; } }
 /* The hero screenshot is the preview's closed state: clicking it opens the preview, and it steps aside while
    the preview is open, so the page never shows two sidebars next to each other. */
 .hero-art.is-try { cursor: pointer; transition: opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
@@ -779,6 +828,7 @@ html[lang="he"] .shot-en, html:not([lang="he"]) .shot-he { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   body, .try-sb, .try-pill, .try-mark, .hero-art.is-try { transition: none; }
+  .btn-try::after { animation: none; }
 }
 
 /* ---------- The race (assets/race.js) ---------- */
@@ -827,7 +877,10 @@ html[lang="he"] .shot-en, html:not([lang="he"]) .shot-he { display: none; }
 .race-done { display: inline-block; margin-top: 10px; padding: 6px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-on-soft); font-weight: 600; font-size: 13.5px; opacity: 0; transform: scale(.9); transition: all .3s cubic-bezier(.2,1.4,.4,1); }
 .race-done.on { opacity: 1; transform: none; }
 .race-foot { display: flex; justify-content: center; margin-top: 26px; }
-.race-foot button { font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line-strong); background: none; color: var(--ink-3); cursor: pointer; }
+/* The replay button is a regular .btn.btn-secondary; this only sizes it down. */
+.race-replay { padding: 9px 18px; font-size: 14px; }
+.race-replay svg { width: 15px; height: 15px; transition: transform .25s ease; }
+.race-replay:hover svg { transform: rotate(-45deg); }
 
 .rb-typed { display: none; }
 .rb-typed.on { display: inline; }
