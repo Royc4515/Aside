@@ -158,4 +158,15 @@
   pill.addEventListener("click", () => setOpen(true));
   document.body.append(pill);
   document.querySelectorAll(".js-try").forEach((b) => { b.hidden = false; b.addEventListener("click", () => setOpen(true)); });
+  // The hero screenshot opens the preview too (see .hero-art.is-try in styles.css).
+  const art = document.querySelector(".hero-art");
+  if (art) {
+    art.classList.add("is-try");
+    art.tabIndex = 0;
+    art.setAttribute("role", "button");
+    art.setAttribute("data-i18n-attr", "aria-label:try.cta");
+    art.setAttribute("aria-label", tr("try.cta"));
+    art.addEventListener("click", () => setOpen(true));
+    art.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(true); } });
+  }
 })();

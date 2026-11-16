@@ -758,6 +758,15 @@ html.try-open .try-sb { transform: none; opacity: 1; }
 .try-keys { display: inline-flex; gap: 6px; }
 .try-sb:focus { outline: none; }
 @media (hover: none) { .try-keys { display: none; } .try-pill { padding-inline-end: 18px; } }
+/* The hero screenshot is the preview's closed state: clicking it opens the preview, and it steps aside while
+   the preview is open, so the page never shows two sidebars next to each other. */
+.hero-art.is-try { cursor: pointer; transition: opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
+.hero-art.is-try:hover { transform: translateY(-4px); }
+.hero-art.is-try:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 22px; }
+@media (min-width: 1100px) {
+  html.try-open .hero-art.is-try { opacity: 0; transform: translateX(60px); pointer-events: none; }
+  html[dir="rtl"].try-open .hero-art.is-try { transform: translateX(-60px); }
+}
 /* don't touch / .btn sets display, which would un-hide the button for visitors without JavaScript */
 .js-try[hidden] { display: none; }
 /* Below the width where the page can move aside (1100px): a bottom sheet, so the quoted source stays visible above it. */
@@ -767,7 +776,7 @@ html.try-open .try-sb { transform: none; opacity: 1; }
   html.try-open body { padding-bottom: 64vh; }
 }
 @media (prefers-reduced-motion: reduce) {
-  body, .try-sb, .try-pill, .try-mark { transition: none; }
+  body, .try-sb, .try-pill, .try-mark, .hero-art.is-try { transition: none; }
 }
 
 /* ---------- The race (assets/race.js) ---------- */
