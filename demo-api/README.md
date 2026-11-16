@@ -11,7 +11,7 @@ in which case the page shows its ready-made text instead.
 
 The visitor can also pick the model, or two models to compare: the request
 adds `"models": ["groq:openai/gpt-oss-120b"]` (one or two keys from
-`lib/catalog.generated.js`, two per provider). The reply is then
+`lib/catalog.generated.js`, up to two per provider). The reply is then
 `{ answers: [...] }`, one entry per pick, each either
 `{ answer, provider, model, key }` or `{ error, key }` where `error` is
 `unavailable`, `cap` (that provider's daily cap) or `region` (Gemini's free

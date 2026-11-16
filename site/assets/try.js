@@ -31,7 +31,7 @@
   const API = typeof window.ASIDE_DEMO_API === "string" ? window.ASIDE_DEMO_API.trim() : "";
   const LIVE = /^https:\/\/\S+$/.test(API) || /^http:\/\/localhost(:\d+)?\/\S*$/.test(API);
   const MAX_QUESTION = 300;      // the server's limit (demo-api/lib/core.js)
-  const LIVE_TIMEOUT_MS = 25000;
+  const LIVE_TIMEOUT_MS = 35000;   // don't touch / above the server's 30s maxDuration: the calls are paid for even if the page gives up
   /** Copy that differs once live answers are on has a "<key>_live" twin in the dictionary. */
   const liveKey = (key) => (LIVE && dict.en[`${key}_live`] ? `${key}_live` : key);
 
@@ -50,10 +50,18 @@
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem(PICK_STORE) || "{}") || {}; } catch (err) { saved = {}; }
     const a = byKey.has(saved.a) ? saved.a : MODELS[0] && MODELS[0].key;
-    const otherProvider = MODELS.find((m) => byKey.get(a) && m.provider !== byKey.get(a).provider);
-    const b = byKey.has(saved.b) && saved.b !== a ? saved.b : (otherProvider || MODELS[1] || {}).key;
+    const b = byKey.has(saved.b) && saved.b !== a ? saved.b : partnerFor(a);
     return { a, b, compare: Boolean(saved.compare) && MODELS.length > 1 };
   })();
+  /**
+   * A default second model for comparing with `a`. Groq first: Gemini's free tier is blocked for
+   * visitors from the EEA, the UK and Switzerland, so it would make a poor first comparison there.
+   */
+  function partnerFor(a) {
+    return (MODELS.find((m) => m.key !== a && m.provider === "groq") || MODELS.find((m) => m.key !== a) || {}).key;
+  }
+  /** Comparing a model with itself is refused by the server, so B always moves off A. */
+  function keepPairDistinct() { if (pick.b === pick.a || !byKey.has(pick.b)) pick.b = partnerFor(pick.a); }
   const savePick = () => { try { localStorage.setItem(PICK_STORE, JSON.stringify(pick)); } catch (err) { /* private mode: the pick lasts until reload */ } };
 
   // question key -> the dictionary key that answers it (also the element on the page it is quoted from)
@@ -128,7 +136,7 @@
     cmp.setAttribute("aria-label", tr("try.compare"));
     cmp.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M17 4v16M3 8h8M13 16h8"/></svg>';
     cmp.append(el("span", "", "try.compare"));
-    cmp.addEventListener("click", () => { pick.compare = !pick.compare; savePick(); closeMenu(); renderPicker(); });
+    cmp.addEventListener("click", () => { pick.compare = !pick.compare; keepPairDistinct(); savePick(); closeMenu(); renderPicker(); });
     row.append(slot("a", "try.model"), vs, slot("b", "try.model_b"), cmp);
     menu = el("div", "try-menu");
     menu.setAttribute("role", "listbox");
@@ -176,7 +184,7 @@
       name.dir = "ltr";
       name.textContent = modelName(m.provider, m.label);
       o.append(dot, name);
-      o.addEventListener("click", () => { pick[slotName] = m.key; savePick(); closeMenu(); renderPicker(); });
+      o.addEventListener("click", () => { pick[slotName] = m.key; keepPairDistinct(); savePick(); closeMenu(true); renderPicker(); });
       menu.append(o);
     }
     menu.hidden = false;
@@ -246,6 +254,10 @@
       });
       const data = await res.json();
       if (res.ok && data && Array.isArray(data.answers) && data.answers.some((a) => a && typeof a.answer === "string" && a.answer.trim())) {
+        return { answers: data.answers };
+      }
+      // Nothing answered, but each pick says why (region, daily limit, unavailable): show that per model.
+      if (data && Array.isArray(data.answers) && models.length && data.answers.length === models.length) {
         return { answers: data.answers };
       }
       // A server without the model picker answers in the old shape.
