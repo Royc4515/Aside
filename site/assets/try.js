@@ -88,6 +88,7 @@
   async function ask(qKey, aKey, freeText) {
     if (busy) return;
     busy = true;
+    root.classList.remove("try-auto");   // the visitor is using it now: let the page move aside so the source shows
     // The chip that was clicked is about to be hidden; keep focus inside the sidebar.
     if (empty.contains(document.activeElement)) sb.focus({ preventScroll: true });
     empty.hidden = true;
@@ -128,15 +129,22 @@
     ask(null, null, value);
   });
 
+  const SEEN_KEY = "aside.site.tried";
+  const seen = () => { try { return localStorage.getItem(SEEN_KEY) === "1"; } catch (e) { return true; } };   // no storage: never auto-open
+  const markSeen = () => { try { localStorage.setItem(SEEN_KEY, "1"); } catch (e) { /* private mode */ } };
+
   let opener = null;
-  function setOpen(open) {
+  /** `auto`: opened by the page, not the visitor. It must not take focus, and it overlays the page instead of pushing it. */
+  function setOpen(open, auto = false) {
     if (open === root.classList.contains("try-open")) return;
     root.classList.toggle("try-open", open);
+    root.classList.toggle("try-auto", open && auto);
     sb.inert = !open;
     if (open) {
       root.classList.add("try-used");   // the floating pill has done its job; the hero button and Alt+A remain
-      opener = document.activeElement;
-      (sb.querySelector(".try-chip:not([hidden])") || sb.querySelector(".try-x")).focus({ preventScroll: true });
+      markSeen();
+      opener = auto ? null : document.activeElement;
+      if (!auto) (sb.querySelector(".try-chip:not([hidden])") || sb.querySelector(".try-x")).focus({ preventScroll: true });
     } else {
       document.querySelectorAll(".try-mark").forEach((n) => n.classList.remove("on"));
       if (opener && opener.focus) opener.focus({ preventScroll: true });
@@ -167,6 +175,25 @@
     if (b.classList.contains("btn-try")) b.append(keycaps());
     b.addEventListener("click", () => setOpen(true));
   });
+  // First visit on a wide screen: show it instead of describing it. The shortcut is "pressed" on the hero
+  // button and the preview opens by itself, once per browser. Not when the visitor came for something else
+  // (a #hash link, already scrolled, already clicking or typing), never with reduced motion, and never on
+  // narrow screens, where a sheet would cover the hero.
+  const AUTO_OPEN_MS = 1400;
+  if (!reduceMotion && !seen() && !location.hash && window.matchMedia("(min-width: 1100px)").matches) {
+    const CANCEL = ["pointerdown", "keydown", "wheel", "touchstart", "scroll"];
+    let timer = 0;
+    const cancel = () => { clearTimeout(timer); CANCEL.forEach((t) => removeEventListener(t, cancel, true)); };
+    CANCEL.forEach((t) => addEventListener(t, cancel, { capture: true, passive: true }));
+    timer = setTimeout(() => {
+      cancel();
+      if (scrollY > 40 || root.classList.contains("try-open")) return;
+      const btn = document.querySelector(".btn-try");
+      if (btn) btn.classList.add("is-pressing");
+      setTimeout(() => { if (btn) btn.classList.remove("is-pressing"); setOpen(true, true); }, 380);
+    }, AUTO_OPEN_MS);
+  }
+
   // In the hero the "Try it" button and the screenshot already offer this, and the pill would cover them.
   const hero = document.querySelector(".hero");
   if (hero && "IntersectionObserver" in window) {
