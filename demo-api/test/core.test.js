@@ -133,6 +133,17 @@ test('Vercel\'s own IP header wins over a forwarded-for header', async () => {
   assert.equal((await forged(9)).status, 429, 'a new x-forwarded-for each time must not reset the cap');
 });
 
+test('DEMO_PROVIDERS picks and orders providers', async () => {
+  const only = world();
+  assert.equal((await (await ask(only, { env: { ...ENV, DEMO_PROVIDERS: 'claude' } })).json()).provider, 'claude');
+  assert.equal(only.called('groq') + only.called('googleapis'), 0);
+  const off = world({ over: { groq: () => json({}, 429), gemini: () => json({}, 429) } });
+  assert.equal((await ask(off, { env: { ...ENV, DEMO_PROVIDERS: ' Groq , gemini, bogus' } })).status, 503);
+  assert.equal(off.called('anthropic'), 0, 'Claude stays off when it is not listed');
+  const junk = world();
+  assert.equal((await (await ask(junk, { env: { ...ENV, DEMO_PROVIDERS: 'bogus' } })).json()).provider, 'groq', 'nothing valid: default order');
+});
+
 test('the store never sees an IP address', async () => {
   const w = world();
   await ask(w);

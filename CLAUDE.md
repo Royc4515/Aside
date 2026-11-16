@@ -21,7 +21,7 @@ Vanilla JS, no build step, no bundler, no npm deps. Node is only used by mainten
 - Static catalog check (catalog vs provider code vs README/ARCHITECTURE/site/UI): `node scripts/check-models.mjs` - verified, passes. CI runs it on push/PR.
 - Syntax check: `for f in $(git ls-files '*.js' '*.mjs'); do node --check "$f"; done` - verified, clean.
 - Rebuild generated site pages after editing `site/index.html`, `site/assets/i18n.js` or `providers/models.js`: `node scripts/build-site.mjs` (`--check` in CI, deploy-site.yml) - verified.
-- Demo server tests (mocked fetch, no keys, no network): `cd demo-api && node --test` - verified, 20 pass. CI runs them in deploy-site.yml.
+- Demo server tests (mocked fetch, no keys, no network): `cd demo-api && node --test` - verified, 21 pass. CI runs them in deploy-site.yml.
 - Build release ZIP: `bash scripts/build-zip.sh` -> `dist/aside-<version>.zip` - verified (needs `zip`). `pwsh ./scripts/build-zip.ps1` - unverified.
 - Live model check: `node scripts/check-models-live.mjs` - unverified; needs provider keys in env or a local `.env` (copy `.env.example`).
 - Release: bump `version` in `manifest.json`, add a dated `## <version> - <date>` section to `CHANGELOG.md`, run the Release workflow or push `v<version>`.

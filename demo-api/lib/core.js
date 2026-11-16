@@ -97,6 +97,16 @@ const CALL = {
 const KEY_ENV = { groq: 'GROQ_API_KEY', gemini: 'GEMINI_API_KEY', claude: 'ANTHROPIC_API_KEY' };
 const ORDER = ['groq', 'gemini', 'claude'];   // free tiers first, the paid one last
 
+/**
+ * DEMO_PROVIDERS (optional, set in Vercel, never by a visitor) picks and orders the providers, e.g.
+ * "gemini" to try one provider on its own, or "groq,gemini" to keep Claude off without removing its key.
+ * Unknown names are ignored; an empty result falls back to the default order.
+ */
+function providerOrder(env) {
+  const picked = String(env.DEMO_PROVIDERS || '').toLowerCase().split(',').map((s) => s.trim()).filter((id) => ORDER.includes(id));
+  return picked.length ? [...new Set(picked)] : ORDER;
+}
+
 // ── Counters (Upstash Redis REST) ────────────────────────────────────────────
 
 function store(env, fetchFn) {
@@ -157,7 +167,7 @@ export async function handleAsk(request, { env, fetch: fetchFn, now }) {
   if (question.length < 2 || question.length > MAX_QUESTION_CHARS) return fallback(400, 'bad_question');
   const lang = input.lang === 'he' ? 'he' : 'en';
 
-  const providers = ORDER.filter((id) => env[KEY_ENV[id]] && DEMO_MODELS[id]);
+  const providers = providerOrder(env).filter((id) => env[KEY_ENV[id]] && DEMO_MODELS[id]);
   if (!providers.length || !env.DEMO_SALT) return fallback(503, 'not_configured');
   const increment = store(env, fetchFn);
   if (!increment) return fallback(503, 'no_store');   // fail closed: without counters there are no caps

@@ -44,6 +44,7 @@ Set these in the Vercel project settings. Never commit them.
 | `DEMO_PER_VISITOR_PER_DAY` | no (5) | Live answers per visitor per day. |
 | `DEMO_ALL_VISITORS_PER_DAY` | no (300) | Live answers for everyone per day. `0` turns live answers off. |
 | `DEMO_CLAUDE_PER_DAY` | no (30) | Claude calls per day. |
+| `DEMO_PROVIDERS` | no (`groq,gemini,claude`) | Which providers to try, in order. `gemini` alone tests one provider; `groq,gemini` keeps Claude off without deleting its key. |
 | `DEMO_ALLOWED_ORIGINS` | no | Comma-separated origins allowed to call the API. Default `https://royc4515.github.io`. |
 
 Days are UTC days.
