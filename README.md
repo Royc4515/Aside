@@ -12,7 +12,7 @@
 Aside is a free, open-source Chrome extension that opens an AI sidebar on any
 webpage, so you can summarize, translate, extract or chat about the page with
 Claude, ChatGPT (OpenAI), Gemini, Grok, Groq or a local Ollama model, using
-your own API key (BYOK). Keys stay in your browser, there is no server or
+your own API key (BYOK). Keys stay in your browser, the extension has no server or
 analytics, and the interface comes in English and Hebrew with full RTL support.
 
 **[Website](https://royc4515.github.io/Aside/) · [אתר בעברית](https://royc4515.github.io/Aside/he/)**
@@ -227,6 +227,7 @@ providers/          BaseProvider + 6 concrete providers + factory; models.js is 
 shared/             settings store (chrome.storage.local), provider monograms
 _locales/{en,he}/   chrome.i18n message catalogs
 site/               landing page (GitHub Pages): live demo, try-it preview, EN + HE
+demo-api/           optional server for live answers in the site's try-it preview (not part of the extension)
 scripts/            model catalog checks, site build, release ZIP
 docs/               architecture, monthly model update runbook
 marketing/          images, README video renderer, Chrome Web Store assets

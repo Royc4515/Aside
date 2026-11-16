@@ -91,7 +91,10 @@ provider's entry alone and say so in the PR.
    it rebuilds the Hebrew page and regenerates, from the catalog, the
    "Latest models" chips, the live demo's model names
    (`site/demo/catalog.js`) and the "Updated <month>" badge in both
-   languages (from `CATALOG_VERIFIED`; don't edit `models.eyebrow` by hand). A chip name
+   languages (from `CATALOG_VERIFIED`; don't edit `models.eyebrow` by hand).
+   It also regenerates the demo server's model list (`demo-api/lib/`): if a
+   model named in `DEMO_PICKS` (top of the demo section in `build-site.mjs`)
+   left the catalog, the build stops and you pick its replacement there. A chip name
    that reads wrong gets a `short` on its option. The demo needs no
    re-render; the README video shows no model names. Then update the
    onboarding blurbs (`ONB_PROVIDERS` in `sidebar/sidebar.js`) and the static
