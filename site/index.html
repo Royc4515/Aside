@@ -186,8 +186,8 @@
   </script>
   <!-- jsonld:end -->
 
-  <link rel="stylesheet" href="tokens.css?v=1.1.5.1">
-  <link rel="stylesheet" href="assets/styles.css?v=1.1.5.1">
+  <link rel="stylesheet" href="tokens.css?v=1.1.5.2">
+  <link rel="stylesheet" href="assets/styles.css?v=1.1.5.2">
   <script>
     // Apply stored theme before paint to avoid flash.
     try {
@@ -247,6 +247,7 @@
           </h1>
           <p class="hero-sub" data-i18n="hero.sub">Aside puts Claude, ChatGPT, Gemini, Grok, Groq and local Ollama side-by-side in a sidebar that travels with you. Bring your own keys. Nothing leaves your browser.</p>
           <div class="hero-cta">
+            <button class="btn btn-primary js-try" type="button" hidden data-i18n="try.cta">Try it on this page</button>
             <button class="btn btn-primary" type="button" aria-disabled="true" disabled
                     data-i18n="cta.store_soon">Coming to Chrome Web Store</button>
             <a class="btn btn-secondary" href="#install" data-i18n="cta.source">Install from source</a>
@@ -254,23 +255,46 @@
           <p class="hero-meta" data-i18n="hero.meta">Free · Open source · BYOK</p>
         </div>
         <div class="hero-art">
-          <picture class="shot-pic"><source type="image/webp" srcset="assets/img/shot-answer-1x.webp 452w, assets/img/shot-answer-2x.webp 904w" sizes="(max-width: 880px) 300px, 380px"><img src="assets/img/shot-answer-1x.png" alt="Aside sidebar summarizing an article with Claude Sonnet 5.5" data-i18n-attr="alt:hero.shot_alt" width="452" height="802" loading="eager" decoding="async"></picture>
+          <!-- One screenshot per language; styles.css shows the one that matches <html lang>. -->
+          <picture class="shot-pic shot-en"><source type="image/webp" srcset="assets/img/shot-answer-1x.webp 452w, assets/img/shot-answer-2x.webp 904w" sizes="(max-width: 880px) 300px, 380px"><img src="assets/img/shot-answer-1x.png" alt="Aside sidebar summarizing an article with Claude Sonnet 5.5" data-i18n-attr="alt:hero.shot_alt" width="452" height="802" loading="eager" decoding="async"></picture>
+          <picture class="shot-pic shot-he"><source type="image/webp" srcset="assets/img/shot-answer-he-1x.webp 452w, assets/img/shot-answer-he-2x.webp 904w" sizes="(max-width: 880px) 300px, 380px"><img src="assets/img/shot-answer-he-1x.png" alt="Aside sidebar summarizing an article with Claude Sonnet 5.5" data-i18n-attr="alt:hero.shot_alt" width="452" height="802" loading="lazy" decoding="async"></picture>
         </div>
       </div>
     </section>
 
-    <!-- Providers strip -->
-    <section class="providers" aria-label="Supported providers">
+    <!-- The race: the usual copy-paste flow next to Aside (assets/race.js) -->
+    <section class="race">
       <div class="container">
-        <p class="providers-label" data-i18n="providers.label">Works with</p>
-        <div class="providers-row">
-          <span class="provider-chip"><span class="dot" style="background:var(--p-claude)"></span>Claude</span>
-          <span class="provider-chip"><span class="dot" style="background:var(--p-gpt)"></span>ChatGPT</span>
-          <span class="provider-chip"><span class="dot" style="background:var(--p-gemini)"></span>Gemini</span>
-          <span class="provider-chip"><span class="dot" style="background:var(--p-grok)"></span>Grok</span>
-          <span class="provider-chip"><span class="dot" style="background:var(--p-groq)"></span>Groq</span>
-          <span class="provider-chip"><span class="dot" style="background:var(--p-ollama)"></span>Ollama</span>
+        <div class="section-head">
+          <span class="eyebrow" data-i18n="race.eyebrow">Same question, two ways</span>
+          <h2 data-i18n="race.title">Stop shuffling tabs.</h2>
+          <p data-i18n="race.sub">Asking an AI about the page you are reading, step by step.</p>
         </div>
+        <div class="race-grid">
+          <div class="race-lane race-old">
+            <div class="race-top"><h3 data-i18n="race.old">The usual way</h3><span class="race-count"><b>8</b><span data-i18n="race.steps">steps</span></span></div>
+            <div class="rb" aria-hidden="true">
+              <div class="rb-tabs"><span class="rb-tab on" data-i18n="race.tab_article">Article</span><span class="rb-tab" data-i18n="race.tab_chat">AI chat</span></div>
+              <div class="rb-view on"><div class="rb-line h"></div><div class="rb-line s"></div><div class="rb-line s" style="width:92%"></div><div class="rb-line s" style="width:78%"></div><div class="rb-line" style="width:88%"></div><div class="rb-line" style="width:60%"></div><span class="rb-clip" data-i18n="race.copied">Copied</span><span class="rb-lost" data-i18n="race.lost">Where was I?</span></div>
+              <div class="rb-view"><div class="rb-ans"><div class="rb-line" style="width:70%"></div><div class="rb-line" style="width:84%"></div><div class="rb-line" style="width:52%"></div></div>
+                <div class="rb-chatbox"><div class="rb-blob"></div><span class="rb-typed" data-i18n="race.typed">summarize this</span></div></div>
+            </div>
+            <ol class="race-steps"><li class="on" data-i18n="race.o1">Select the text</li><li class="on" data-i18n="race.o2">Copy it</li><li class="on" data-i18n="race.o3">Switch to the AI tab</li><li class="on" data-i18n="race.o4">Paste it in</li><li class="on" data-i18n="race.o5">Type your question</li><li class="on" data-i18n="race.o6">Wait for the answer</li><li class="on" data-i18n="race.o7">Switch back</li><li class="on" data-i18n="race.o8">Find your place again</li></ol>
+            <span class="race-done on" data-i18n="race.old_done">Done, two tab switches later.</span>
+          </div>
+          <div class="race-lane race-new">
+            <div class="race-top"><h3 data-i18n="race.new">With Aside</h3><span class="race-count"><b>3</b><span data-i18n="race.steps">steps</span></span></div>
+            <div class="rb" aria-hidden="true">
+              <div class="rb-tabs"><span class="rb-tab on" data-i18n="race.tab_article">Article</span></div>
+              <div class="rb-view on"><div class="rb-line h"></div><div class="rb-line s"></div><div class="rb-line s" style="width:92%"></div><div class="rb-line s" style="width:78%"></div><div class="rb-line" style="width:88%"></div><div class="rb-line" style="width:60%"></div></div>
+              <div class="rb-side on ans"><div class="rb-line a"></div><div class="rb-line"></div><div class="rb-line" style="width:86%"></div><div class="rb-line" style="width:70%"></div><div class="rb-line" style="width:78%"></div></div>
+              <div class="rb-keys"><kbd>Alt</kbd><kbd>A</kbd></div>
+            </div>
+            <ol class="race-steps"><li class="on" data-i18n="race.n1">Press Alt + A</li><li class="on" data-i18n="race.n2">Click Summarize</li><li class="on" data-i18n="race.o6">Wait for the answer</li></ol>
+            <span class="race-done on" data-i18n="race.new_done">Done, in the same tab.</span>
+          </div>
+        </div>
+        <div class="race-foot"><button class="race-replay" type="button" data-i18n="race.replay">Replay</button></div>
       </div>
     </section>
 
@@ -288,10 +312,6 @@
                  data-i18n-attr="aria-label:demo.alt" aria-label="Aside demo: summarizing an article, then switching from Claude to Gemini for a follow-up">
               <img class="demo-poster" src="assets/video/aside-demo-poster.jpg" alt="" width="1920" height="1080" decoding="async">
             </div>
-            <button class="demo-sound" type="button" aria-pressed="false" aria-label="Turn sound on">
-              <svg class="i-muted" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="m16 9 5 6M21 9l-5 6"/></svg>
-              <svg class="i-sound" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
-            </button>
             <button class="demo-toggle" type="button" aria-pressed="false" aria-label="Play demo">
               <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
               <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
@@ -630,8 +650,10 @@
     </div>
   </footer>
 
-  <script src="assets/i18n.js?v=1.1.5.1" defer></script>
-  <script src="assets/theme.js?v=1.1.5.1" defer></script>
-  <script src="assets/demo.js?v=1.1.5.1" defer></script>
+  <script src="assets/i18n.js?v=1.1.5.2" defer></script>
+  <script src="assets/theme.js?v=1.1.5.2" defer></script>
+  <script src="assets/demo.js?v=1.1.5.2" defer></script>
+  <script src="assets/try.js?v=1.1.5.2" defer></script>
+  <script src="assets/race.js?v=1.1.5.2" defer></script>
 </body>
 </html>

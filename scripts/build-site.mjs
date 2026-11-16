@@ -255,6 +255,13 @@ function buildHebrew(src, dict) {
   html = html.replace(/(<meta property="og:locale" content=")[^"]*(")/, `$1${OG_LOCALE.he}$2`);
   html = html.replace(/(<meta property="og:locale:alternate" content=")[^"]*(")/, `$1${OG_LOCALE.en}$2`);
   html = html.replace(/(<button class="lang-toggle"[^>]*aria-label=")[^"]*("[^>]*>)EN(<)/, '$1החלף לאנגלית$2עב$3');
+  // The Hebrew page shows the Hebrew hero screenshot, so that is the one to load eagerly here.
+  const swapLoading = (h, cls, from, to) => {
+    const re = new RegExp(`(<picture class="shot-pic ${cls}">[\\s\\S]*?loading=")${from}(")`);
+    if (!re.test(h)) throw new Error(`site/index.html lost its ${cls} hero screenshot`);
+    return h.replace(re, `$1${to}$2`);
+  };
+  html = swapLoading(swapLoading(html, 'shot-en', 'eager', 'lazy'), 'shot-he', 'lazy', 'eager');
   html = rebaseRelativeUrls(html);
   if (!html.includes('data-page-lang="he"')) throw new Error('could not mark the Hebrew page (html tag changed?)');
   return withJsonLd(html, dict.he, 'he');
