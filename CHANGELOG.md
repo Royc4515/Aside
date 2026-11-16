@@ -4,7 +4,7 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
-## 1.1.5 - 2026-11-11 · Monthly tech update (November 2026)
+## 1.1.5 - 2026-11-16 · New models, a live demo and "try it" on the site
 
 ### Changed
 
@@ -146,7 +146,7 @@ Small refresh. Nothing was broken; two catalog entries moved to newer models.
   works everywhere and is just as strong. Every release since 1.0.0 had
   this bug. `https://` sites were never affected.
 
-## 1.1.0 — 2026-09-27 · Monthly tech update (September 2026)
+## 1.1.0 - 2026-09-27 · Monthly tech update (September 2026)
 
 The first refresh since June. Two providers' defaults had already stopped
 working.
@@ -229,7 +229,7 @@ Then click **Reload** on Aside's card at `chrome://extensions`. Your keys and
 history stay. If you load it from a new folder, Chrome installs it as a
 separate extension without your settings.
 
-## 1.0.1 — 2026-09-24 · Groq hotfix
+## 1.0.1 - 2026-09-24 · Groq hotfix
 
 Groq has been unusable on the free and developer tiers since 2026-08-16: Groq
 shut down both Aside's default (`llama-3.3-70b-versatile`) and its built-in
