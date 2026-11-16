@@ -25,17 +25,17 @@ function world({ over = {}, storeDown = false, counts = {} } = {}) {
       return json(JSON.parse(init.body).map(([cmd, key, n]) => ({ result: cmd === 'INCRBY' ? (counts[key] = (counts[key] || 0) + n) : 1 })));
     }
     const id = host.includes('groq') ? 'groq' : host.includes('google') ? 'gemini' : 'claude';
-    return (over[id] || UPSTREAM[id])();
+    return (over[id] || UPSTREAM[id])(url, init);
   };
   const called = (name) => calls.filter((c) => c.url.includes(name)).length;
   return { fetch, calls, counts, called };
 }
 
-function ask(w, { body = { question: 'Is Aside free?', lang: 'en' }, env = ENV, country = 'IL', origin = ORIGIN, method = 'POST', ip = '1.2.3.4', headers: extra = {} } = {}) {
+function ask(w, { body = { question: 'Is Aside free?', lang: 'en' }, env = ENV, country = 'IL', origin = ORIGIN, method = 'POST', ip = '1.2.3.4', headers: extra = {}, timeoutMs, budgetMs } = {}) {
   const headers = { origin, 'x-forwarded-for': ip, 'content-type': 'application/json', ...extra };
   if (country) headers['x-vercel-ip-country'] = country;
   const request = new Request('https://demo.test/api/ask', { method, headers, body: method === 'POST' ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined });
-  return handleAsk(request, { env, fetch: w.fetch, now: () => new Date('2026-11-16T10:00:00Z') });
+  return handleAsk(request, { env, fetch: w.fetch, now: () => new Date('2026-11-16T10:00:00Z'), ...(timeoutMs ? { timeoutMs } : {}), ...(budgetMs ? { budgetMs } : {}) });
 }
 
 test('answers from the first free provider and says which model answered', async () => {
@@ -323,4 +323,27 @@ test('a failed pick says why, as a fixed code only', async () => {
     assert.equal(JSON.parse(text).answers[0].detail, detail);
     assert.ok(!text.includes('k-gemini'));
   }
+});
+
+/** A provider that answers only after `ms`, and gives up when the request's signal aborts. */
+const slow = (ms) => (url, init) => new Promise((resolve, reject) => {
+  const t = setTimeout(() => resolve(UPSTREAM.gemini()), ms);
+  init.signal.addEventListener('abort', () => { clearTimeout(t); reject(Object.assign(new Error('aborted'), { name: 'TimeoutError' })); });
+});
+
+test('a slow model is given time, up to the per-call limit', async () => {
+  const w = world({ over: { gemini: slow(40) } });
+  const { answers } = await (await ask(w, { ...pick(K.flash), timeoutMs: 200 })).json();
+  assert.equal(answers[0].answer, 'gemini says hi');
+  const late = world({ over: { gemini: slow(400) } });
+  const r = await (await ask(late, { ...pick(K.flash, K.g20), timeoutMs: 50 })).json();
+  assert.equal(r.answers[0].detail, 'timeout');
+  assert.equal(r.answers[1].answer, 'groq says hi');
+});
+
+test('a fallback call never starts past the request deadline', async () => {
+  const w = world({ over: { gemini: slow(400) } });
+  const res = await ask(w, { ...pick(K.flash), timeoutMs: 100, budgetMs: 120 });
+  assert.equal(res.status, 503, 'no time left for Groq after Gemini used the budget');
+  assert.equal(w.called('groq'), 0);
 });
