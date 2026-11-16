@@ -26,9 +26,11 @@
     () => tab(0),
     () => { views[0].classList.remove("rb-sel"); $(".rb-lost").classList.add("on"); },
   ];
+  // Waiting for the answer is a step on both sides, so the count is like for like.
   const NEW = [
     () => { keys.classList.add("on"); side.classList.add("on"); },
-    () => { keys.classList.remove("on"); side.classList.add("ans"); },
+    () => keys.classList.remove("on"),
+    () => side.classList.add("ans"),
   ];
 
   let timers = [];
@@ -54,7 +56,9 @@
   function run() { reset(); play(old, OLD); play(neu, NEW); }
 
   $(".race-replay").addEventListener("click", run);
-  if (reduceMotion || !("IntersectionObserver" in window)) { run(); return; }
+  // The markup ships the finished state (for visitors without JavaScript or motion); rewind it to play.
+  if (reduceMotion || !("IntersectionObserver" in window)) return;
+  reset();
   new IntersectionObserver((entries, io) => {
     if (entries[0].isIntersecting) { io.disconnect(); run(); }
   }, { threshold: 0.4 }).observe(sec);

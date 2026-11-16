@@ -711,7 +711,7 @@ body { transition: margin .45s cubic-bezier(.2,.8,.2,1); }
   padding: 10px 12px 10px 18px; border-radius: 999px; background: #262421; color: #eeece2; font-size: 15px; border: 1px solid rgba(238,236,226,.16);
   box-shadow: 0 18px 50px rgba(0,0,0,.35); cursor: pointer; font-family: inherit; transition: transform .3s ease, opacity .3s ease; white-space: nowrap; }
 .try-pill kbd { font: 500 13px var(--font-mono); padding: 5px 9px; border-radius: 8px; background: linear-gradient(#3b3833,#2e2b27); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 2px 0 #191714; }
-html.try-open .try-pill { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
+html.try-open .try-pill, html.try-used .try-pill { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
 .try-sb { position: fixed; z-index: 85; top: 12px; bottom: 12px; inset-inline-end: 12px; width: min(400px, calc(100vw - 24px)); border-radius: 18px;
   background: #262421; color: #eeece2; display: flex; flex-direction: column; overflow: hidden; font-family: var(--font-sans);
   box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 30px 80px rgba(20,18,14,.45); transform: translateX(calc(100% + 30px)); opacity: 0;
@@ -746,9 +746,9 @@ html.try-open .try-sb { transform: none; opacity: 1; }
 .try-foot form:focus-within { border-color: rgba(224,136,102,.7); box-shadow: 0 0 0 4px rgba(224,136,102,.14); }
 .try-foot form button { width: 34px; height: 34px; border-radius: 50%; border: 0; background: #e08866; color: #fff; cursor: pointer; font-size: 16px; }
 .try-note { text-align: center; font-size: 11.5px; color: #7d776b; margin-top: 8px; }
-.try-mark { background-image: linear-gradient(transparent 55%, color-mix(in oklab, var(--accent) 45%, transparent) 55%, color-mix(in oklab, var(--accent) 45%, transparent) 94%, transparent 94%);
-  background-repeat: no-repeat; background-size: 0% 100%; transition: background-size .9s ease; scroll-margin: 120px; }
-.try-mark.on { background-size: 100% 100%; }
+.try-mark { border-radius: 8px; scroll-margin: 120px; transition: background-color .6s ease, box-shadow .6s ease; }
+/* The whole block, not a text underline: a per-line gradient only tinted the last line of a paragraph. */
+.try-mark.on { background-color: color-mix(in oklab, var(--accent) 22%, transparent); box-shadow: 0 0 0 8px color-mix(in oklab, var(--accent) 22%, transparent); }
 
 .try-badge { margin-inline-start: auto; padding: 4px 10px; border-radius: 999px; font: 600 11.5px var(--font-mono); letter-spacing: .04em;
   text-transform: uppercase; color: #e08866; border: 1px solid rgba(224,136,102,.5); }
@@ -758,8 +758,10 @@ html.try-open .try-sb { transform: none; opacity: 1; }
 .try-keys { display: inline-flex; gap: 6px; }
 .try-sb:focus { outline: none; }
 @media (hover: none) { .try-keys { display: none; } .try-pill { padding-inline-end: 18px; } }
-/* Phones: a bottom sheet, so the quoted source stays visible above it. */
-@media (max-width: 700px) {
+/* don't touch / .btn sets display, which would un-hide the button for visitors without JavaScript */
+.js-try[hidden] { display: none; }
+/* Below the width where the page can move aside (1100px): a bottom sheet, so the quoted source stays visible above it. */
+@media (max-width: 1099px) {
   html .try-sb, html[dir="rtl"] .try-sb { top: auto; bottom: 8px; inset-inline: 8px; width: auto; height: 62vh; transform: translateY(calc(100% + 24px)); }
   html.try-open .try-sb { transform: none; }
   html.try-open body { padding-bottom: 64vh; }

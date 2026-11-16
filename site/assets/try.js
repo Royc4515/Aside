@@ -15,7 +15,8 @@
   const lang = () => (root.lang === "he" ? "he" : "en");
   const tr = (key) => (dict[lang()] || dict.en)[key] || dict.en[key] || "";
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const narrow = () => window.matchMedia("(max-width: 700px)").matches;
+  // Matches the bottom-sheet breakpoint in styles.css.
+  const narrow = () => window.matchMedia("(max-width: 1099px)").matches;
 
   // question key -> the dictionary key that answers it (also the element on the page it is quoted from)
   const QA = [["try.q1", "about.body"], ["try.q2", "faq.a2"], ["try.q3", "faq.a1"], ["try.q4", "faq.a7"]];
@@ -79,7 +80,7 @@
     document.querySelectorAll(".try-mark").forEach((n) => n.classList.remove("try-mark", "on"));
     src.classList.add("try-mark");
     requestAnimationFrame(() => src.classList.add("on"));
-    // On a phone the sheet covers the lower part of the screen, so the source goes to the top.
+    // In bottom-sheet mode the sheet covers the lower part of the screen, so the source goes to the top.
     src.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: narrow() ? "start" : "center" });
   }
 
@@ -133,6 +134,7 @@
     root.classList.toggle("try-open", open);
     sb.inert = !open;
     if (open) {
+      root.classList.add("try-used");   // the floating pill has done its job; the hero button and Alt+A remain
       opener = document.activeElement;
       (sb.querySelector(".try-chip:not([hidden])") || sb.querySelector(".try-x")).focus({ preventScroll: true });
     } else {
