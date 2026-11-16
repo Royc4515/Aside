@@ -68,6 +68,9 @@ jobs:
           test -f _site/assets/img/hero-light-1920.webp
           test -f _site/assets/img/og-card.png
           test -f _site/assets/img/shot-answer-he-1x.png
+          test -f _site/assets/img/shot-ask-he-1x.png
+          test -f _site/assets/img/shot-switch-he-1x.png
+          test -f _site/assets/img/shot-followup-he-1x.png
           test -f _site/demo/demo.html
           test -f _site/demo/catalog.js
 

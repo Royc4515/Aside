@@ -47,6 +47,9 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   as a preview; no AI model is called. On phones it is a bottom sheet.
   The hero's main button is the try button (large, with the shortcut on
   it), and the hero screenshot carries a "Click to try it live" label.
+- **Landing page in Hebrew:** the hero and gallery screenshots are Hebrew on
+  the Hebrew page (and after switching language), taken from the demo's
+  Hebrew mode.
 - **Landing page: "Stop shuffling tabs".** A new section plays the usual
   copy, switch tab, paste, switch back routine next to the Aside way, step
   by step.
