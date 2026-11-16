@@ -9,6 +9,17 @@ When a visitor types a question into the preview, the page sends
 answers with `{ answer, provider, model }`, or with `{ fallback: true, reason }`,
 in which case the page shows its ready-made text instead.
 
+The visitor can also pick the model, or two models to compare: the request
+adds `"models": ["groq:openai/gpt-oss-120b"]` (one or two keys from
+`lib/catalog.generated.js`, two per provider). The reply is then
+`{ answers: [...] }`, one entry per pick, each either
+`{ answer, provider, model, key }` or `{ error, key }` where `error` is
+`unavailable`, `cap` (that provider's daily cap) or `region` (Gemini's free
+tier, see below). A single pick that cannot answer is answered by a free
+provider instead, marked with `requested` and `notice`; a paid model is called
+only when the visitor picked it. A failed side of a comparison stays failed.
+Unknown keys are refused before anything is counted.
+
 ## Why it cannot run up a bill
 
 - **The server owns the prompt.** The visitor sends a question of at most 300
@@ -16,8 +27,9 @@ in which case the page shows its ready-made text instead.
   on the server (`lib/context.generated.js`), so this is not a general chatbot
   with someone else's key.
 - **Hard daily caps, kept in Redis.** Per visitor, for all visitors together,
-  and a separate smaller one for the paid provider. Counters are increased
-  before any model is called.
+  and per provider (a small one for the paid one). They count model calls, so
+  a comparison counts twice. Counters are increased before any model is
+  called.
 - **Fail closed.** No Redis, a Redis error, a missing key: no model call.
 - **Free tiers first.** Groq, then Gemini, then Claude. Claude is called only
   if `ANTHROPIC_API_KEY` is set and its own daily cap has room.
@@ -41,9 +53,9 @@ Set these in the Vercel project settings. Never commit them.
 | `GROQ_API_KEY` | at least one provider key | Groq free tier. |
 | `GEMINI_API_KEY` | | Gemini free tier. Skipped for visitors from the EEA, the UK and Switzerland, and when the country is unknown: Google's terms allow only paid services there. |
 | `ANTHROPIC_API_KEY` | | Claude. Paid per token. Leave it out to keep Claude off. |
-| `DEMO_PER_VISITOR_PER_DAY` | no (5) | Live answers per visitor per day. |
-| `DEMO_ALL_VISITORS_PER_DAY` | no (300) | Live answers for everyone per day. `0` turns live answers off. |
-| `DEMO_CLAUDE_PER_DAY` | no (30) | Claude calls per day. |
+| `DEMO_PER_VISITOR_PER_DAY` | no (10) | Model calls per visitor per day (a comparison is two). |
+| `DEMO_ALL_VISITORS_PER_DAY` | no (300) | Model calls for everyone per day. `0` turns live answers off. |
+| `DEMO_GROQ_PER_DAY`, `DEMO_GEMINI_PER_DAY`, `DEMO_CLAUDE_PER_DAY` | no (300, 200, 30) | Calls per provider per day. |
 | `DEMO_PROVIDERS` | no (`groq,gemini,claude`) | Which providers to try, in order. `gemini` alone tests one provider; `groq,gemini` keeps Claude off without deleting its key. |
 | `DEMO_ALLOWED_ORIGINS` | no | Comma-separated origins allowed to call the API. Default `https://royc4515.github.io`. |
 

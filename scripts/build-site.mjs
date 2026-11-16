@@ -136,8 +136,13 @@ function demoCatalog(models) {
 
 // ── Demo API (demo-api/): which models answer, and what they know ────────────
 
-// One small, cheap model per provider the demo server may call. Ids must exist in the catalog.
-const DEMO_PICKS = { groq: 'openai/gpt-oss-20b', gemini: 'gemini-3.5-flash-lite', claude: 'claude-haiku-5-5' };
+// The models a visitor may pick in the try-it preview, two per provider. The first of each is the one
+// the automatic chain uses, so put the cheaper or free-tier-friendlier model first. Ids must exist in the catalog.
+const DEMO_PICKS = {
+  groq: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b'],
+  gemini: ['gemini-3.5-flash-lite', 'gemini-3.8-flash'],
+  claude: ['claude-haiku-5-5', 'claude-sonnet-5-5'],
+};
 // The dictionary entries the model answers from. Kept short: Groq's free tier allows 8K tokens a minute.
 const DEMO_FACT_KEYS = ['about.body', 'privacy.body'];
 const DEMO_FACTS_MAX_CHARS = 6000;
@@ -148,10 +153,13 @@ const generatedModule = (source, name, value) =>
 
 function demoApiCatalog(catalog) {
   const out = {};
-  for (const [pid, id] of Object.entries(DEMO_PICKS)) {
-    const opt = catalog[pid]?.options.find((o) => o.id === id);
-    if (!opt) throw new Error(`build-site.mjs: DEMO_PICKS.${pid} "${id}" is not in providers/models.js`);
-    out[pid] = { id, label: opt.label.replace(/\s*\(.*\)\s*$/, ''), ...(opt.effort ? { effort: opt.effort } : {}) };
+  for (const [pid, ids] of Object.entries(DEMO_PICKS)) {
+    out[pid] = ids.map((id) => {
+      const opt = catalog[pid]?.options.find((o) => o.id === id);
+      if (!opt) throw new Error(`build-site.mjs: DEMO_PICKS.${pid} "${id}" is not in providers/models.js`);
+      // `key` is what the page sends; the server looks it up here and never puts a client string in a request.
+      return { key: `${pid}:${id}`, provider: pid, id, label: opt.label.replace(/\s*\(.*\)\s*$/, ''), ...(opt.effort ? { effort: opt.effort } : {}) };
+    });
   }
   return generatedModule('providers/models.js', 'DEMO_MODELS', out);
 }
