@@ -37,7 +37,7 @@ model-metadata endpoints, so it costs nothing. Anything it lists under
 | Gemini | ai.google.dev/gemini-api/docs/models | ai.google.dev/gemini-api/docs/changelog |
 | xAI | docs.x.ai/docs/models | docs.x.ai release notes |
 | Groq | console.groq.com/docs/models | console.groq.com/docs/deprecations |
-| Ollama | ollama.com/library (sort by popular / newest) | — |
+| Ollama | ollama.com/library (sort by popular / newest) | - |
 
 **Never guess a model id.** Only add an id you saw on the provider's own docs
 or in its live `/models` response. If a source can't be reached, leave that

@@ -41,9 +41,12 @@ analytics, and the interface comes in English and Hebrew with full RTL support.
     <img src="marketing/demo-poster.jpg" alt="Watch the 30-second Aside demo" width="92%"/>
   </a>
   <br/>
-  <sub><b>30 seconds, sound on:</b> <code>Alt + A</code> on an article, a streamed summary from Claude Sonnet 5.5,
+  <sub><b>30 seconds:</b> <code>Alt + A</code> on an article, a streamed summary from Claude Sonnet 5.5,
   then a one-click switch to Gemini for a follow-up.
-  <a href="https://royc4515.github.io/Aside/#demo">Watch on the site</a> · <a href="site/assets/video/aside-demo.mp4">MP4</a></sub>
+  <a href="https://royc4515.github.io/Aside/#demo">Watch it live on the site</a> · <a href="site/assets/video/aside-demo.mp4">MP4 (with music)</a></sub>
+  <br/>
+  <sub><b>Or try it before installing:</b> press <code>Alt + A</code> on <a href="https://royc4515.github.io/Aside/">the website</a>
+  for a preview of the sidebar, right on that page.</sub>
 </div>
 
 ---
@@ -220,9 +223,13 @@ content/            page-injected script + iframe host
 sidebar/            main chat UI (HTML/CSS/JS, no framework)
 options/            settings page (API keys, model picker, language)
 popup/              toolbar popup
-providers/          BaseProvider + 6 concrete providers + factory
-shared/             provider monograms, helpers
+providers/          BaseProvider + 6 concrete providers + factory; models.js is the model catalog
+shared/             settings store (chrome.storage.local), provider monograms
 _locales/{en,he}/   chrome.i18n message catalogs
+site/               landing page (GitHub Pages): live demo, try-it preview, EN + HE
+scripts/            model catalog checks, site build, release ZIP
+docs/               architecture, monthly model update runbook
+marketing/          images, README video renderer, Chrome Web Store assets
 ```
 
 Contributions welcome - open an issue or PR.

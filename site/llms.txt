@@ -14,7 +14,7 @@ Key facts:
 
 ## Pages
 
-- [Landing page (English)](https://royc4515.github.io/Aside/): features, demo video, providers, install steps, FAQ
+- [Landing page (English)](https://royc4515.github.io/Aside/): features, a live demo, a try-it preview of the sidebar (Alt + A on the page), providers, install steps, FAQ
 - [Landing page (Hebrew)](https://royc4515.github.io/Aside/he/): the same page in Hebrew
 - [Privacy policy](https://royc4515.github.io/Aside/privacy.html)
 - [Support](https://royc4515.github.io/Aside/support.html)
