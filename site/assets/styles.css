@@ -73,6 +73,8 @@ button, .btn {
   border: 1px solid var(--line-strong);
 }
 .btn-secondary:hover { background: var(--surface-2); color: var(--ink); text-decoration: none; }
+/* Keyboard focus on any button: the accent ring, not the browser's black default. */
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .btn-secondary[disabled] { color: var(--ink-4); background: var(--surface-2); border-color: transparent; cursor: not-allowed; }
 .btn-secondary[disabled]:hover { background: var(--surface-2); color: var(--ink-4); }
 
@@ -758,7 +760,7 @@ html.try-open .try-sb { transform: none; opacity: 1; }
 .try-more button:hover { border-color: rgba(224,136,102,.75); background: #2a2824; color: #eeece2; }
 .try-foot { flex: none; padding: 10px 14px 12px; border-top: 1px solid rgba(238,236,226,.09); }
 .try-foot form { display: flex; align-items: center; gap: 8px; background: #2a2824; border: 1px solid rgba(238,236,226,.16); border-radius: 16px; padding: 7px; padding-inline-start: 16px; transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease; }
-.try-foot input { flex: 1; min-width: 0; height: 36px; background: none; border: 0; color: #eeece2; caret-color: #e08866; font: 15px var(--font-sans); }
+.try-foot input { flex: 1; min-width: 0; height: 36px; background: none; border: 0; color: #eeece2; caret-color: #e08866; font: 16px var(--font-sans); }   /* don't touch / 16px: iOS Safari zooms the page when a focused input is smaller */
 .try-foot input::placeholder { color: #7d776b; }
 /* don't touch / the form shows the focus ring (focus-within); a second outline on the input drew a box inside it */
 .try-sb .try-foot input:focus-visible { outline: none; }
