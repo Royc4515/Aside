@@ -32,19 +32,29 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
     `catalog.js`, and CI fails if they drift.
   - The Hebrew page gets a fully Hebrew, right-to-left demo (article, chat,
     answers), using the extension's own Hebrew UI strings.
-  - Same behavior as the video: it plays from the start when scrolled into
-    view, pauses when it leaves, has sound on where the browser allows,
-    and respects reduced motion. The music drives the animation's clock.
+  - It plays from the start when scrolled into view, pauses when it
+    leaves, and respects reduced motion.
   - ~50 KB of HTML instead of 8.6 MB of video, and sharp at any size. Blur
     filters and film grain are swapped for look-alike gradients in the
     live version: they cost 4x the frame time without a GPU. Measured
     57-59 fps on desktop and on a phone with a 4x-throttled CPU.
   - The poster image shows until the demo loads, and is what visitors
     without JavaScript see.
+- **Landing page: try it on the page itself.** Alt+A (or the "Try it on this
+  page" button) opens a preview of the sidebar on the landing page. It
+  answers four common questions with the site's own FAQ text and marks where
+  on the page each answer comes from. The answers are ready-made and labelled
+  as a preview; no AI model is called. On phones it is a bottom sheet.
+- **Landing page: "Stop shuffling tabs".** A new section plays the usual
+  copy, switch tab, paste, switch back routine next to the Aside way, step
+  by step.
+- **Landing page: no more sound.** The demo is silent, and the sound button
+  is gone. The "Works with" strip is removed too: the provider list is
+  already in the table and the model cards.
 - **README video:** re-rendered from the same file with a model wall that
   names no models, so it stays accurate between UI changes. Re-rendering
-  (`marketing/demo/render.mjs`) now reuses the shipped music
-  (`site/demo/music.m4a`); the Pixabay source track is only needed for a new
+  (`marketing/demo/render.mjs`) now reuses the finished music bed
+  (`marketing/demo/music.m4a`); the Pixabay source track is only needed for a new
   music cut.
 
 ### Fixed
