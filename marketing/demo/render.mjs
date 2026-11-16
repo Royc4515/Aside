@@ -16,8 +16,8 @@
  *   CHROME=/path/to/chrome FFMPEG=/path/to/ffmpeg node render.mjs [outDir]
  *   node render.mjs --stills 2,7,12        # QA: PNG stills at given seconds
  *
- * Music: by default the finished music bed the live demo plays,
- * site/demo/music.m4a, is reused as is. Only a change to the timeline needs a
+ * Music: by default the finished music bed, marketing/demo/music.m4a, is
+ * reused as is (the landing page's live demo is silent). Only a change to the timeline needs a
  * new edit: run music_edit.py, which cuts "Minimal Technology" by BerryDeep
  * (Pixabay Content License) to the animation and writes out/music.wav; that
  * file wins when present (override the path with MUSIC). The source track is
@@ -45,7 +45,7 @@ const HEIGHT = 1080;
 const CHROME = process.env.CHROME;
 const FFMPEG = process.env.FFMPEG || 'ffmpeg';
 const EDIT_WAV = join(HERE, 'out', 'music.wav');
-const SHIPPED_MUSIC = join(HERE, '..', '..', 'site', 'demo', 'music.m4a');
+const SHIPPED_MUSIC = join(HERE, 'music.m4a');
 const MUSIC = process.env.MUSIC || (existsSync(EDIT_WAV) ? EDIT_WAV : SHIPPED_MUSIC);
 // A fresh edit gets loudness-normalized; the shipped bed already was.
 const PREMASTERED = !MUSIC.endsWith('.wav');
@@ -194,12 +194,12 @@ try {
       '-deadline', 'good', '-cpu-used', '2', ...audio(['-c:a', 'libopus', '-b:a', '128k']), join(web, 'aside-demo.webm')]);
     await run(FFMPEG, [...q, '-ss', '12.6', '-i', mp4, '-frames:v', '1', '-vf', 'scale=1600:-1', '-q:v', '3',
       join(web, 'aside-demo-poster.jpg')]);
-    // A fresh music edit is also the live demo's: copy it next to demo.html.
+    // Keep a fresh music edit as the new premastered bed for later re-renders.
     if (hasMusic && !PREMASTERED) {
       await run(FFMPEG, [...q, '-i', join(web, 'aside-demo.mp4'), '-vn', '-c:a', 'copy', join(web, 'music.m4a')]);
     }
     console.log('wrote', web, '- copy aside-demo.* to site/assets/video/, the poster also to marketing/demo-poster.jpg'
-      + (hasMusic && !PREMASTERED ? ', and music.m4a to site/demo/' : ''));
+      + (hasMusic && !PREMASTERED ? ', and music.m4a to marketing/demo/' : ''));
   }
 } finally {
   await browser.close();

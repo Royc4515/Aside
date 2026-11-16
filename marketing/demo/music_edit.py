@@ -19,7 +19,7 @@ intro's silence). The edit, in video time:
   27.94 -> 31.00  the track's final hit on the outro logo, with the drop-out's
                   pad tail fading underneath
 Writes out/music.wav by default; render.mjs picks it up from there (and
-writes the music.m4a that the live demo plays).
+writes the music.m4a that later re-renders reuse).
 """
 import os
 import subprocess

@@ -69,7 +69,6 @@ jobs:
           test -f _site/assets/img/og-card.png
           test -f _site/demo/demo.html
           test -f _site/demo/catalog.js
-          test -f _site/demo/music.m4a
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

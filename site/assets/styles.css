@@ -366,7 +366,7 @@ section { padding: 88px 0; }
    it must reach this page, where it counts as the gesture that unmutes. */
 .demo-live { opacity: 0; transition: opacity .35s ease; pointer-events: none; }
 .demo-live.is-ready { opacity: 1; }
-.demo-toggle, .demo-sound {
+.demo-toggle {
   position: absolute;
   inset-inline-end: 26px;
   bottom: 26px;
@@ -380,27 +380,19 @@ section { padding: 88px 0; }
   -webkit-backdrop-filter: blur(12px) saturate(140%);
   opacity: .75;
 }
-.demo-toggle:hover, .demo-toggle:focus-visible,
-.demo-sound:hover, .demo-sound:focus-visible { opacity: 1; transform: scale(1.05); }
-.demo-toggle:focus-visible, .demo-sound:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.demo-toggle svg, .demo-sound svg { width: 18px; height: 18px; }
+.demo-toggle:hover, .demo-toggle:focus-visible { opacity: 1; transform: scale(1.05); }
+.demo-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.demo-toggle svg { width: 18px; height: 18px; }
 .demo-toggle .i-pause { display: none; }
 .demo-toggle.is-playing .i-play { display: none; }
 .demo-toggle.is-playing .i-pause { display: block; }
-.demo-sound { inset-inline-end: 80px; }
-.demo-sound .i-sound { display: none; }
-.demo-sound.is-on .i-muted { display: none; }
-.demo-sound.is-on .i-sound { display: block; }
-/* Muted is the default state; a soft accent ring invites the first click. */
-.demo-sound:not(.is-on) { box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 55%, transparent); }
 @media (max-width: 720px) {
   .demo-frame { padding: 6px; border-radius: 16px; }
   .demo-screen { border-radius: 11px; }
   /* On a phone the demo is ~180px tall; 40px buttons covered a quarter of it. */
-  .demo-toggle, .demo-sound { bottom: 10px; width: 32px; height: 32px; }
-  .demo-toggle svg, .demo-sound svg { width: 14px; height: 14px; }
+  .demo-toggle { bottom: 10px; width: 32px; height: 32px; }
+  .demo-toggle svg { width: 14px; height: 14px; }
   .demo-toggle { inset-inline-end: 10px; }
-  .demo-sound { inset-inline-end: 48px; }
 }
 
 /* ---------- Latest models ---------- */
@@ -494,8 +486,8 @@ section { padding: 88px 0; }
 :root[data-theme="dark"] .model-card--grok { --c: #8f897c !important; }
 
 @media (prefers-reduced-motion: reduce) {
-  .model-card, .demo-toggle, .demo-sound { transition: none; }
-  .model-card:hover, .demo-toggle:hover, .demo-sound:hover { transform: none; }
+  .model-card, .demo-toggle { transition: none; }
+  .model-card:hover, .demo-toggle:hover { transform: none; }
 }
 
 /* ---------- Screenshots gallery ---------- */
