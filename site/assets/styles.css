@@ -711,8 +711,6 @@ section { padding: 88px 0; }
 /* ---------- Try it on this page (assets/try.js) ---------- */
 body { transition: margin .45s cubic-bezier(.2,.8,.2,1); }
 @media (min-width: 1100px) { html.try-open body { margin-inline-end: 424px; } }
-/* Opened by the page itself (first visit): overlay, so the page does not shift without the visitor's input. */
-html.try-open.try-auto body { margin-inline-end: 0; }
 .try-pill { position: fixed; z-index: 80; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px;
   padding: 10px 12px 10px 18px; border-radius: 999px; background: #262421; color: #eeece2; font-size: 15px; border: 1px solid rgba(238,236,226,.16);
   box-shadow: 0 18px 50px rgba(0,0,0,.35); cursor: pointer; font-family: inherit; transition: transform .3s ease, opacity .3s ease; white-space: nowrap; }
@@ -797,7 +795,6 @@ html[lang="he"] .shot-en, html:not([lang="he"]) .shot-he { display: none; }
   animation: try-pulse 2.4s ease-out infinite; }
 @keyframes try-pulse { 0% { opacity: .7; transform: scale(1); } 70%, 100% { opacity: 0; transform: scale(1.12, 1.45); } }
 html.try-used .btn-try::after { animation: none; }
-.btn-try.is-pressing kbd { transform: translateY(2px); box-shadow: none; background: rgba(0, 0, 0, .4); transition: all .12s ease; }
 /* A visible label on the screenshot: without it nothing says the picture can be clicked. */
 .hero-art-cue { position: absolute; z-index: 2; left: 50%; bottom: 22px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px;
   padding: 10px 16px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; white-space: nowrap;
