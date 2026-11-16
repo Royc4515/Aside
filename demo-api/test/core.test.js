@@ -263,7 +263,7 @@ test('a failed side of a comparison stays failed; the other side still answers',
   const w = world({ over: { claude: () => json({}, 500) } });
   const { answers } = await (await ask(w, pick(K.g120, K.sonnet))).json();
   assert.equal(answers[0].answer, 'groq says hi');
-  assert.deepEqual(answers[1], { error: 'unavailable', key: K.sonnet });
+  assert.deepEqual(answers[1], { error: 'unavailable', detail: 'http_500', key: K.sonnet });
   assert.equal(w.called('groq'), 1, 'no stand-in for the failed side');
 });
 
@@ -307,4 +307,20 @@ test('no answer from either side of a comparison: fallback', async () => {
   const res = await ask(w, pick(K.g20, K.lite));
   assert.equal(res.status, 503);
   assert.equal((await res.json()).fallback, true);
+});
+
+test('a failed pick says why, as a fixed code only', async () => {
+  const cases = [
+    [() => json({ error: 'k-gemini leaked' }, 404), 'http_404'],
+    [() => json({ candidates: [{ finishReason: 'MAX_TOKENS', content: { parts: [{ text: 'half' }] } }] }), 'cut_off'],
+    [() => json({ candidates: [{ content: { parts: [] } }] }), 'empty'],
+    [() => { throw new Error('socket hang up k-gemini'); }, 'error'],
+  ];
+  for (const [reply, detail] of cases) {
+    const w = world({ over: { gemini: reply } });
+    const res = await ask(w, pick(K.flash, K.g20));
+    const text = await res.text();
+    assert.equal(JSON.parse(text).answers[0].detail, detail);
+    assert.ok(!text.includes('k-gemini'));
+  }
 });

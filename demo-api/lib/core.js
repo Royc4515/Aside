@@ -70,6 +70,19 @@ function complete(finished, text) {
   return text;
 }
 
+/**
+ * Why a call failed, as a short fixed code (http_429, cut_off, timeout, ...), for the operator to read
+ * in a response. Never the upstream body or message: those can echo the request, and the key with it.
+ */
+function failureDetail(err) {
+  const msg = String(err?.message || '');
+  const status = /^upstream (\d{3})$/.exec(msg)?.[1];
+  if (status) return `http_${status}`;
+  if (msg === 'cut off') return 'cut_off';
+  if (err?.name === 'TimeoutError' || err?.name === 'AbortError') return 'timeout';
+  return 'error';
+}
+
 const CALL = {
   // Reasoning tokens count against the output cap, so the caps leave room for them.
   async groq(fetchFn, key, model, system, question) {
@@ -204,8 +217,10 @@ export async function handleAsk(request, { env, fetch: fetchFn, now }) {
     try {
       const text = String(await CALL[m.provider](fetchFn, env[KEY_ENV[m.provider]], m, system, question) || '').trim();
       if (text) return { answer: text.slice(0, MAX_ANSWER_CHARS), provider: m.provider, model: m.label, key: m.key };
-    } catch { /* rate limit, timeout, outage, cut off */ }
-    return { error: 'unavailable' };
+      return { error: 'unavailable', detail: 'empty' };
+    } catch (err) {
+      return { error: 'unavailable', detail: failureDetail(err) };
+    }
   };
   /** The first model of each enabled provider in turn, skipping `skip`. Paid providers only when `paid`. */
   const chain = async (skip, paid) => {
@@ -237,7 +252,7 @@ export async function handleAsk(request, { env, fetch: fetchFn, now }) {
     // One pick that could not answer: a free provider answers instead, and says so. Never a paid one the visitor did not pick.
     if (picks.length === 1 && answers[0].error) {
       const r = await chain(picks[0], false);
-      if (r) return reply(200, { answers: [{ ...r, requested: picks[0].key, notice: answers[0].error }] });
+      if (r) return reply(200, { answers: [{ ...r, requested: picks[0].key, notice: answers[0].error, ...(answers[0].detail ? { detail: answers[0].detail } : {}) }] });
     }
     return answers.some((a) => a.answer) ? reply(200, { answers }) : reply(503, { fallback: true, reason: answers[0].error, answers });
   } catch { return fallback(503, 'store_error'); }
