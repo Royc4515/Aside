@@ -1229,6 +1229,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 .sb-stream-tokens { color: var(--accent); }
 
 /* ── Page context pill (above composer) ───────────────────────────── */
+/* don't touch / the display rule below beats the hidden attribute, which
+   showed the English "Page context" placeholder on pages with no text. */
+.sb-context-pill[hidden] { display: none !important; }
 .sb-context-pill {
   display: inline-flex;
   align-items: center;

@@ -78,6 +78,8 @@ function applyUILanguage() {
   delete pickHeroTitle._pick;
   applyI18n();
   renderUpdateNote();
+  renderTemplates();
+  renderContextPill();
   renderHero();
   renderTools();
   renderCmdbar();
@@ -229,6 +231,12 @@ async function renderPageMemory() {
 }
 
 // ── Quick prompt templates ─────────────────────────────────────────────
+// English lives in prompt-templates.js; other UI languages override it with
+// tpl_<id> / tpl_<id>_prompt keys in translations.js. The prompt is translated
+// too: it lands in the composer where the user reads and edits it.
+const tplKey = (p) => `tpl_${p.id.replace(/-/g, '_')}`;
+function templateLabel(p)  { return t(tplKey(p)) || p.label; }
+function templatePrompt(p) { return t(`${tplKey(p)}_prompt`) || p.prompt; }
 function renderTemplates() {
   const wrap = document.getElementById('templates');
   const scroll = document.getElementById('templates-scroll');
@@ -240,15 +248,15 @@ function renderTemplates() {
   if (!window.PROMPT_TEMPLATES) { wrap.hidden = true; return; }
   wrap.hidden = false;
   scroll.innerHTML = window.PROMPT_TEMPLATES.map(p => `
-    <button class="sb-template" data-prompt="${p.id}" type="button" title="${escapeHtml(p.prompt)}">
+    <button class="sb-template" data-prompt="${p.id}" type="button" title="${escapeHtml(templatePrompt(p))}">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p.icon}</svg>
-      <span>${escapeHtml(p.label)}</span>
+      <span>${escapeHtml(templateLabel(p))}</span>
     </button>`).join('');
   scroll.querySelectorAll('.sb-template').forEach(b => {
     b.onclick = () => {
       const tpl = window.PROMPT_TEMPLATES.find(x => x.id === b.dataset.prompt);
       if (!tpl) return;
-      input.value = tpl.prompt;
+      input.value = templatePrompt(tpl);
       input.focus();
       // Resize textarea to content
       input.style.height = 'auto';
@@ -1175,7 +1183,7 @@ function renderContextPill() {
     : (t('context_on_title')  || 'Page context on - click to exclude this page');
   txt.textContent = off
     ? (t('context_off') || 'Page context off')
-    : `${t('context_including') || 'Including page context'} · ~${human} tokens`;
+    : `${t('context_including') || 'Including page context'} · ${(t('context_tokens') || '~{n} tokens').replace('{n}', human)}`;
   if (tog) tog.textContent = off ? (t('context_toggle_off') || 'Off') : (t('context_toggle_on') || 'On');
   pill.onclick = async () => {
     settings.pageContext = off; // off was true → flip to enabled

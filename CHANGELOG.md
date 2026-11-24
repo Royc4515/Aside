@@ -60,6 +60,16 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
 - FAQ wording: "there is no server we control" is now "the extension has no
   server at all", which stays true with the website's demo server.
 
+### Fixed
+
+- **Hebrew sidebar: the quick prompt chips were in English.** ELI5, Bullet
+  points, Action items and the rest now show in Hebrew, and tapping one puts
+  a Hebrew prompt in the composer. Other UI languages still use English.
+- The page-context pill's "~N tokens" was English in every language; Hebrew
+  now reads "כ־N טוקנים".
+- On pages with no readable text, the page-context pill showed an untranslated
+  "Page context" placeholder instead of hiding.
+
 ## 1.1.5 - 2026-11-16 · New models, a live demo and "try it" on the site
 
 ### Changed
