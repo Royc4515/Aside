@@ -175,7 +175,7 @@ own model selection.
 - **Your API keys live on your machine.** Aside stores them in Chrome's on-device `storage.local` - never synced to a Google account, never uploaded - and sends them only to the provider you chose, over HTTPS. No analytics, no telemetry, no proxy server - your requests go straight from your browser to OpenAI / Anthropic / Google / xAI / Groq / your local Ollama.
 - **Page content is sent only on your prompt.** When you press *Summarize* (or any action that needs the page), Aside grabs the readable body of the current tab, trims it to 12 000 characters, and includes it in **that one request**. Nothing is uploaded in the background.
 - **Conversation history stays local.** Threads are saved to Chrome's `storage.local` on your device. Nothing leaves your browser until you ask the model another question.
-- **Update checks happen only when you ask.** Clicking *Check for updates* in the toolbar popup sends one request to GitHub's public API (`api.github.com`) for the latest release number. It carries no key, prompt, page text or identifier, and Aside never checks in the background.
+- **Update checks carry nothing about you.** Aside asks GitHub's public API (`api.github.com`) for the latest release number at most once a week, after a failed answer (at most once every 6 hours), and when you click *Check for updates* in the toolbar popup. Each check is one request with no key, prompt, page text or identifier. Copies from the Chrome Web Store skip it: Chrome updates those itself.
 - **Ollama mode is fully offline.** No key, no network call - your prompt and the page text go to the model running on your own computer.
 
 ---

@@ -56,10 +56,6 @@ async function init() {
 // Written by background.js after an update; same key as UPDATE_NOTICE_KEY there.
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
 const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
-const RELEASES_API = 'https://api.github.com/repos/Royc4515/Aside/releases/latest';
-// Last GitHub check result that found a newer version, for the sidebar's
-// "new version available" line. Read by sidebar/sidebar.js and background.js.
-const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
 
 /**
  * Two update affordances:
@@ -67,8 +63,9 @@ const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
  *    linking to that release's notes (also clears the toolbar badge);
  *  - a "Check for updates" button. A Web Store copy asks the store now and
  *    applies a found update on a second click. Any other copy (Load unpacked,
- *    which is how Aside ships today) asks GitHub for the latest release and
- *    links to its download, since Chrome cannot update those by itself.
+ *    which is how Aside ships today) has background.js ask GitHub for the
+ *    latest release and links to its download, since Chrome cannot update
+ *    those by itself.
  */
 async function initUpdates() {
   const note = document.getElementById('update-note');
@@ -139,34 +136,21 @@ async function initUpdates() {
     }
   });
 
-  /**
-   * One request to GitHub's public API, only on this click: no key, no user
-   * data, nothing sent in the background. Unauthenticated calls are limited
-   * to 60 an hour per IP, which a click-only check never gets near.
-   */
+  // The request itself lives in background.js (shared with the weekly and
+  // after-failure checks), which also stores the result for the sidebar.
   async function checkGitHub() {
     btn.disabled = true;
     status.textContent = 'Checking GitHub...';
     try {
-      const res = await fetch(RELEASES_API, {
-        headers: { Accept: 'application/vnd.github+json' },
-        cache: 'no-store',
-        credentials: 'omit',
-      });
-      if (!res.ok) throw new Error(String(res.status));
-      const release = await res.json();
-      const latest = String(release?.tag_name || '').replace(/^v/, '');
-      if (!AsideVersion.isPlain(latest) || !AsideVersion.isPlain(current)) throw new Error('bad version');
-      if (AsideVersion.compare(latest, current) > 0) {
-        // Only follow a link that stays inside this repo's releases.
-        downloadUrl = String(release.html_url || '').startsWith(`${RELEASES_URL}/`)
-          ? release.html_url : `${RELEASES_URL}/latest`;
-        await Store.set({ [AVAILABLE_UPDATE_KEY]: { version: latest, url: downloadUrl } });
-        label.textContent = `Download v${latest}`;
+      const r = await chrome.runtime.sendMessage({ type: 'CHECK_UPDATE_NOW' });
+      if (r?.status === 'newer') {
+        downloadUrl = r.url;
+        label.textContent = `Download v${r.version}`;
         status.textContent = 'Unzip it over your current Aside folder, then click Reload in chrome://extensions. Do not remove Aside first: that deletes your keys and chats.';
-      } else {
-        await Store.remove(AVAILABLE_UPDATE_KEY);
+      } else if (r?.status === 'latest') {
         status.textContent = `You're on the latest version (v${current}).`;
+      } else {
+        status.textContent = 'Could not reach GitHub. Try again later.';
       }
     } catch {
       status.textContent = 'Could not reach GitHub. Try again later.';

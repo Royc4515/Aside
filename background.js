@@ -62,6 +62,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     clearUpdateNotice().then(() => sendResponse({ ok: true }));
     return true;
   }
+  // Popup's "Check for updates" (unpacked copies): always ask now.
+  if (msg?.type === 'CHECK_UPDATE_NOW') {
+    checkGitHubForUpdate().then(sendResponse);
+    return true;
+  }
+  // Sidebar: a model answer failed. Maybe a newer Aside fixes it.
+  if (msg?.type === 'MODEL_FAILED') {
+    maybeCheckForUpdate(FAILURE_GAP).then((avail) => sendResponse({ available: avail }));
+    return true;
+  }
   if (msg?.type === 'ENSURE_SESSION') {
     ensureSessionAccess().then(() => sendResponse({ ok: true }));
     return true;
@@ -103,8 +113,20 @@ chrome.runtime.onInstalled.addListener(async ({ reason, previousVersion }) => {
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
 // The version this profile last ran. See checkVersionChange().
 const LAST_VERSION_KEY = 'aside.lastVersion';
-// Written by the popup's GitHub check when it finds a newer release.
+// Written by checkGitHubForUpdate() when it finds a newer release; read by the
+// popup and the sidebar's "new version available" line.
 const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
+// Time (ms) of the last automatic GitHub check, for the throttles below.
+const LAST_UPDATE_CHECK_KEY = 'aside.lastUpdateCheck';
+
+const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
+const RELEASES_API = 'https://api.github.com/repos/Royc4515/Aside/releases/latest';
+const HOUR = 60 * 60 * 1000;
+// Automatic checks: once a week, and after a failed model answer (an old
+// build can break when a provider retires a model), but never more than
+// once per FAILURE_GAP so a wrong key failing every message stays quiet.
+const WEEKLY_GAP = 7 * 24 * HOUR;
+const FAILURE_GAP = 6 * HOUR;
 
 /**
  * Remember that Aside just updated, so the popup can say so and link to the
@@ -149,6 +171,71 @@ async function checkVersionChange() {
   } catch {}
 }
 checkVersionChange();
+
+/**
+ * Ask GitHub for the latest release and remember whether it is newer.
+ * One GET to the public API: no key, no cookies, no user data. Returns
+ * { status: 'newer' | 'latest' | 'error', version?, url? }.
+ */
+let updateCheckInFlight = null;
+function checkGitHubForUpdate() {
+  // A weekly check and a failure check can start together; share one request.
+  if (updateCheckInFlight) return updateCheckInFlight;
+  updateCheckInFlight = (async () => {
+    const current = chrome.runtime.getManifest().version;
+    try {
+      await Store.set({ [LAST_UPDATE_CHECK_KEY]: Date.now() });
+      const res = await fetch(RELEASES_API, {
+        headers: { Accept: 'application/vnd.github+json' },
+        cache: 'no-store',
+        credentials: 'omit',
+      });
+      if (!res.ok) return { status: 'error' };
+      const release = await res.json();
+      const latest = String(release?.tag_name || '').replace(/^v/, '');
+      if (!AsideVersion.isPlain(latest) || !AsideVersion.isPlain(current)) return { status: 'error' };
+      if (AsideVersion.compare(latest, current) > 0) {
+        // Only ever point at this repo's releases.
+        const url = String(release.html_url || '').startsWith(`${RELEASES_URL}/`)
+          ? release.html_url : `${RELEASES_URL}/latest`;
+        await Store.set({ [AVAILABLE_UPDATE_KEY]: { version: latest, url } });
+        return { status: 'newer', version: latest, url };
+      }
+      await Store.remove(AVAILABLE_UPDATE_KEY);
+      return { status: 'latest', version: current };
+    } catch {
+      return { status: 'error' };
+    } finally {
+      updateCheckInFlight = null;
+    }
+  })();
+  return updateCheckInFlight;
+}
+
+/**
+ * Automatic check, throttled by `gap` since the last one. Web Store copies
+ * are skipped: Chrome updates those itself, and GitHub could be ahead of the
+ * store. Resolves to the stored "available" entry (or null) either way, so a
+ * caller can tell the user without caring whether a request was made.
+ */
+async function maybeCheckForUpdate(gap) {
+  try {
+    if (chrome.runtime.getManifest().update_url) return null;
+    const { [LAST_UPDATE_CHECK_KEY]: last } = await Store.get([LAST_UPDATE_CHECK_KEY]);
+    const now = Date.now();
+    // A clock set backwards (last in the future) counts as due.
+    if (!(typeof last === 'number' && last <= now && now - last < gap)) {
+      await checkGitHubForUpdate();
+    }
+    const { [AVAILABLE_UPDATE_KEY]: avail } = await Store.get([AVAILABLE_UPDATE_KEY]);
+    return avail || null;
+  } catch {
+    return null;
+  }
+}
+// The worker starts whenever Aside is used, so this is "at most weekly"
+// without the alarms permission.
+maybeCheckForUpdate(WEEKLY_GAP);
 
 async function clearUpdateNotice() {
   await Store.remove(UPDATE_NOTICE_KEY);

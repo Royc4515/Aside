@@ -206,8 +206,8 @@ function dismissUpdateNote() {
 }
 
 // ── "New version available" line ───────────────────────────────────────
-// Shows what the popup's last GitHub check found. The sidebar never asks
-// GitHub itself: the update check stays click-only (privacy policy).
+// Shows what background.js's last GitHub check found (weekly, after a failed
+// answer, or the popup button). The sidebar never contacts GitHub itself.
 const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
 
 async function renderAvailableUpdate() {
@@ -1379,6 +1379,7 @@ async function runComparePrompt(label) {
       skel.content = `**${info.name}**: ${err.message || 'Failed'}`;
       skel.html = renderMarkdown(skel.content);
       skel.model = info;
+      reportModelFailure(err);
     }
   }
 
@@ -1443,6 +1444,7 @@ async function runPrompt(label) {
     turns.pop();
     renderTurns();
     showError(err.message || 'An unexpected error occurred.');
+    reportModelFailure(err);
   } finally {
     busy = false;
     document.getElementById('ask-btn').disabled = false;
@@ -1565,7 +1567,34 @@ function turnHtml(t, i) {
 // ── Errors ─────────────────────────────────────────────────────────────
 function showError(msg) {
   document.getElementById('error-message').textContent = msg;
+  document.getElementById('update-hint').hidden = true;
   document.getElementById('error-state').style.display = 'block';
+}
+
+/**
+ * A model answer failed. Old builds break when a provider retires a model,
+ * so let background.js check GitHub (throttled there) and, if a newer Aside
+ * exists, say so in the error card. The "available" line shows up too, via
+ * the storage listener. Only a fixed type goes out, never the error text.
+ */
+// Failures an update cannot fix: the hint would mislead, so it stays off
+// for these (the check still runs).
+const NOT_FIXED_BY_UPDATE = /invalid api key|incorrect api key|api key not valid|unauthori[sz]ed|\b40[13]\b|\b429\b|rate limit|quota|insufficient|billing|credit/i;
+
+function reportModelFailure(err) {
+  const keyOrQuota = NOT_FIXED_BY_UPDATE.test(String(err?.message || ''));
+  chrome.runtime.sendMessage({ type: 'MODEL_FAILED' }).then((r) => {
+    if (keyOrQuota) return;
+    const v = r?.available?.version;
+    if (!AsideVersion.isPlain(v)) return;
+    if (AsideVersion.compare(v, chrome.runtime.getManifest().version) <= 0) return;
+    const hint = document.getElementById('update-hint');
+    const [before, after = ''] = t('update_may_fix').split('{v}');
+    const ver = document.createElement('bdi');
+    ver.textContent = `v${v}`;
+    hint.replaceChildren(before, ver, after);
+    hint.hidden = false;
+  }).catch(() => {});
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────

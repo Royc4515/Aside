@@ -4,6 +4,19 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## Unreleased
+
+### Added
+
+- **Automatic update check.** Copies not from the Chrome Web Store now ask
+  GitHub for the latest release on their own: at most once a week, and after
+  an AI answer fails (at most once every 6 hours), since an old version can
+  break when a provider retires a model. A newer version shows the sidebar's
+  "new version available" line, and a failed answer's error card adds "Aside
+  vX is available and may fix this". The popup button still checks at once.
+  Each check is one request with no data; the privacy policy lists all three
+  triggers.
+
 ## 1.1.6 - 2026-11-24 · Update notice, Hebrew prompt chips, live answers on the site
 
 ### Added

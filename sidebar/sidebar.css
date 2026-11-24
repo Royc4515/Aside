@@ -721,6 +721,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 .sb-page-memory-arrow { flex-shrink: 0; opacity: 0.7; }
 [dir="rtl"] .sb-page-memory-arrow { transform: scaleX(-1); }
 
+.sb-error-hint { margin-top: 8px; font-weight: 600; }
+.sb-error-hint[hidden] { display: none; }
+
 /* ── "Updated to vX" note ────────────────────────────────────────── */
 .sb-update-note[hidden] { display: none !important; }
 .sb-update-note {
