@@ -53,7 +53,7 @@ async function init() {
   initUpdates();
 }
 
-// Written by background.js after an update; kept in sync with UPDATE_NOTICE_KEY there.
+// Written by background.js after an update; same key as UPDATE_NOTICE_KEY there.
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
 const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
 
@@ -129,8 +129,7 @@ async function initUpdates() {
 
   async function dismissUpdateNote() {
     note.hidden = true;
-    await Store.remove(UPDATE_NOTICE_KEY);
-    chrome.action.setBadgeText({ text: '' }).catch(() => {});
+    try { await chrome.runtime.sendMessage({ type: 'UPDATE_NOTICE_SEEN' }); } catch {}
   }
 }
 

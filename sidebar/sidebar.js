@@ -77,6 +77,7 @@ function applyUILanguage() {
   document.documentElement.dir = (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr';
   delete pickHeroTitle._pick;
   applyI18n();
+  renderUpdateNote();
   renderHero();
   renderTools();
   renderCmdbar();
@@ -164,6 +165,41 @@ function switchTab(name) {
     t.classList.toggle('is-active', t.dataset.tab === name));
   document.getElementById('tab-chat').style.display  = name === 'chat'  ? '' : 'none';
   document.getElementById('tab-tools').style.display = name === 'tools' ? '' : 'none';
+}
+
+// ── "Aside updated to vX" note ─────────────────────────────────────────
+// Same notice the popup shows (written by background.js on update). Shown
+// here too because most people never open the popup. Re-run on language
+// change so the text follows the UI language.
+const UPDATE_NOTICE_KEY = 'aside.updateNotice';
+const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
+
+async function renderUpdateNote() {
+  const note = document.getElementById('update-note');
+  if (!note) return;
+  let notice;
+  try { ({ [UPDATE_NOTICE_KEY]: notice } = await Store.get([UPDATE_NOTICE_KEY])); } catch {}
+  if (!notice?.to) { note.hidden = true; return; }
+
+  // Built from nodes, not innerHTML: the version comes from storage. <bdi>
+  // keeps "v1.2.0" in one piece inside the Hebrew sentence.
+  const text = document.getElementById('update-note-text');
+  const [before, after = ''] = t('update_note').split('{v}');
+  const ver = document.createElement('bdi');
+  ver.textContent = `v${notice.to}`;
+  text.replaceChildren(before, ver, after);
+
+  const link = document.getElementById('update-note-link');
+  link.href = /^\d+(\.\d+){1,3}$/.test(notice.to) ? `${RELEASES_URL}/tag/v${notice.to}` : RELEASES_URL;
+  // Opening the notes counts as read, as in the popup.
+  link.onclick = () => { dismissUpdateNote(); };
+  document.getElementById('update-note-close').onclick = dismissUpdateNote;
+  note.hidden = false;
+}
+
+function dismissUpdateNote() {
+  document.getElementById('update-note').hidden = true;
+  chrome.runtime.sendMessage({ type: 'UPDATE_NOTICE_SEEN' }).catch(() => {});
 }
 
 // ── Per-page memory banner ─────────────────────────────────────────────
@@ -1106,6 +1142,8 @@ window.addEventListener('message', async (e) => {
 chrome.storage.onChanged.addListener((changes, area) => {
   // Settings live in local now; ignore session (channel nonce) and other areas.
   if (area !== 'local') return;
+  // Dismissed in the popup or another tab's sidebar: hide it here too.
+  if (UPDATE_NOTICE_KEY in changes) renderUpdateNote();
   // Skip our own activeProvider write — we updated `provider` and `settings` already.
   const keys = Object.keys(changes);
   if (keys.length === 1 && keys[0] === 'activeProvider'

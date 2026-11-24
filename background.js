@@ -56,6 +56,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   // Content script asks us to (re)grant session-storage access before it
   // writes the channel nonce. Reply only once access is actually granted.
+  // Popup or sidebar: the user dismissed the "Updated to vX" note or opened
+  // its release notes. Clearing here keeps the key and the badge in one place.
+  if (msg?.type === 'UPDATE_NOTICE_SEEN') {
+    clearUpdateNotice().then(() => sendResponse({ ok: true }));
+    return true;
+  }
   if (msg?.type === 'ENSURE_SESSION') {
     ensureSessionAccess().then(() => sendResponse({ ok: true }));
     return true;
@@ -92,7 +98,7 @@ chrome.runtime.onInstalled.addListener(async ({ reason, previousVersion }) => {
   if (reason === 'update') await noteUpdate(previousVersion);
 });
 
-// Read by popup/popup.js; cleared there when the user dismisses the notice.
+// Read by popup/popup.js and sidebar/sidebar.js; cleared by UPDATE_NOTICE_SEEN.
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
 
 /**
@@ -106,6 +112,11 @@ async function noteUpdate(previousVersion) {
   if (!previousVersion || previousVersion === current) return;
   await Store.set({ [UPDATE_NOTICE_KEY]: { from: previousVersion, to: current } });
   showUpdateBadge();
+}
+
+async function clearUpdateNotice() {
+  await Store.remove(UPDATE_NOTICE_KEY);
+  chrome.action.setBadgeText({ text: '' }).catch(() => {});
 }
 
 function showUpdateBadge() {

@@ -15,6 +15,9 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   away and, if a version is waiting, offers "Update to vX now", which reloads
   Aside onto it (open sidebars reopen with Alt+A). Unpacked copies say they
   cannot check. Reloading an unpacked build at the same version shows nothing.
+- The same "Aside updated to vX - What's new" note appears at the top of the
+  sidebar's chat, in English or Hebrew to match the UI language. Dismissing it
+  in the popup or in any sidebar clears it everywhere, badge included.
 - **Landing page: live answers in the "try it" preview (off until a demo
   server is configured).** A question a visitor types can now be answered by
   a real model instead of "this preview only knows the questions below". The
