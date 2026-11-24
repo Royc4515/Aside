@@ -4,10 +4,32 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
-## Unreleased
+## 1.1.6 - 2026-11-24 · Update notice, Hebrew prompt chips, live answers on the site
 
 ### Added
 
+- **Updates in the toolbar popup.** After Chrome installs a new version, the
+  icon shows a "NEW" badge and the popup says "Updated to vX - What's new",
+  linking to that release's notes; dismissing it or opening the notes clears
+  the badge. A "Check for updates" button asks the Chrome Web Store right
+  away and, if a version is waiting, offers "Update to vX now", which reloads
+  Aside onto it (open sidebars reopen with Alt+A). Unpacked copies say they
+  cannot check. Reloading an unpacked build at the same version shows nothing.
+- **Update check against GitHub for unpacked copies.** Aside is not on the
+  Chrome Web Store yet, so Chrome cannot update it. For these copies "Check
+  for updates" asks GitHub for the latest release and, if it is newer, offers
+  "Download vX" with how to install it without losing keys or chats (unzip
+  over the same folder, then Reload; never remove Aside first). The request
+  goes to `api.github.com` only on that click, carries no data, and is in
+  the privacy policy.
+- **"New version available" in the sidebar.** When that check finds a newer
+  release, the sidebar shows "Aside vX is available - Download" (Hebrew:
+  "גרסה חדשה של Aside זמינה"), with how to install it in the tooltip. The
+  sidebar never contacts GitHub itself; it shows the popup's last result and
+  drops it once that version is installed.
+- The same "Aside updated to vX - What's new" note appears at the top of the
+  sidebar's chat, in English or Hebrew to match the UI language. Dismissing it
+  in the popup or in any sidebar clears it everywhere, badge included.
 - **Landing page: live answers in the "try it" preview (off until a demo
   server is configured).** A question a visitor types can now be answered by
   a real model instead of "this preview only knows the questions below". The
@@ -49,6 +71,19 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
 
 - FAQ wording: "there is no server we control" is now "the extension has no
   server at all", which stays true with the website's demo server.
+
+### Fixed
+
+- **Hebrew sidebar: the quick prompt chips were in English.** ELI5, Bullet
+  points, Action items and the rest now show in Hebrew, and tapping one puts
+  a Hebrew prompt in the composer. Other UI languages still use English.
+- The page-context pill's "~N tokens" was English in every language; Hebrew
+  now reads "כ־N טוקנים".
+- On pages with no readable text, the page-context pill showed an untranslated
+  "Page context" placeholder instead of hiding.
+- The "updated" note now also appears when new files are picked up by a
+  browser restart rather than the Reload button. Chrome sends no install
+  event in that case, so Aside compares against the last version it ran.
 
 ## 1.1.5 - 2026-11-16 · New models, a live demo and "try it" on the site
 

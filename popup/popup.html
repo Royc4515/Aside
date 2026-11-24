@@ -122,6 +122,28 @@
       cursor: pointer; text-align: start;
     }
     .link:hover { background: var(--surface-2); color: var(--ink); }
+    .update-note {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 11px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-inline-start: 3px solid var(--accent);
+      border-radius: 10px;
+      font-size: 12.5px; color: var(--ink-2);
+    }
+    .update-note[hidden] { display: none; }
+    .update-note-text { flex: 1; }
+    .update-note a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    .update-note a:hover { text-decoration: underline; }
+    .icon-btn {
+      background: transparent; border: none; border-radius: 6px;
+      color: var(--ink-3); font-size: 15px; line-height: 1;
+      padding: 2px 6px; cursor: pointer;
+    }
+    .icon-btn:hover { background: var(--line); color: var(--ink); }
+    .update-status { font-size: 11.5px; color: var(--ink-3); padding: 0 10px; }
+    .update-status:empty { display: none; }
+    .link[disabled] { opacity: .6; cursor: default; }
   </style>
 </head>
 <body>
@@ -154,6 +176,11 @@
     </div>
   </div>
 
+  <div class="update-note" id="update-note" role="status" hidden>
+    <span class="update-note-text">Updated to <strong id="update-note-version"></strong> - <a id="update-note-link" href="#" target="_blank" rel="noopener">What's new</a></span>
+    <button class="icon-btn" id="update-note-close" aria-label="Dismiss" title="Dismiss">&times;</button>
+  </div>
+
   <div class="row" id="status-row">
     <span id="status-mark"></span>
     <span class="row-label" id="provider-name-text">No provider set</span>
@@ -173,7 +200,13 @@
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.7l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.7-.3 1.6 1.6 0 0 0-1 1.4V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.4 1.6 1.6 0 0 0-1.7.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.7 1.6 1.6 0 0 0-1.4-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.4-1 1.6 1.6 0 0 0-.3-1.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.7.3H9a1.6 1.6 0 0 0 1-1.4V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.4 1.6 1.6 0 0 0 1.7-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.7V9a1.6 1.6 0 0 0 1.4 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.4 1z"/></svg>
     <span>Settings</span>
   </button>
+  <button class="link" id="update-btn">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg>
+    <span id="update-btn-label">Check for updates</span>
+  </button>
+  <div class="update-status" id="update-status" aria-live="polite"></div>
   <script src="../shared/store.js"></script>
+  <script src="../shared/version.js"></script>
   <script src="../shared/provider-marks.js"></script>
   <script src="../providers/models.js"></script>
   <script src="popup.js"></script>

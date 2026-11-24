@@ -155,6 +155,18 @@
       <li>The server is hosted on Vercel, which, like any web host, sees your IP address when your browser connects.</li>
     </ul>
 
+    <h2>Checking for updates</h2>
+    <p>
+      The toolbar popup has a <strong>Check for updates</strong> button. Only
+      when you click it, and only for a copy not installed from the Chrome Web
+      Store, the extension sends one request to GitHub's public API
+      (<code>api.github.com</code>) to read the number of the latest release.
+      The request carries no API key, prompt, page text, cookies or identifier;
+      GitHub sees your IP address and standard request headers, as any website
+      would. Aside never checks for updates in the background. A copy from the
+      Chrome Web Store asks the Web Store instead, through Chrome itself.
+    </p>
+
     <h2>Web fonts</h2>
     <p>
       Aside’s own interface (the sidebar, options, and popup pages) loads fonts

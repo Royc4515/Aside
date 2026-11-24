@@ -140,6 +140,22 @@
 
       <!-- Chat tab content -->
       <div class="sb-scroll" id="tab-chat">
+        <!-- "Aside updated to vX" note, shown once after an extension update -->
+        <div class="sb-update-note" id="update-note" role="status" hidden>
+          <span class="sb-update-note-text" id="update-note-text"></span>
+          <a class="sb-update-note-link" id="update-note-link" href="#" target="_blank" rel="noopener" data-i18n="update_whats_new">What's new</a>
+          <button class="sb-update-note-close" id="update-note-close" data-i18n-title="update_dismiss" aria-label="Dismiss" title="Dismiss">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <!-- "New version available" line, from the popup's last GitHub check -->
+        <div class="sb-update-note" id="avail-note" role="status" hidden>
+          <span class="sb-update-note-text" id="avail-note-text"></span>
+          <a class="sb-update-note-link" id="avail-note-link" href="#" target="_blank" rel="noopener" data-i18n="update_download">Download</a>
+          <button class="sb-update-note-close" id="avail-note-close" data-i18n-title="update_dismiss" aria-label="Dismiss" title="Dismiss">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
         <!-- Per-page memory banner (shown when prior threads exist on this URL) -->
         <button class="sb-page-memory" id="page-memory" hidden>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -325,6 +341,7 @@
   </div>
 
   <script src="../shared/store.js"></script>
+  <script src="../shared/version.js"></script>
   <script src="translations.js"></script>
   <script src="i18n.js"></script>
   <script src="../shared/provider-marks.js"></script>

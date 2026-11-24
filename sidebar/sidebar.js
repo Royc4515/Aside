@@ -77,6 +77,10 @@ function applyUILanguage() {
   document.documentElement.dir = (lang === 'he' || lang === 'ar') ? 'rtl' : 'ltr';
   delete pickHeroTitle._pick;
   applyI18n();
+  renderUpdateNote();
+  renderAvailableUpdate();
+  renderTemplates();
+  renderContextPill();
   renderHero();
   renderTools();
   renderCmdbar();
@@ -166,6 +170,77 @@ function switchTab(name) {
   document.getElementById('tab-tools').style.display = name === 'tools' ? '' : 'none';
 }
 
+// ── "Aside updated to vX" note ─────────────────────────────────────────
+// Same notice the popup shows (written by background.js on update). Shown
+// here too because most people never open the popup. Re-run on language
+// change so the text follows the UI language.
+const UPDATE_NOTICE_KEY = 'aside.updateNotice';
+const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
+
+async function renderUpdateNote() {
+  const note = document.getElementById('update-note');
+  if (!note) return;
+  let notice;
+  try { ({ [UPDATE_NOTICE_KEY]: notice } = await Store.get([UPDATE_NOTICE_KEY])); } catch {}
+  if (!notice?.to) { note.hidden = true; return; }
+
+  // Built from nodes, not innerHTML: the version comes from storage. <bdi>
+  // keeps "v1.2.0" in one piece inside the Hebrew sentence.
+  const text = document.getElementById('update-note-text');
+  const [before, after = ''] = t('update_note').split('{v}');
+  const ver = document.createElement('bdi');
+  ver.textContent = `v${notice.to}`;
+  text.replaceChildren(before, ver, after);
+
+  const link = document.getElementById('update-note-link');
+  link.href = AsideVersion.isPlain(notice.to) ? `${RELEASES_URL}/tag/v${notice.to}` : RELEASES_URL;
+  // Opening the notes counts as read, as in the popup.
+  link.onclick = () => { dismissUpdateNote(); };
+  document.getElementById('update-note-close').onclick = dismissUpdateNote;
+  note.hidden = false;
+}
+
+function dismissUpdateNote() {
+  document.getElementById('update-note').hidden = true;
+  chrome.runtime.sendMessage({ type: 'UPDATE_NOTICE_SEEN' }).catch(() => {});
+}
+
+// ── "New version available" line ───────────────────────────────────────
+// Shows what the popup's last GitHub check found. The sidebar never asks
+// GitHub itself: the update check stays click-only (privacy policy).
+const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
+
+async function renderAvailableUpdate() {
+  const note = document.getElementById('avail-note');
+  if (!note) return;
+  let avail;
+  try { ({ [AVAILABLE_UPDATE_KEY]: avail } = await Store.get([AVAILABLE_UPDATE_KEY])); } catch {}
+  const current = chrome.runtime.getManifest().version;
+  // Stale (already installed) or malformed: hide. background.js clears the
+  // key on the next version change.
+  if (!avail || !AsideVersion.isPlain(avail.version) || !AsideVersion.isPlain(current)
+      || AsideVersion.compare(avail.version, current) <= 0) {
+    note.hidden = true; return;
+  }
+  const [before, after = ''] = t('update_available').split('{v}');
+  const ver = document.createElement('bdi');
+  ver.textContent = `v${avail.version}`;
+  document.getElementById('avail-note-text').replaceChildren(before, ver, after);
+
+  const link = document.getElementById('avail-note-link');
+  // Storage is ours, but only ever follow a link inside this repo's releases.
+  link.href = String(avail.url || '').startsWith(`${RELEASES_URL}/`) ? avail.url : `${RELEASES_URL}/latest`;
+  // How to install without losing data; a tooltip keeps the line one row.
+  link.title = t('update_how');
+  note.title = t('update_how');
+  document.getElementById('avail-note-close').onclick = () => {
+    note.hidden = true;
+    // Dismissed means "not now": the next popup check that finds it shows it again.
+    Store.remove(AVAILABLE_UPDATE_KEY).catch(() => {});
+  };
+  note.hidden = false;
+}
+
 // ── Per-page memory banner ─────────────────────────────────────────────
 async function renderPageMemory() {
   const banner = document.getElementById('page-memory');
@@ -193,6 +268,12 @@ async function renderPageMemory() {
 }
 
 // ── Quick prompt templates ─────────────────────────────────────────────
+// English lives in prompt-templates.js; other UI languages override it with
+// tpl_<id> / tpl_<id>_prompt keys in translations.js. The prompt is translated
+// too: it lands in the composer where the user reads and edits it.
+const tplKey = (p) => `tpl_${p.id.replace(/-/g, '_')}`;
+function templateLabel(p)  { return t(tplKey(p)) || p.label; }
+function templatePrompt(p) { return t(`${tplKey(p)}_prompt`) || p.prompt; }
 function renderTemplates() {
   const wrap = document.getElementById('templates');
   const scroll = document.getElementById('templates-scroll');
@@ -204,15 +285,15 @@ function renderTemplates() {
   if (!window.PROMPT_TEMPLATES) { wrap.hidden = true; return; }
   wrap.hidden = false;
   scroll.innerHTML = window.PROMPT_TEMPLATES.map(p => `
-    <button class="sb-template" data-prompt="${p.id}" type="button" title="${escapeHtml(p.prompt)}">
+    <button class="sb-template" data-prompt="${p.id}" type="button" title="${escapeHtml(templatePrompt(p))}">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${p.icon}</svg>
-      <span>${escapeHtml(p.label)}</span>
+      <span>${escapeHtml(templateLabel(p))}</span>
     </button>`).join('');
   scroll.querySelectorAll('.sb-template').forEach(b => {
     b.onclick = () => {
       const tpl = window.PROMPT_TEMPLATES.find(x => x.id === b.dataset.prompt);
       if (!tpl) return;
-      input.value = tpl.prompt;
+      input.value = templatePrompt(tpl);
       input.focus();
       // Resize textarea to content
       input.style.height = 'auto';
@@ -1106,6 +1187,9 @@ window.addEventListener('message', async (e) => {
 chrome.storage.onChanged.addListener((changes, area) => {
   // Settings live in local now; ignore session (channel nonce) and other areas.
   if (area !== 'local') return;
+  // Dismissed in the popup or another tab's sidebar: hide it here too.
+  if (UPDATE_NOTICE_KEY in changes) renderUpdateNote();
+  if (AVAILABLE_UPDATE_KEY in changes) renderAvailableUpdate();
   // Skip our own activeProvider write — we updated `provider` and `settings` already.
   const keys = Object.keys(changes);
   if (keys.length === 1 && keys[0] === 'activeProvider'
@@ -1137,7 +1221,7 @@ function renderContextPill() {
     : (t('context_on_title')  || 'Page context on - click to exclude this page');
   txt.textContent = off
     ? (t('context_off') || 'Page context off')
-    : `${t('context_including') || 'Including page context'} · ~${human} tokens`;
+    : `${t('context_including') || 'Including page context'} · ${(t('context_tokens') || '~{n} tokens').replace('{n}', human)}`;
   if (tog) tog.textContent = off ? (t('context_toggle_off') || 'Off') : (t('context_toggle_on') || 'On');
   pill.onclick = async () => {
     settings.pageContext = off; // off was true → flip to enabled
