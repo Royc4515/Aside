@@ -4,7 +4,7 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
-## Unreleased
+## 1.1.7 - 2026-11-24 · Automatic update check, weekly and after a failed answer
 
 ### Added
 
