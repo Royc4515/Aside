@@ -157,14 +157,21 @@
 
     <h2>Checking for updates</h2>
     <p>
-      The toolbar popup has a <strong>Check for updates</strong> button. Only
-      when you click it, and only for a copy not installed from the Chrome Web
-      Store, the extension sends one request to GitHub's public API
-      (<code>api.github.com</code>) to read the number of the latest release.
-      The request carries no API key, prompt, page text, cookies or identifier;
-      GitHub sees your IP address and standard request headers, as any website
-      would. Aside never checks for updates in the background. A copy from the
-      Chrome Web Store asks the Web Store instead, through Chrome itself.
+      A copy of Aside not installed from the Chrome Web Store asks GitHub's
+      public API (<code>api.github.com</code>) for the number of the latest
+      release, so it can tell you when a newer version is out. It does this:
+    </p>
+    <ul>
+      <li>at most once a week, when the extension starts working;</li>
+      <li>after an AI answer fails, at most once every 6 hours, because an old version can stop working when a provider retires a model;</li>
+      <li>when you click <strong>Check for updates</strong> in the toolbar popup.</li>
+    </ul>
+    <p>
+      Each check is one request that carries no API key, prompt, page text,
+      cookies or identifier, and nothing about the failed answer. GitHub sees
+      your IP address and standard request headers, as any website would. A
+      copy from the Chrome Web Store makes no such request: Chrome updates it
+      through the Web Store.
     </p>
 
     <h2>Web fonts</h2>
@@ -174,8 +181,8 @@
       <code>fonts.gstatic.com</code>). When those pages render, your browser
       requests the font files from Google, which means Google receives your IP
       address and standard request headers, governed by Google’s own privacy
-      policy. This is the only third-party request Aside makes that you do not
-      initiate; it carries no API keys, prompts, page text, or identifiers.
+      policy. Apart from the update check above, this is the only third-party
+      request Aside makes that you do not initiate; it carries no API keys, prompts, page text, or identifiers.
     </p>
 
     <h2>Permissions, explained</h2>
