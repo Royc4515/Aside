@@ -103,6 +103,8 @@ chrome.runtime.onInstalled.addListener(async ({ reason, previousVersion }) => {
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
 // The version this profile last ran. See checkVersionChange().
 const LAST_VERSION_KEY = 'aside.lastVersion';
+// Written by the popup's GitHub check when it finds a newer release.
+const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
 
 /**
  * Remember that Aside just updated, so the popup can say so and link to the
@@ -120,7 +122,14 @@ async function noteUpdate(previousVersion) {
 }
 
 async function rememberVersion() {
-  await Store.set({ [LAST_VERSION_KEY]: chrome.runtime.getManifest().version });
+  const current = chrome.runtime.getManifest().version;
+  await Store.set({ [LAST_VERSION_KEY]: current });
+  // Once that version (or a later one) is installed, "available" is stale.
+  const { [AVAILABLE_UPDATE_KEY]: avail } = await Store.get([AVAILABLE_UPDATE_KEY]);
+  if (avail && (!AsideVersion.isPlain(avail.version) || !AsideVersion.isPlain(current)
+      || AsideVersion.compare(avail.version, current) <= 0)) {
+    await Store.remove(AVAILABLE_UPDATE_KEY);
+  }
 }
 
 /**

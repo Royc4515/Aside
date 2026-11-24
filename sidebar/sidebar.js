@@ -78,6 +78,7 @@ function applyUILanguage() {
   delete pickHeroTitle._pick;
   applyI18n();
   renderUpdateNote();
+  renderAvailableUpdate();
   renderTemplates();
   renderContextPill();
   renderHero();
@@ -192,7 +193,7 @@ async function renderUpdateNote() {
   text.replaceChildren(before, ver, after);
 
   const link = document.getElementById('update-note-link');
-  link.href = /^\d+(\.\d+){1,3}$/.test(notice.to) ? `${RELEASES_URL}/tag/v${notice.to}` : RELEASES_URL;
+  link.href = AsideVersion.isPlain(notice.to) ? `${RELEASES_URL}/tag/v${notice.to}` : RELEASES_URL;
   // Opening the notes counts as read, as in the popup.
   link.onclick = () => { dismissUpdateNote(); };
   document.getElementById('update-note-close').onclick = dismissUpdateNote;
@@ -202,6 +203,42 @@ async function renderUpdateNote() {
 function dismissUpdateNote() {
   document.getElementById('update-note').hidden = true;
   chrome.runtime.sendMessage({ type: 'UPDATE_NOTICE_SEEN' }).catch(() => {});
+}
+
+// ── "New version available" line ───────────────────────────────────────
+// Shows what the popup's last GitHub check found. The sidebar never asks
+// GitHub itself: the update check stays click-only (privacy policy).
+const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
+
+async function renderAvailableUpdate() {
+  const note = document.getElementById('avail-note');
+  if (!note) return;
+  let avail;
+  try { ({ [AVAILABLE_UPDATE_KEY]: avail } = await Store.get([AVAILABLE_UPDATE_KEY])); } catch {}
+  const current = chrome.runtime.getManifest().version;
+  // Stale (already installed) or malformed: hide. background.js clears the
+  // key on the next version change.
+  if (!avail || !AsideVersion.isPlain(avail.version) || !AsideVersion.isPlain(current)
+      || AsideVersion.compare(avail.version, current) <= 0) {
+    note.hidden = true; return;
+  }
+  const [before, after = ''] = t('update_available').split('{v}');
+  const ver = document.createElement('bdi');
+  ver.textContent = `v${avail.version}`;
+  document.getElementById('avail-note-text').replaceChildren(before, ver, after);
+
+  const link = document.getElementById('avail-note-link');
+  // Storage is ours, but only ever follow a link inside this repo's releases.
+  link.href = String(avail.url || '').startsWith(`${RELEASES_URL}/`) ? avail.url : `${RELEASES_URL}/latest`;
+  // How to install without losing data; a tooltip keeps the line one row.
+  link.title = t('update_how');
+  note.title = t('update_how');
+  document.getElementById('avail-note-close').onclick = () => {
+    note.hidden = true;
+    // Dismissed means "not now": the next popup check that finds it shows it again.
+    Store.remove(AVAILABLE_UPDATE_KEY).catch(() => {});
+  };
+  note.hidden = false;
 }
 
 // ── Per-page memory banner ─────────────────────────────────────────────
@@ -1152,6 +1189,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
   // Dismissed in the popup or another tab's sidebar: hide it here too.
   if (UPDATE_NOTICE_KEY in changes) renderUpdateNote();
+  if (AVAILABLE_UPDATE_KEY in changes) renderAvailableUpdate();
   // Skip our own activeProvider write — we updated `provider` and `settings` already.
   const keys = Object.keys(changes);
   if (keys.length === 1 && keys[0] === 'activeProvider'

@@ -57,6 +57,9 @@ async function init() {
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
 const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
 const RELEASES_API = 'https://api.github.com/repos/Royc4515/Aside/releases/latest';
+// Last GitHub check result that found a newer version, for the sidebar's
+// "new version available" line. Read by sidebar/sidebar.js and background.js.
+const AVAILABLE_UPDATE_KEY = 'aside.availableUpdate';
 
 /**
  * Two update affordances:
@@ -74,7 +77,7 @@ async function initUpdates() {
     document.getElementById('update-note-version').textContent = `v${notice.to}`;
     const link = document.getElementById('update-note-link');
     // Only a plain x.y.z maps to a release tag; anything else goes to the list.
-    link.href = /^\d+(\.\d+){1,3}$/.test(notice.to)
+    link.href = AsideVersion.isPlain(notice.to)
       ? `${RELEASES_URL}/tag/v${notice.to}` : RELEASES_URL;
     note.hidden = false;
     // Opening the notes counts as read. Clear it before the popup closes on
@@ -158,9 +161,11 @@ async function initUpdates() {
         // Only follow a link that stays inside this repo's releases.
         downloadUrl = String(release.html_url || '').startsWith(`${RELEASES_URL}/`)
           ? release.html_url : `${RELEASES_URL}/latest`;
+        await Store.set({ [AVAILABLE_UPDATE_KEY]: { version: latest, url: downloadUrl } });
         label.textContent = `Download v${latest}`;
         status.textContent = 'Unzip it over your current Aside folder, then click Reload in chrome://extensions. Do not remove Aside first: that deletes your keys and chats.';
       } else {
+        await Store.remove(AVAILABLE_UPDATE_KEY);
         status.textContent = `You're on the latest version (v${current}).`;
       }
     } catch {

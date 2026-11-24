@@ -22,6 +22,11 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   over the same folder, then Reload; never remove Aside first). The request
   goes to `api.github.com` only on that click, carries no data, and is in
   the privacy policy.
+- **"New version available" in the sidebar.** When that check finds a newer
+  release, the sidebar shows "Aside vX is available - Download" (Hebrew:
+  "גרסה חדשה של Aside זמינה"), with how to install it in the tooltip. The
+  sidebar never contacts GitHub itself; it shows the popup's last result and
+  drops it once that version is installed.
 - The same "Aside updated to vX - What's new" note appears at the top of the
   sidebar's chat, in English or Hebrew to match the UI language. Dismissing it
   in the popup or in any sidebar clears it everywhere, badge included.
