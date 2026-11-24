@@ -50,5 +50,88 @@ async function init() {
     chrome.runtime.openOptionsPage();
     window.close();
   });
+  initUpdates();
 }
+
+// Written by background.js after an update; kept in sync with UPDATE_NOTICE_KEY there.
+const UPDATE_NOTICE_KEY = 'aside.updateNotice';
+const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
+
+/**
+ * Two update affordances:
+ *  - after Chrome installed a new version, a one-time "Updated to vX" note
+ *    linking to that release's notes (also clears the toolbar badge);
+ *  - a "Check for updates" button that asks the Web Store now instead of
+ *    waiting for Chrome's periodic check, and applies a found update on a
+ *    second click.
+ */
+async function initUpdates() {
+  const note = document.getElementById('update-note');
+  const { [UPDATE_NOTICE_KEY]: notice } = await Store.get([UPDATE_NOTICE_KEY]);
+  if (notice?.to) {
+    document.getElementById('update-note-version').textContent = `v${notice.to}`;
+    const link = document.getElementById('update-note-link');
+    // Only a plain x.y.z maps to a release tag; anything else goes to the list.
+    link.href = /^\d+(\.\d+){1,3}$/.test(notice.to)
+      ? `${RELEASES_URL}/tag/v${notice.to}` : RELEASES_URL;
+    note.hidden = false;
+    // Opening the notes counts as read. Clear it before the popup closes on
+    // the new tab, or the write can be cut off and the note comes back.
+    link.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await dismissUpdateNote();
+      chrome.tabs.create({ url: link.href });
+      window.close();
+    });
+    document.getElementById('update-note-close').addEventListener('click', dismissUpdateNote);
+  }
+
+  const btn    = document.getElementById('update-btn');
+  const label  = document.getElementById('update-btn-label');
+  const status = document.getElementById('update-status');
+  let readyVersion = null;
+
+  btn.addEventListener('click', async () => {
+    if (readyVersion) {
+      // Reload swaps in the downloaded version. Open sidebars lose their
+      // connection until reopened, which is why this waits for a click.
+      chrome.runtime.reload();
+      return;
+    }
+    // don't touch / Chrome answers "no_update" for unpacked copies instead of
+    // failing, which would falsely say "latest". Store installs get update_url.
+    if (!chrome.runtime.getManifest().update_url) {
+      status.textContent = 'This copy is not from the Chrome Web Store, so it cannot check for updates.';
+      return;
+    }
+    btn.disabled = true;
+    status.textContent = 'Checking...';
+    try {
+      const res = await chrome.runtime.requestUpdateCheck();
+      // Chrome 109+ resolves { status, version }; keep the array form for safety.
+      const st  = res?.status ?? (Array.isArray(res) ? res[0] : undefined);
+      const ver = res?.version ?? (Array.isArray(res) ? res[1]?.version : undefined);
+      if (st === 'update_available') {
+        readyVersion = ver || 'new';
+        label.textContent = ver ? `Update to v${ver} now` : 'Update now';
+        status.textContent = 'Open sidebars close and reopen on Alt+A.';
+      } else if (st === 'throttled') {
+        status.textContent = 'Checked recently. Try again in a few minutes.';
+      } else {
+        status.textContent = `You're on the latest version (v${chrome.runtime.getManifest().version}).`;
+      }
+    } catch {
+      status.textContent = 'Could not reach the Chrome Web Store. Try again later.';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  async function dismissUpdateNote() {
+    note.hidden = true;
+    await Store.remove(UPDATE_NOTICE_KEY);
+    chrome.action.setBadgeText({ text: '' }).catch(() => {});
+  }
+}
+
 init();

@@ -79,7 +79,7 @@ function setupContextMenus() {
 }
 
 // First-run / Update: open options page and setup context menus.
-chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+chrome.runtime.onInstalled.addListener(async ({ reason, previousVersion }) => {
   setupContextMenus();
   ensureSessionAccess();
   // Pull any data older versions left in chrome.storage.sync into local.
@@ -89,6 +89,35 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     const { activeProvider } = await Store.get(['activeProvider']);
     if (!activeProvider) chrome.runtime.openOptionsPage();
   }
+  if (reason === 'update') await noteUpdate(previousVersion);
+});
+
+// Read by popup/popup.js; cleared there when the user dismisses the notice.
+const UPDATE_NOTICE_KEY = 'aside.updateNotice';
+
+/**
+ * Remember that Aside just updated, so the popup can say so and link to the
+ * release notes. The toolbar badge points the user at the popup.
+ */
+async function noteUpdate(previousVersion) {
+  const current = chrome.runtime.getManifest().version;
+  // don't touch / "Reload" on an unpacked build fires 'update' with the same
+  // version; without this every dev reload would announce a fake update.
+  if (!previousVersion || previousVersion === current) return;
+  await Store.set({ [UPDATE_NOTICE_KEY]: { from: previousVersion, to: current } });
+  showUpdateBadge();
+}
+
+function showUpdateBadge() {
+  chrome.action.setBadgeBackgroundColor({ color: '#c8643c' }).catch(() => {});
+  chrome.action.setBadgeText({ text: 'NEW' }).catch(() => {});
+}
+
+// The badge does not survive a browser restart; put it back while the
+// notice is still unread.
+chrome.runtime.onStartup?.addListener(async () => {
+  const { [UPDATE_NOTICE_KEY]: notice } = await Store.get([UPDATE_NOTICE_KEY]);
+  if (notice) showUpdateBadge();
 });
 
 // Context menu click handling

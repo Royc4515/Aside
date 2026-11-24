@@ -8,6 +8,13 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
 
 ### Added
 
+- **Updates in the toolbar popup.** After Chrome installs a new version, the
+  icon shows a "NEW" badge and the popup says "Updated to vX - What's new",
+  linking to that release's notes; dismissing it or opening the notes clears
+  the badge. A "Check for updates" button asks the Chrome Web Store right
+  away and, if a version is waiting, offers "Update to vX now", which reloads
+  Aside onto it (open sidebars reopen with Alt+A). Unpacked copies say they
+  cannot check. Reloading an unpacked build at the same version shows nothing.
 - **Landing page: live answers in the "try it" preview (off until a demo
   server is configured).** A question a visitor types can now be answered by
   a real model instead of "this preview only knows the questions below". The
