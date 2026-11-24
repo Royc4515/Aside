@@ -127,6 +127,8 @@ providers any time from the sidebar header; each remembers its own model.
 5. **Pin it to the toolbar.** Click the puzzle icon in the toolbar and pin Aside so it's one click away.
 6. **Set the `Alt + A` shortcut.** Chrome only auto-assigns shortcuts for Web Store extensions, so set it once by hand: open `chrome://extensions/shortcuts`, find **Aside**, click the box next to *Toggle the AI sidebar*, and press <kbd>Alt</kbd> + <kbd>A</kbd>. (You can also just open it from the toolbar icon or the right-click menu.)
 
+**Updating later.** Click *Check for updates* in Aside's toolbar popup. If a newer version exists, download its `aside.zip`, unzip it **over the same folder** (replace the files), then click the reload arrow on Aside's card in `chrome://extensions`. Don't remove Aside and load a new folder: Chrome ties your API keys and chats to that folder, so they would be gone. After the update Aside shows a *What's new* note.
+
 ### Step 2 · Get a free Groq API key (recommended)
 
 > Groq runs OpenAI's open-weight GPT-OSS 120B at conversational speed and has a free tier - perfect for daily use. About **60 seconds**.
@@ -173,6 +175,7 @@ own model selection.
 - **Your API keys live on your machine.** Aside stores them in Chrome's on-device `storage.local` - never synced to a Google account, never uploaded - and sends them only to the provider you chose, over HTTPS. No analytics, no telemetry, no proxy server - your requests go straight from your browser to OpenAI / Anthropic / Google / xAI / Groq / your local Ollama.
 - **Page content is sent only on your prompt.** When you press *Summarize* (or any action that needs the page), Aside grabs the readable body of the current tab, trims it to 12 000 characters, and includes it in **that one request**. Nothing is uploaded in the background.
 - **Conversation history stays local.** Threads are saved to Chrome's `storage.local` on your device. Nothing leaves your browser until you ask the model another question.
+- **Update checks happen only when you ask.** Clicking *Check for updates* in the toolbar popup sends one request to GitHub's public API (`api.github.com`) for the latest release number. It carries no key, prompt, page text or identifier, and Aside never checks in the background.
 - **Ollama mode is fully offline.** No key, no network call - your prompt and the page text go to the model running on your own computer.
 
 ---

@@ -3,7 +3,7 @@
  * Routes commands and messages between popup, content script, and sidebar iframe.
  */
 
-importScripts('shared/store.js');
+importScripts('shared/store.js', 'shared/version.js');
 
 /**
  * Grant content scripts (untrusted contexts) read/write access to
@@ -96,10 +96,13 @@ chrome.runtime.onInstalled.addListener(async ({ reason, previousVersion }) => {
     if (!activeProvider) chrome.runtime.openOptionsPage();
   }
   if (reason === 'update') await noteUpdate(previousVersion);
+  await rememberVersion();
 });
 
 // Read by popup/popup.js and sidebar/sidebar.js; cleared by UPDATE_NOTICE_SEEN.
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
+// The version this profile last ran. See checkVersionChange().
+const LAST_VERSION_KEY = 'aside.lastVersion';
 
 /**
  * Remember that Aside just updated, so the popup can say so and link to the
@@ -109,10 +112,34 @@ async function noteUpdate(previousVersion) {
   const current = chrome.runtime.getManifest().version;
   // don't touch / "Reload" on an unpacked build fires 'update' with the same
   // version; without this every dev reload would announce a fake update.
-  if (!previousVersion || previousVersion === current) return;
+  // Only a move to a newer version counts, so a downgrade stays quiet.
+  if (!AsideVersion.isPlain(previousVersion) || !AsideVersion.isPlain(current)) return;
+  if (AsideVersion.compare(current, previousVersion) <= 0) return;
   await Store.set({ [UPDATE_NOTICE_KEY]: { from: previousVersion, to: current } });
   showUpdateBadge();
 }
+
+async function rememberVersion() {
+  await Store.set({ [LAST_VERSION_KEY]: chrome.runtime.getManifest().version });
+}
+
+/**
+ * Catch updates that onInstalled misses.
+ * don't touch / an unpacked copy whose files were replaced and then picked up
+ * by a browser restart (not the Reload button) runs the new version with no
+ * onInstalled event at all (verified in Chromium). Comparing against the last
+ * version this profile ran covers that, and is harmless when onInstalled did
+ * fire: both write the same notice.
+ */
+async function checkVersionChange() {
+  try {
+    const { [LAST_VERSION_KEY]: last } = await Store.get([LAST_VERSION_KEY]);
+    // First run with this code: nothing to compare yet, just record it.
+    if (last) await noteUpdate(last);
+    await rememberVersion();
+  } catch {}
+}
+checkVersionChange();
 
 async function clearUpdateNotice() {
   await Store.remove(UPDATE_NOTICE_KEY);

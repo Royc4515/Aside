@@ -4,7 +4,7 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
-## Unreleased
+## 1.1.6 - 2026-11-24 · Update notice, Hebrew prompt chips, live answers on the site
 
 ### Added
 
@@ -15,6 +15,13 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   away and, if a version is waiting, offers "Update to vX now", which reloads
   Aside onto it (open sidebars reopen with Alt+A). Unpacked copies say they
   cannot check. Reloading an unpacked build at the same version shows nothing.
+- **Update check against GitHub for unpacked copies.** Aside is not on the
+  Chrome Web Store yet, so Chrome cannot update it. For these copies "Check
+  for updates" asks GitHub for the latest release and, if it is newer, offers
+  "Download vX" with how to install it without losing keys or chats (unzip
+  over the same folder, then Reload; never remove Aside first). The request
+  goes to `api.github.com` only on that click, carries no data, and is in
+  the privacy policy.
 - The same "Aside updated to vX - What's new" note appears at the top of the
   sidebar's chat, in English or Hebrew to match the UI language. Dismissing it
   in the popup or in any sidebar clears it everywhere, badge included.
@@ -69,6 +76,9 @@ Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Asid
   now reads "כ־N טוקנים".
 - On pages with no readable text, the page-context pill showed an untranslated
   "Page context" placeholder instead of hiding.
+- The "updated" note now also appears when new files are picked up by a
+  browser restart rather than the Reload button. Chrome sends no install
+  event in that case, so Aside compares against the last version it ran.
 
 ## 1.1.5 - 2026-11-16 · New models, a live demo and "try it" on the site
 

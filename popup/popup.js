@@ -56,14 +56,16 @@ async function init() {
 // Written by background.js after an update; same key as UPDATE_NOTICE_KEY there.
 const UPDATE_NOTICE_KEY = 'aside.updateNotice';
 const RELEASES_URL = 'https://github.com/Royc4515/Aside/releases';
+const RELEASES_API = 'https://api.github.com/repos/Royc4515/Aside/releases/latest';
 
 /**
  * Two update affordances:
  *  - after Chrome installed a new version, a one-time "Updated to vX" note
  *    linking to that release's notes (also clears the toolbar badge);
- *  - a "Check for updates" button that asks the Web Store now instead of
- *    waiting for Chrome's periodic check, and applies a found update on a
- *    second click.
+ *  - a "Check for updates" button. A Web Store copy asks the store now and
+ *    applies a found update on a second click. Any other copy (Load unpacked,
+ *    which is how Aside ships today) asks GitHub for the latest release and
+ *    links to its download, since Chrome cannot update those by itself.
  */
 async function initUpdates() {
   const note = document.getElementById('update-note');
@@ -89,7 +91,9 @@ async function initUpdates() {
   const btn    = document.getElementById('update-btn');
   const label  = document.getElementById('update-btn-label');
   const status = document.getElementById('update-status');
-  let readyVersion = null;
+  let readyVersion = null;   // Web Store: a downloaded version waiting for reload
+  let downloadUrl = null;    // GitHub: the release page of a newer version
+  const current = chrome.runtime.getManifest().version;
 
   btn.addEventListener('click', async () => {
     if (readyVersion) {
@@ -98,10 +102,15 @@ async function initUpdates() {
       chrome.runtime.reload();
       return;
     }
+    if (downloadUrl) {
+      chrome.tabs.create({ url: downloadUrl });
+      window.close();
+      return;
+    }
     // don't touch / Chrome answers "no_update" for unpacked copies instead of
     // failing, which would falsely say "latest". Store installs get update_url.
     if (!chrome.runtime.getManifest().update_url) {
-      status.textContent = 'This copy is not from the Chrome Web Store, so it cannot check for updates.';
+      await checkGitHub();
       return;
     }
     btn.disabled = true;
@@ -126,6 +135,40 @@ async function initUpdates() {
       btn.disabled = false;
     }
   });
+
+  /**
+   * One request to GitHub's public API, only on this click: no key, no user
+   * data, nothing sent in the background. Unauthenticated calls are limited
+   * to 60 an hour per IP, which a click-only check never gets near.
+   */
+  async function checkGitHub() {
+    btn.disabled = true;
+    status.textContent = 'Checking GitHub...';
+    try {
+      const res = await fetch(RELEASES_API, {
+        headers: { Accept: 'application/vnd.github+json' },
+        cache: 'no-store',
+        credentials: 'omit',
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const release = await res.json();
+      const latest = String(release?.tag_name || '').replace(/^v/, '');
+      if (!AsideVersion.isPlain(latest) || !AsideVersion.isPlain(current)) throw new Error('bad version');
+      if (AsideVersion.compare(latest, current) > 0) {
+        // Only follow a link that stays inside this repo's releases.
+        downloadUrl = String(release.html_url || '').startsWith(`${RELEASES_URL}/`)
+          ? release.html_url : `${RELEASES_URL}/latest`;
+        label.textContent = `Download v${latest}`;
+        status.textContent = 'Unzip it over your current Aside folder, then click Reload in chrome://extensions. Do not remove Aside first: that deletes your keys and chats.';
+      } else {
+        status.textContent = `You're on the latest version (v${current}).`;
+      }
+    } catch {
+      status.textContent = 'Could not reach GitHub. Try again later.';
+    } finally {
+      btn.disabled = false;
+    }
+  }
 
   async function dismissUpdateNote() {
     note.hidden = true;
