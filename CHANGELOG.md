@@ -4,6 +4,23 @@ Newest first. Each version's section here becomes its GitHub release notes,
 so link with full URLs: relative links break on the release page.
 Model refreshes follow [docs/MONTHLY_UPDATE.md](https://github.com/Royc4515/Aside/blob/main/docs/MONTHLY_UPDATE.md).
 
+## 1.1.8 - 2026-11-25 · Author credit in settings
+
+### Added
+
+- **Author credit.** The settings page's side panel now says "Made by Roy
+  Carmelli" under the version, linking to the
+  [author's portfolio](https://roy-carmelli-portfolio.vercel.app/) in a new
+  tab. It is a plain link: no request, script or image from another host.
+- **Website link in Chrome.** The manifest's `homepage_url` points to the
+  [landing page](https://royc4515.github.io/Aside/), so `chrome://extensions`
+  shows a link to it.
+
+### Fixed
+
+- **Settings version label.** It was hardcoded to v1.0.0; it now reads the
+  real version from the manifest.
+
 ## 1.1.7 - 2026-11-24 · Automatic update check, weekly and after a failed answer
 
 ### Added
