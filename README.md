@@ -241,5 +241,5 @@ Contributions welcome - open an issue or PR.
 ---
 
 <div align="center">
-  <sub>Built with care. MIT licensed. © 2026 Roy Carmelli.</sub>
+  <sub>Built by <a href="https://roy-carmelli-portfolio.vercel.app/">Roy Carmelli</a> · <a href="https://www.linkedin.com/in/roy-carmelli">LinkedIn</a> · <a href="https://github.com/Royc4515">GitHub</a><br>MIT licensed. © 2026.</sub>
 </div>
