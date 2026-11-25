@@ -24,3 +24,11 @@ Key facts:
 - [GitHub repository](https://github.com/Royc4515/Aside): source code, README, MIT license
 - [Latest release](https://github.com/Royc4515/Aside/releases/latest): aside.zip download
 - [Architecture](https://github.com/Royc4515/Aside/blob/main/docs/ARCHITECTURE.md)
+
+## Author
+
+Aside is built and maintained by Roy Carmelli.
+
+- [Portfolio](https://roy-carmelli-portfolio.vercel.app/)
+- [LinkedIn](https://www.linkedin.com/in/roy-carmelli)
+- [GitHub profile](https://github.com/Royc4515)
