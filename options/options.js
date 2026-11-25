@@ -79,6 +79,9 @@ function applyTheme(theme) {
 }
 
 async function init() {
+  // Read from the manifest so the label can never go stale again (it said v1.0.0 through 1.1.7).
+  const versionEl = document.getElementById('side-version');
+  if (versionEl) versionEl.textContent = 'v' + chrome.runtime.getManifest().version;
   const stored = await Store.get(Store.SETTINGS_KEYS);
   state = {
     ...state,

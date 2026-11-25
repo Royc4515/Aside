@@ -3,9 +3,10 @@
   "name": "__MSG_ext_name__",
   "short_name": "Aside",
   "description": "__MSG_ext_description__",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "default_locale": "en",
   "minimum_chrome_version": "114",
+  "homepage_url": "https://royc4515.github.io/Aside/",
 
   "permissions": ["storage", "activeTab", "scripting", "tabs", "contextMenus"],
   "host_permissions": ["<all_urls>"],
