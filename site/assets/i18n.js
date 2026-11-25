@@ -185,6 +185,9 @@
       "footer.privacy": "Privacy",
       "footer.support": "Support",
       "footer.github": "GitHub",
+      "footer.builtBy": "Built by",
+      "footer.author": "Roy Carmelli",
+      "footer.linkedin": "LinkedIn",
     },
     he: {
       "nav.features": "פיצ׳רים",
@@ -361,6 +364,9 @@
       "footer.privacy": "פרטיות",
       "footer.support": "תמיכה",
       "footer.github": "GitHub",
+      "footer.builtBy": "נבנה על ידי",
+      "footer.author": "רועי כרמלי",
+      "footer.linkedin": "LinkedIn",
     },
   };
 

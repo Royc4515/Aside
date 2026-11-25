@@ -663,6 +663,9 @@ section { padding: 88px 0; }
   display: flex; justify-content: space-between; align-items: center;
   flex-wrap: wrap; gap: 16px;
 }
+.footer-credit { margin: 0; }
+.footer-credit a { color: var(--ink-2); font-weight: 500; }
+.footer-credit a:hover { color: var(--ink); }
 .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
 .footer-links a { color: var(--ink-3); }
 .footer-links a:hover { color: var(--ink); text-decoration: none; }
